@@ -12,9 +12,34 @@ from django.contrib import messages
 import json, datetime
 #import cachedb
 
-# TODO, check if session is valid everywhere!
-
 SESSION_NICKNAME = 'session_nickname'
+
+class auth():
+
+    def __call__(self, f):
+        """
+        If there are decorator arguments, __call__() is only called
+        once, as part of the decoration process! You can only give
+        it a single argument, which is the function object.
+        """
+        def authed_func(request, *args, **kargs):
+            nickname = request.session.get(SESSION_NICKNAME, False)
+
+            if not nickname:
+                return HttpResponseRedirect(rurl('wars:pick-name'))
+
+            try:
+                request.user = FSWUser.objects.get(nickname=nickname)
+                return f(request, *args, **kargs)
+            except FSWUser.DoesNotExist:
+                del request.session[SESSION_NICKNAME]
+                messages.add_message(request, messages.INFO, 'Please pick a username')
+                return HttpResponseRedirect(rurl('wars:pick-name'))
+
+        return authed_func
+
+
+
 
 #def pick_name(request):
 #    if SESSION_NICKNAME in request.session and cachedb.user_exists_p(request.session[SESSION_NICKNAME]):
@@ -44,7 +69,7 @@ def delete_users(request):
     FSWUser.objects.all().delete()
     return HttpResponseRedirect(rurl('frontpage'))
 
-
+@auth()
 def battle(request):
     return HttpResponse(str(request))
 
@@ -99,9 +124,10 @@ def pick_name(request):
             return HttpResponseRedirect(rurl('wars:pick-sounds'))
     return rtr('wars/pick_name.html')
 
+@auth()
 @csrf_exempt
 def pick_sounds(request):
-    nickname = request.SESSION[SESSION_NICKNAME]
+    nickname = request.session[SESSION_NICKNAME]
     form = PickSoundsForm()
     if request.method == 'POST':
         form = PickSoundsForm(request.POST)
