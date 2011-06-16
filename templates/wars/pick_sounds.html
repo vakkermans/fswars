@@ -1,61 +1,166 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
+{% load display_sound %}
 {% block head %}
-	{{ block.super }}
-	<style type="text/css">
-        .center {
-            overflow: auto;
-            position: relative;
-            float: left;
-            width: 800px;
-        }
-    </style>
-    <script type="text/javascript">
-    $(document).ready(function(){
-        // set API key
-    	apiKey = settings.apiKey;
-    	console.debug("key: " + apiKey); 
+{{ block.super }}
+<style type="text/css" media="all">
+    #picked_sounds
+    {
+        width: 450px;
+        overflow: hidden;
+        border: 1px solid black;
+        float:right;
+        padding: 5px;
+    }
 
-    	// create django object
-    	freesound = new Freesound(apiKey, true);
+    #picked_sounds .add
+    {
+        display: none;
+    }
+
+    #picked_sounds .remove
+    {
+        display: inline;
+    }
+
+    #search-results
+    {
+        width: 450px;
+        overflow: hidden;
+        border: 1px solid black;
+        float:left;
+        padding: 5px;
+    }
+
+    #search-results .add
+    {
+        display: inline;
+    }
+
+    #search-results .remove
+    {
+        display: none;
+    }
+</style>
+<script type="text/javascript">
+    var sources = [];
+	var num_sounds = 0;
+	var max_sounds = 1;
+	function search_sounds() {
+		if ($("search-q").length) {
+			var q = $("search-q").val();
+			var p = 1;
+			var f = "";
+			var s = "";
+			freesound.getSoundsFromQuery(q,p,f,s,displaySearchResults, errorSearch);
+		}
+	}
+	function displaySearchResults(soundCollection) {
+		$("#search-results").append("<br>* number of results: " + soundCollection.properties['num_results']);
+		$("#search-results").append("<br>* number of pages: " + soundCollection.properties['num_pages']);
+		$("#search-results").append("<br>* sounds:");
+		for (obj in soundCollection.properties['sounds']) {
+			$("#search-results").append("<br>--- " + obj + ": " + soundCollection.properties['sounds'][obj]['id'] + " - " + soundCollection.properties['sounds'][obj]['original_filename']);
+		}
+		 
+		sc = soundCollection;
+		// $("#respSearch").append('<br><br><button onclick="sc.previous(displaySearchResults);">previous</button><button onclick="sc.next(displaySearchResults);">next</button>')
+	}
+	function errorSearch() {
+	}
+    function saveSources()
+    {
+        $("#save-button").attr("disabled", "disabled");
+
+        $("#id_sources").val(sources.join(","))
+
+        $.post("{% url sound-edit-sources sound.user.username sound.id %}", $("#save-form").serialize(), function ()
+        {
+            $("#save-button").removeAttr("disabled");
+        });
+    }
+
+    function addSound(element, soundId)
+    {
+        if ($.inArray(soundId, sources) == -1)
+        {
+            sources.push(soundId);
+
+            $(element).closest("#search-results > div").clone().appendTo("#picked_sounds");
+
+            $("#id_sources").val(sources.join(","));
+        }
+    }
+
+    function removeSound(element, soundId)
+    {
+        var index = $.inArray(soundId, sources);
+
+        if (index != -1)
+        {
+            sources.splice(index, 1);
+
+            $(element).closest("#picked_sounds > div").remove();
+
+            $("#id_sources").val(sources.join(","));
+        }
+    }
+
+    $(function()
+    {
+        sources = $.map($("#id_sources").val().split(","), function (soundId) { return parseInt(soundId) });
+
+        $("#save-button").click(function ()
+        {
+            saveSources();
+            return false;
+        });
+
+        $("#search-button").click(function ()
+        {
+            $("#search-results").load("{% url sounds-search %}", $.param({"q": $("#search-q").val(), "ajax": 1}));
+            return false;
+        });
     });
-    function search_sound() {
-        if ($("search_txt").length > 0) {
-        	var q = $("search_txt").val();
-        	var p = 1;
-        	var f = "";
-        	var s = "";
+</script>
+{% endblock head %}
 
-        	freesound.getSoundsFromQuery(q,p,f,s,displaySearchResults, errorSearch);
-        }
-        
-    }
-    function displaySearchResults(soundCollection) {
-    	for (obj in soundCollection.properties['sounds']) {
-    		$("#sound_list").append("<li>" + obj + ": " + soundCollection.properties['sounds'][obj]['id'] + " - " + soundCollection.properties['sounds'][obj]['original_filename'] + "</li>");
-    	}
-    }
-    function errorSearch() {
-    }
-	</script>
-{% endblock %}
+{% block title %}Pick your sounds...{% endblock title %}
 
-{% block content %}
+{% block section_content %}
 
-<div class="center">
-	<div id="search_sounds">
-		<input id="search_txt" type="text">
-		<input id="search_btn" type="button" value="get!">
-	</div>
-	<div id="sound_list">
-		<ul>
-			
-		</ul>
-	</div>
-	
+<h2>Search sounds</h2>
+<p>
+</p>
+
+<form id="save-form">{% csrf_token %}
+    {{form.as_p}}
+    <p>
+    	<input type="text" name="q" id="search-q" size="45" /> 
+    	<input type="submit" name="submit" value="search sounds" onclick="search_sounds" id="search-button"/>
+    </p>
+    <p><input type="submit" name="save" value="save..." id="save-button"/></p>
+    <p>
+        <a href="{% url sound-edit sound.user.username sound.id %}">Go back to edit page</a>
+    </p>
+</form>
+
+<div id="search-results" class="sound_list_minimal">
+    <h3>Search results:</h3>
+    
 </div>
 
+<div id="picked_sounds" class="sound_list_minimal">
+    <h3>War files</h3>
+    <div>
+        <div class="sound_list_moderation">
+         	
+        </div>
+        <div>
+            <a class="add" onclick="addSound(this, {{source.id}})">Add</a>
+            <a class="remove" onclick="removeSound(this, {{source.id}})">Remove</a>
+        </div>
+    </div>
+</div>
 
-{% endblock %}
-
-
+{% endblock section_content %}
