@@ -123,7 +123,7 @@
 	            console.log("addSound");
 	            sounds.push(soundId);
 				// TODO: change id and remove onclick handler
-	            $(element).closest("#search-results > div").clone().attr("id",soundId+"_choose").attr("onclick", "removeSound(this,"+soundId+")'").appendTo("#picked_sounds");
+	            $(element).closest("#search-results > div").clone().attr("id",soundId+"_choose").appendTo("#picked_sounds");
 	
 	            $("#id_sources").val(sources.join(","));
 	        }
@@ -146,12 +146,6 @@
             //$("#id_sources").val(sources.join(","));
         }
     }
-    function sendSounds() {
-        console.log(sounds);
-    	$.post('sounds', {"sound_ids": sounds}, function(data) {
-			
-        });
-    }
 </script>
 {% endblock head %}
 
@@ -169,7 +163,6 @@
     	<!-- <input type="submit" name="submit" value="search sounds" onclick="search_sounds" id="search-button"/> -->
     	<a href="#" onclick="search_sounds()">Get!</a>
     </p>
-    <p><input type="submit" name="send" value="SEND!" id="send-button" onclick="sendSounds()"/></p>
 </div>
 
 <div id="search-results" class="sound_list_minimal">
@@ -186,7 +179,7 @@
     </div>
 </div>
 
- <form action="." method="POST">{% csrf_token %}
+ <form id="send_form" action="." method="POST">{% csrf_token %}
         {{ form.as_p }}
         <br>
         <input type="submit" value="Play!">
