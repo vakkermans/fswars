@@ -12,6 +12,8 @@ from django.contrib import messages
 import json, datetime
 #import cachedb
 
+# TODO, check if session is valid everywhere!
+
 SESSION_NICKNAME = 'session_nickname'
 
 #def pick_name(request):
@@ -37,6 +39,15 @@ SESSION_NICKNAME = 'session_nickname'
 #                cachedb.set_player(2, nickname)
 #            return HttpResponseRedirect(rurl('wars:pick-sounds'))
 #    return rtr('wars/pick_name.html')
+
+def delete_users(request):
+    FSWUser.objects.all().delete()
+    return HttpResponseRedirect(rurl('frontpage'))
+
+
+def battle(request):
+    return HttpResponse(str(request))
+
 
 def players_present():
     player1 = True if FSWUser.objects.filter(player_number=1).count() > 0 else False
@@ -90,10 +101,14 @@ def pick_name(request):
 
 @csrf_exempt
 def pick_sounds(request):
-    # username = request.SESSION['username']
+    nickname = request.SESSION[SESSION_NICKNAME]
+    form = PickSoundsForm()
     if request.method == 'POST':
-        print "post"
-        
-        return rtr('wars/pick_sounds.html')
-    else:
-        return rtr('wars/pick_sounds.html')
+        form = PickSoundsForm(request.POST)
+        if form.is_valid():
+            sound_id = int(form.cleaned_data['sound_ids'])
+            user = FSWUser.objects.get(nickname=nickname)
+            user.sounds = json.dumps([sound_id])
+            user.save()
+            return HttpResponseRedirect(rurl('wars:battle'))
+    return rtr('wars/pick_sounds.html')
