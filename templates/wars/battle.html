@@ -3,6 +3,7 @@
 {% block head %}
 	{{ block.super }}
 	<style type="text/css">
+        /*
         .p1 {
           overflow: auto;
           position: relative;
@@ -22,7 +23,9 @@
             float: left;
             width: 800px;
         }
+        */
     </style>
+     <link rel="stylesheet" type="text/css" href="/static_media/css/3-column-layout.css" />
     <script type="text/javascript">
     $(document).ready(function(){
     	apiKey = settings.apiKey;
@@ -50,14 +53,18 @@
 
 {% block content %}
 <div id="result"></div>
-<div class="center">
-	<div class="p1">
+<div class="content-container">
+	<div class="left">
 		<label for="sound_p1">Player 1</label>
-		<div id=sound_p1>{{p1_sound}}</div>
+		<div id="sound_p1">sound 1</div>
 	</div>
-	<div class="p2">
+	<div id="middle">
+		<label for="presets">Presets</label>
+		<div id="presets">presets</div>
+	</div>
+	<div class="right">
 		<label for="sound_p2">Player 2</label>
-		<div id=sound_p2>{{p2_sound}}</div>
+		<div id="sound_p2">sound 2</div>
 	</div>
 </div>
 <br /><br /><br /><a href="#" onclick="fight()">Fight!</a>
