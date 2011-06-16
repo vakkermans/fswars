@@ -15,9 +15,6 @@ from algorithms import algorithms
 SESSION_NICKNAME = 'session_nickname'
 
 
-
-
-
 class auth():
 
     def __call__(self, f):
@@ -82,6 +79,8 @@ def pick_sounds(request, battle_id):
             return HttpResponseRedirect(rurl('wars:wait-on-sounds', battle.id))
     return rtr('wars/pick_sounds.html')
 
+
+@auth()
 def battle(request, battle_id):
     return rtr('wars/battle.html')
 
