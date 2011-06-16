@@ -44,21 +44,42 @@ def init():
 
 
 def getSoundAnalysisData(id, filter):
-    s = Sound.get_sound(6)
+    s = Sound.get_sound(id)
+    
+    print "Sound " + str(id) + " " + s['preview-hq-mp3']
+    
     analysis = s.get_analysis(showall = True)
-    
     analysis = level_filter(analysis, filter)
-    
+
     return analysis
 
 
-LOUDNESS_DESCRIPTORS = [ 'lowlevel.average_loudness']
-RHYTHM_DESCRIPTORS = [ 'rhythm.beats_loudness.mean']
-TONALITY_DESCRIPTORS = [ 'tonal.key_strength']
+def computeBattle(id1, id2, descriptors):
+    
+    print "\n\n"
+    print "Battle: " + str(descriptors)
+    
+    as1 = getSoundAnalysisData(id1, descriptors)
+    as2 = getSoundAnalysisData(id2, descriptors)
+    
+    v1 = as1['lowlevel']['average_loudness']
+    v2 = as2['lowlevel']['average_loudness']
+    
+    if v1 > v2:
+        print "Sound " + str(id1) + " wins (" + str(v1) + " > " + str(v2) + ")" 
+    elif v1 == v2:
+        print "Tie (" + str(v1) + " = " + str(v2) + ")"
+    else:
+        print "Sound " + str(id2) + " wins (" + str(v2) + " > " + str(v1) + ")"
+
+    print "\n\n"
+LOUDNESS = [ 'lowlevel.average_loudness']
+RHYTHM = [ 'rhythm.beats_loudness.mean']
+TONALITY = [ 'tonal.key_strength']
 
 
 
 if __name__ == '__main__':
     print "Algortithms for fsWars\n---------------------\n"
     init()
-    print getSoundAnalysisData(6,LOUDNESS_DESCRIPTORS)
+    computeBattle(6,7,LOUDNESS)
