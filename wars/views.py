@@ -6,6 +6,7 @@ from django.http import HttpResponseForbidden, HttpResponse, \
     HttpResponseNotAllowed, HttpResponseRedirect
 from utils.web import rtr, rurl
 from forms import *
+from django.views.decorators.csrf import csrf_exempt
 from models import *
 from django.contrib import messages
 import json, datetime
@@ -41,6 +42,7 @@ def players_present():
     player1 = True if FSWUser.objects.filter(player_number=1).count() > 0 else False
     player2 = True if FSWUser.objects.filter(player_number=2).count() > 0 else False
     return player1, player2
+
 
 def pick_name(request):
     if SESSION_NICKNAME in request.session:
@@ -86,6 +88,12 @@ def pick_name(request):
             return HttpResponseRedirect(rurl('wars:pick-sounds'))
     return rtr('wars/pick_name.html')
 
-
+@csrf_exempt
 def pick_sounds(request):
-    return rtr('wars/pick_sounds.html')
+    # username = request.SESSION['username']
+    if request.method == 'POST':
+        print "post"
+        
+        return rtr('wars/pick_sounds.html')
+    else:
+        return rtr('wars/pick_sounds.html')
