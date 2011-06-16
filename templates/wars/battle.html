@@ -1,4 +1,4 @@
-{% extends base.html %}
+{% extends 'base.html' %}
 
 {% block head %}
 	{{ block.super }}
@@ -7,13 +7,13 @@
           overflow: auto;
           position: relative;
           float: left;
-          width: 400px;
+          width: 250px;
           margin-right: 0px;
         }
         .p2 {
             position: relative;
             float: left;
-            width: 400px;
+            width: 250px;
             margin-top: 0px;
         }
         .center {
@@ -26,23 +26,41 @@
     <script type="text/javascript">
     $(document).ready(function(){
     	apiKey = settings.apiKey;
-    	console.debug("key: " + apiKey); 
+    	if(apiKey == "")
+    	{
+    		alert("no KEY!"); 
+    	}			
+    	else 
+    	{				
+    		/*======= freesound object ========*/
+    		//creating freesound object	
+    		freesound = new Freesound(apiKey, true);
+    	} 
     });
+    function fight() {
+        // TODO: implement preset
+        console.log($("#sound_p1").val());
+		var url = "/wars/compute/{{p1_sound}}/{{p2_sound}}/loudness/"; 
+		$.get(url, function(data) {
+			$("#result").append(data);
+		});
+    }
 	</script>
 {% endblock %}
 
 {% block content %}
-
+<div id="result"></div>
 <div class="center">
 	<div class="p1">
-		<input id="p1_search_txt" type="text">
-		<input id="p1_">
+		<label for="sound_p1">Player 1</label>
+		<div id=sound_p1>{{p1_sound}}</div>
 	</div>
 	<div class="p2">
-		<input id="p2_search_txt" type="text">
+		<label for="sound_p2">Player 2</label>
+		<div id=sound_p2>{{p2_sound}}</div>
 	</div>
 </div>
-
+<br /><br /><br /><a href="#" onclick="fight()">Fight!</a>
 
 {% endblock %}
 

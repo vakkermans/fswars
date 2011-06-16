@@ -123,7 +123,7 @@
 	            console.log("addSound");
 	            sounds.push(soundId);
 				// TODO: change id and remove onclick handler
-	            $(element).closest("#search-results > div").clone().attr("id",soundId+"_choose").appendTo("#picked_sounds");
+	            $(element).closest("#search-results > div").clone().attr("id",soundId+"_choose").attr("onclick", "removeSound(this," +soundId+ ")").appendTo("#picked_sounds");
 	
 	            $("#id_sources").val(sources.join(","));
 	        }
@@ -136,7 +136,7 @@
     function removeSound(element, soundId)
     {
         var index = $.inArray(soundId, sounds);
-
+        // $(element).prev().attr("id)
         if (index != -1)
         {
             sources.splice(index, 1);
@@ -174,7 +174,7 @@
     <h3>War files</h3>
     <div>
         <div>
-            <a class="remove" onclick="removeSound(this, {{source.id}})">Remove</a>
+            <a class="remove" onclick="removeSound(this)">Remove</a>
         </div>
     </div>
 </div>
