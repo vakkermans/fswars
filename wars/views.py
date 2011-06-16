@@ -80,6 +80,9 @@ def pick_sounds(request, battle_id):
             return HttpResponseRedirect(rurl('wars:wait-on-sounds'))
     return rtr('wars/pick_sounds.html')
 
+def battle(request, battle_id):
+    return rtr('wars/battle.html')
+
 
 
 def compute(request, id1, id2, preset):
