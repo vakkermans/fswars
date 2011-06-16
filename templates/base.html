@@ -3,25 +3,21 @@
 
     <head>
         {% block head %}
+            <title>FSWars - {% block title %}Freesound is your battleground!{% endblock %}</title>
+
             <link href='http://fonts.googleapis.com/css?family=Quattrocento' rel='stylesheet' type='text/css'>
             <link REL="SHORTCUT ICON" HREF="{{STATIC_URL}}favicon.ico">
-            <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-            <meta name="FSWars" content="Freesound is your battleground." />
             <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/all.css" />
             <!--[if IE 6]><link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/ie6.css" /><![endif]-->
-            <title>FSWars - {% block title %}Freesound is your battleground{% endblock %}</title>
-            <!--  
-            <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js" type="text/javascript"></script>
-            -->
-            <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js" type="text/javascript"></script>
-            <script src="{{ STATIC_URL }}js/fswars.js" type="text/javascript"></script>
-            
-            <script type="text/javascript" src="jquery.js"></script>
-			<script type="text/javascript" src="jquery-jsonp.js"></script>
-			<script type="text/javascript" src="http://tabasco.upf.edu/media/js/freesound-javascript/freesoundLib.js"></script>
-			<!-- Chrome and Firefox need "hosted" version of freesoundLib.js, Safari also works with local freesoundLib.js -->
-			<!-- script type="text/javascript" src="freesoundLib.js"></script -->
-			<script type="text/javascript" src="settings.js"></script>
+
+            <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+            <meta name="FSWars" content="Freesound is your battleground." />
+
+            <script type="text/javascript" src="{{ STATIC_URL }}js/fswars.js" type="text/javascript"></script>
+            <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.js"></script>
+            <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-jsonp.js"></script>
+            <script type="text/javascript" src="{{ STATIC_URL }}js/settings.js"></script>
+            <script type="text/javascript" src="http://tabasco.upf.edu/media/js/freesound-javascript/freesoundLib.js"></script>
         {% endblock %}
     </head>
 
