@@ -102,22 +102,21 @@ def compute(request, id1, id2, preset):
                                                             algorithms.ALGORITHM_CLASSES[ps])))
 
 
-#@auth()
-#def battle(request):
-#    algorithms.init()
-#    user = FSWUser.objects.get(nickname = request.session[SESSION_NICKNAME])
-#    player1 = FSWUser.objects.get(player_number=1)
-#    player2 = FSWUser.objects.get(player_number=2)
-#    p1_sound = json.loads(player1.sounds)[0]
-#    p2_sound = json.loads(player2.sounds)[0]
-#
-#    return rtr('wars/battle.html')
+@auth()
+def fight(request, battle_id, id1, id2, preset):
+    battle = get_object_or_404(Battle, id=battle_id)
+    ps = preset.upper()
+    if ps not in algorithms.ALGORITHM_CLASSES:
+        print 'ARG, not a valid preset'
+    battle_result = algorithms.computeBattle(int(id1), int(id2), algorithms.ALGORITHM_CLASSES[ps])
+    history = json.loads(battle.history) if battle.history else []
+    history.append([id1, id2, ps, battle_result['winner'], battle_result['number']])
+    battle.history = json.dumps(history)
+    # N.B. player1 always starts! 1-indexed, so 1 or 2
+    battle.turn_owner = 2 if len(history) % 2 == 1 else 1
+    battle.save()
+    return HttpResponse(battle.do_json())
 
-
-#def players_present():
-#    player1 = True if FSWUser.objects.filter(player_number=1).count() > 0 else False
-#    player2 = True if FSWUser.objects.filter(player_number=2).count() > 0 else False
-#    return player1, player2
 
 
 

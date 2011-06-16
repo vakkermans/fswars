@@ -23,8 +23,11 @@ urlpatterns = patterns('',
         wait_on_sounds,
         name='wait-on-sounds'),
 
-    url(r'^compute/(?P<id1>\d+)/(?P<id2>\d+)/(?P<preset>\w+)/$',
-        compute,
-        name='compute'),
+#    url(r'^compute/(?P<id1>\d+)/(?P<id2>\d+)/(?P<preset>\w+)/$',
+#        compute,
+#        name='compute'),
 
+    url(r'^battle/(?P<battle_id>\d+)/fight/(?P<id1>\d+)/(?P<id2>\d+)/(?P<preset>\w+)/$',
+        fight,
+        name='fight'),
 )
