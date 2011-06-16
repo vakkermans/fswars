@@ -6,9 +6,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
 
-    url(r'^$', direct_to_template, {'template': 'frontpage.html'}, name='frontpage'),
-
-    url(r'^wars/', include('wars.urls', namespace='wars')),
+    url(r'', include('wars.urls', namespace='wars')),
 
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', include(admin.site.urls)),
@@ -21,4 +19,4 @@ if settings.DEBUG:
         (r'^%s/(?P<path>.*)$' % settings.MEDIA_URL.strip('/'), 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
 
     )
-    
+

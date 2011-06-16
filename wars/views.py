@@ -9,11 +9,14 @@ from forms import *
 from django.views.decorators.csrf import csrf_exempt
 from models import *
 from django.contrib import messages
-import json, datetime
-#import cachedb
+import json
 from algorithms import algorithms
 
 SESSION_NICKNAME = 'session_nickname'
+
+
+
+
 
 class auth():
 
@@ -27,19 +30,37 @@ class auth():
             nickname = request.session.get(SESSION_NICKNAME, False)
 
             if not nickname:
-                return HttpResponseRedirect(rurl('wars:pick-name'))
+                return HttpResponseRedirect(rurl('wars:frontpage'))
 
-            try:
-                request.user = FSWUser.objects.get(nickname=nickname)
-                return f(request, *args, **kargs)
-            except FSWUser.DoesNotExist:
-                del request.session[SESSION_NICKNAME]
-                messages.add_message(request, messages.INFO, 'Please pick a username')
-                return HttpResponseRedirect(rurl('wars:pick-name'))
+            request.user = nickname
+            return f(request, *args, **kargs)
 
         return authed_func
 
 
+def frontpage(request):
+    form = PickNameForm()
+    if request.method == 'POST':
+        form = PickNameForm(request.POST)
+        if form.is_valid():
+            nickname = form.cleaned_data['nickname']
+            request.session[SESSION_NICKNAME] = nickname
+            try:
+                battle = Battle.objects.get(player2=None)
+                battle.player2 = nickname
+            except Battle.DoesNotExist:
+                battle = Battle(player1=nickname)
+                battle.save()
+            return HttpResponseRedirect(rurl('wait-on-player', battle.id))
+    return rtr('wars/frontpage.html')
+
+
+@auth()
+def wait_on_player(request, battle_id):
+    battle = get_object_or_404(Battle, id=battle_id)
+    if battle.status_players():
+        return HttpResponseRedirect(rurl('pick-sounds', battle.id))
+    return rtr('wars/wait_on_player.html')
 
 
 #def pick_name(request):
@@ -96,7 +117,7 @@ def battle(request):
     player2 = FSWUser.objects.get(player_number=2)
     p1_sound = json.loads(player1.sounds)[0]
     p2_sound = json.loads(player2.sounds)[0]
-    
+
     return rtr('wars/battle.html')
 
 
