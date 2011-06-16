@@ -12,7 +12,7 @@ def pick_name(request):
     if request.method == 'POST':
         form = PickNameForm(request.POST)
         if form.is_valid():
-            print HttpResponseRedirect(rurl('wars:pick-sound'))
+            return HttpResponseRedirect(rurl('wars:pick-sounds'))
     return rtr('wars/pick_name.html')
 
 def pick_sounds(request):
