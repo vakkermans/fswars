@@ -1,10 +1,12 @@
 from freesound_python import *
-import sys
-import os
-from algorithms_settings import key
+from api_key import key
+#from algorithms_settings import ALGORITHM_CLASSES
 import random
 import webbrowser
-
+import math
+import numpy
+import sys
+import os
 
 
 # UTILS
@@ -74,12 +76,15 @@ def templateAlgorithm(analysis1, analysis2):
         return 0, value1, value2 # Tie
 
 
-def brightness1Algorithm(analysis1, analysis2):
+def brightnessAlgorithm(analysis1, analysis2):
     b1 = analysis1['lowlevel']['spectral_centroid']['mean']
     b2 = analysis2['lowlevel']['spectral_centroid']['mean']
     
     value1 = b1
     value2 = b2
+    
+    if math.fabs(value1-value2) < 0.075 :
+        value2 = value1 # Make them tie
     
     if value1 > value2:
         return 1, value1, value2 # sound 1 wins
@@ -96,20 +101,8 @@ def brightness2Algorithm(analysis1, analysis2):
     value1 = b1
     value2 = b2
     
-    if value1 > value2:
-        return 1, value1, value2 # sound 1 wins
-    elif value1 < value2:
-        return 2, value1, value2 # Sound 2 wins
-    else:
-        return 0, value1, value2 # Tie
-
-
-def darkness1Algorithm(analysis1, analysis2):
-    d1 = analysis1['highlevel']['timbre']['all']['dark']
-    d2 = analysis2['highlevel']['timbre']['all']['dark']
-    
-    value1 = d1
-    value2 = d2
+    if math.fabs(value1-value2) < 0.075 :
+        value2 = value1 # Make them tie
     
     if value1 > value2:
         return 1, value1, value2 # sound 1 wins
@@ -118,7 +111,8 @@ def darkness1Algorithm(analysis1, analysis2):
     else:
         return 0, value1, value2 # Tie
 
-def noisiness1Algorithm(analysis1, analysis2):
+
+def noisinessAlgorithm(analysis1, analysis2):
     n1 = analysis1['lowlevel']['spectral_flatness_db']['mean']
     n2 = analysis2['lowlevel']['spectral_flatness_db']['mean']
     
@@ -133,12 +127,73 @@ def noisiness1Algorithm(analysis1, analysis2):
         return 0, value1, value2 # Tie
 
 
+def tonalAlgorithm(analysis1, analysis2):
+    n1 = analysis1['tonal']['key_strength']
+    n2 = analysis2['tonal']['key_strength']
+    
+    value1 = n1
+    value2 = n2
+    
+    if math.fabs(value1-value2) < 0.075 :
+        value2 = value1 # Make them tie
+    
+    if value1 > value2:
+        return 1, value1, value2 # sound 1 wins
+    elif value1 < value2:
+        return 2, value1, value2 # Sound 2 wins
+    else:
+        return 0, value1, value2 # Tie
+
+
+def loudnessAlgorithm(analysis1, analysis2):
+
+   loudness1 = analysis1['lowlevel']['average_loudness']
+   loudness2 = analysis2['lowlevel']['average_loudness']
+   midhigh1 = analysis1['lowlevel']['spectral_energyband_middle_high']['mean']
+   midhigh2 = analysis2['lowlevel']['spectral_energyband_middle_high']['mean']
+   
+   value1 = loudness1*midhigh1
+   value2 = loudness2*midhigh2
+   
+   if value1 > value2:
+       return 1, value1, value2 # sound 1 wins
+   elif value1 < value2:
+       return 2, value1, value2 # Sound 2 wins
+   else:
+       return 0, value1, value2 # Tie
+   
+
+def rhythmRegularityAlgorithm(analysis1, analysis2):
+   b1 = analysis1['rhythm']['bpm_estimates']
+   b2 = analysis2['rhythm']['bpm_estimates']
+   
+   value1 = numpy.std(b1)
+   value2 = numpy.std(b2)
+
+   if abs(value1-value2)<0.05:
+      value1 = -analysis1['rhythm']['beats_loudness']['mean']
+      value2 = -analysis2['rhythm']['beats_loudness']['mean']
+
+   
+   if value1 < value2:
+       return 1, value1, value2 # sound 1 wins
+   elif value1 > value2:
+       return 2, value1, value2 # Sound 2 wins
+   else:
+       return 0, value1, value2 # Tie
+
+
+ALGORITHM_CLASSES = { 'LOUDNESS': loudnessAlgorithm,
+                      'BRIGHTNESS': brightness2Algorithm,
+                      'TONAL': tonalAlgorithm,
+                      'NOISINESS': noisinessAlgorithm,
+                      'RHYTHM': rhythmRegularityAlgorithm
+                    }
 
 if __name__ == '__main__':
     print "Algortithms for fsWars\n---------------------\n"
     init()
-    
     id1 = random_id()
     id2 = random_id()
     
-    computeBattle(id1,id2,noisiness1Algorithm)
+    computeBattle(id1,id2, ALGORITHM_CLASSES['RHYTHM'] )
