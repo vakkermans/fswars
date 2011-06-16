@@ -38,6 +38,11 @@ SESSION_NICKNAME = 'session_nickname'
 #            return HttpResponseRedirect(rurl('wars:pick-sounds'))
 #    return rtr('wars/pick_name.html')
 
+def delete_users(request):
+    FSWUser.objects.all().delete()
+    return HttpResponseRedirect(rurl('frontpage'))
+
+
 def players_present():
     player1 = True if FSWUser.objects.filter(player_number=1).count() > 0 else False
     player2 = True if FSWUser.objects.filter(player_number=2).count() > 0 else False
@@ -91,9 +96,10 @@ def pick_name(request):
 @csrf_exempt
 def pick_sounds(request):
     # username = request.SESSION['username']
+    form = PickSoundsForm()
     if request.method == 'POST':
         print "post"
-        
+
         return rtr('wars/pick_sounds.html')
-    else:
-        return rtr('wars/pick_sounds.html')
+
+    return rtr('wars/pick_sounds.html')

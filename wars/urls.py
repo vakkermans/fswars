@@ -11,4 +11,10 @@ urlpatterns = patterns('',
         pick_sounds,
         name='pick-sounds'),
 
+    url(r'^delete_users/$',
+        delete_users,
+        name='delete-users'),
+
+
+
 )
