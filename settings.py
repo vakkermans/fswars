@@ -79,6 +79,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
     'wars',
+    'superuser', # this prevents a superuser to be created each time
 )
 
 # A sample logging configuration. The only tangible logging
@@ -104,4 +105,9 @@ LOGGING = {
     }
 }
 
-print STATIC_ROOT, STATIC_URL
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
