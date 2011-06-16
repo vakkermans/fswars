@@ -19,7 +19,7 @@ urlpatterns = patterns('',
         battle,
         name='battle'),
 
-    url(r'^compute/(?P<sound_id_pl1>\d+)/(?P<sound_id_pl2>\d+)/(?P<preset>\w+)/$',
+    url(r'^compute/(?P<id1>\d+)/(?P<id2>\d+)/(?P<preset>\w+)/$',
         compute,
         name='compute'),
 
