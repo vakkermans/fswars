@@ -16,7 +16,7 @@ urlpatterns = patterns('',
         name='pick-sounds'),
         
     url(r'^battle/(?P<battle_id>\d+)/$',
-        pick_sounds,
+        battle,
         name='battle'),
 
 #    url(r'^battle/$',
