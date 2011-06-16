@@ -44,14 +44,15 @@ def frontpage(request):
         form = PickNameForm(request.POST)
         if form.is_valid():
             nickname = form.cleaned_data['nickname']
-            request.session[SESSION_NICKNAME] = nickname
             try:
                 battle = Battle.objects.get(player2__isnull=True)
+                nickname = nickname+'2' if battle.player1 == nickname else nickname
                 battle.player2 = nickname
                 battle.save()
             except Battle.DoesNotExist:
                 battle = Battle(player1=nickname)
                 battle.save()
+            request.session[SESSION_NICKNAME] = nickname
             return HttpResponseRedirect(rurl('wars:wait-on-player', battle.id))
     return rtr('wars/frontpage.html')
 
@@ -72,15 +73,22 @@ def pick_sounds(request, battle_id):
     if request.method == 'POST':
         form = PickSoundsForm(request.POST)
         if form.is_valid():
-            sound_id = int(form.cleaned_data['sound_ids'])
+            sound_ids = form.cleaned_data.get('sound_ids',[])
             if battle.player1 == request.user:
-                battle.player1_sounds = [sound_id]
+                battle.player1_sounds = json.dumps(sound_ids)
             else:
-                battle.player2_sounds = [sound_id]
+                battle.player2_sounds = json.dumps(sound_ids)
             battle.save()
-            return HttpResponseRedirect(rurl('wars:wait-on-sounds'))
+            return HttpResponseRedirect(rurl('wars:wait-on-sounds', battle.id))
     return rtr('wars/pick_sounds.html')
 
+
+@auth()
+def wait_on_sounds(request, battle_id):
+    battle = get_object_or_404(Battle, id=battle_id)
+    if battle.status_sounds():
+        return HttpResponseRedirect(rurl('wars:battle', battle.id))
+    return rtr('wars/wait_on_sounds.html')
 
 
 def compute(request, id1, id2, preset):
