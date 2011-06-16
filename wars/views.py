@@ -63,43 +63,25 @@ def wait_on_player(request, battle_id):
     return rtr('wars/wait_on_player.html')
 
 
-#def pick_name(request):
-#    if SESSION_NICKNAME in request.session and cachedb.user_exists_p(request.session[SESSION_NICKNAME]):
-#        if cachedb.player_present(1) and cachedb.player_present(2):
-#            messages.add_message(request, messages.INFO, 'Already 2 players playing.')
-#            return rtr('wars/pick_name.html')
-#        else:
-#            return HttpResponseRedirect(rurl('wars:pick-sounds'))
-#    form = PickNameForm()
-#    if request.method == 'POST':
-#        form = PickNameForm(request.POST)
-#        if form.is_valid():
-#            nickname = form.cleaned_data['nickname']
-#            if cachedb.user_exists_p(nickname):
-#                messages.add_message(request, messages.INFO, 'Pick another nickname, this one is already taken.')
-#                return rtr('wars/pick_name.html')
-#            request.session[SESSION_NICKNAME] = form.cleaned_data['nickname']
-#            cachedb.add_user(nickname)
-#            if cachedb.player_present(1):
-#                cachedb.set_player(1, nickname)
-#            else:
-#                cachedb.set_player(2, nickname)
-#            return HttpResponseRedirect(rurl('wars:pick-sounds'))
-#    return rtr('wars/pick_name.html')
-
-def delete_users(request):
-    FSWUser.objects.all().delete()
-    return HttpResponseRedirect(rurl('frontpage'))
-
 @auth()
-def waiting_queue(request):
-    player1, player2 = players_present()
-    if player1 and player2:
-        return HttpResponseRedirect(rurl('wars:battle'))
-    else:
-        return rtr('wars/queue.html')
+@csrf_exempt
+def pick_sounds(request, battle_id):
+    battle = get_object_or_404(Battle, id=battle_id)
+    form = PickSoundsForm()
+    if request.method == 'POST':
+        form = PickSoundsForm(request.POST)
+        if form.is_valid():
+            sound_id = int(form.cleaned_data['sound_ids'])
+            if battle.player1 == request.user:
+                battle.player1_sounds = [sound_id]
+            else:
+                battle.player2_sounds = [sound_id]
+            battle.save()
+            return HttpResponseRedirect(rurl('wars:wait-on-sounds'))
+    return rtr('wars/pick_sounds.html')
 
-@auth()
+
+
 def compute(request, id1, id2, preset):
     ps = preset.upper()
     if ps not in algorithms.ALGORITHM_CLASSES:
@@ -109,79 +91,22 @@ def compute(request, id1, id2, preset):
                                                             algorithms.ALGORITHM_CLASSES[ps])))
 
 
-@auth()
-def battle(request):
-    algorithms.init()
-    user = FSWUser.objects.get(nickname = request.session[SESSION_NICKNAME])
-    player1 = FSWUser.objects.get(player_number=1)
-    player2 = FSWUser.objects.get(player_number=2)
-    p1_sound = json.loads(player1.sounds)[0]
-    p2_sound = json.loads(player2.sounds)[0]
-
-    return rtr('wars/battle.html')
-
-
-def players_present():
-    player1 = True if FSWUser.objects.filter(player_number=1).count() > 0 else False
-    player2 = True if FSWUser.objects.filter(player_number=2).count() > 0 else False
-    return player1, player2
+#@auth()
+#def battle(request):
+#    algorithms.init()
+#    user = FSWUser.objects.get(nickname = request.session[SESSION_NICKNAME])
+#    player1 = FSWUser.objects.get(player_number=1)
+#    player2 = FSWUser.objects.get(player_number=2)
+#    p1_sound = json.loads(player1.sounds)[0]
+#    p2_sound = json.loads(player2.sounds)[0]
+#
+#    return rtr('wars/battle.html')
 
 
-def pick_name(request):
-    if SESSION_NICKNAME in request.session:
-        # check if user is playing
-        try:
-            user = FSWUser.objects.get(nickname = request.session[SESSION_NICKNAME])
-            if user.player_number != 0:
-                user.player_number = 0
-                user.save()
-            player1, player2 = players_present()
-            if player1 and player2:
-                messages.add_message(request, messages.INFO, 'There are already 2 players.')
-                return rtr('wars/pick_name.html')
-            user.player_number = (1 if player2 else 2)
-            user.save()
-            return HttpResponseRedirect(rurl('wars:pick-sounds'))
-        except FSWUser.DoesNotExist:
-            del request.session[SESSION_NICKNAME]
+#def players_present():
+#    player1 = True if FSWUser.objects.filter(player_number=1).count() > 0 else False
+#    player2 = True if FSWUser.objects.filter(player_number=2).count() > 0 else False
+#    return player1, player2
 
-    # user doens't have session
-    form = PickNameForm()
-    if request.method == 'POST':
-        form = PickNameForm(request.POST)
-        if form.is_valid():
-            nickname = form.cleaned_data['nickname']
-            # if user already exists
-            user, created = FSWUser.objects.get_or_create(nickname=nickname)
-            #nickname = request.session[SESSION_NICKNAME]
-            if not created:
-                if datetime.datetime.now() - user.modified > datetime.timedelta(days=1):
-                    pass
-                else:
-                    messages.add_message(request, messages.INFO, 'Pick another nickname, this one is already taken.')
-                    return rtr('wars/pick_name.html')
-            request.session[SESSION_NICKNAME] = nickname
-            # N.B.! copied from above, DRY it out
-            player1, player2 = players_present()
-            if player1 and player2:
-                messages.add_message(request, messages.INFO, 'There are already 2 players.')
-                return rtr('wars/pick_name.html')
-            user.player_number = (1 if player2 else 2)
-            user.save()
-            return HttpResponseRedirect(rurl('wars:pick-sounds'))
-    return rtr('wars/pick_name.html')
 
-@auth()
-@csrf_exempt
-def pick_sounds(request):
-    nickname = request.session[SESSION_NICKNAME]
-    form = PickSoundsForm()
-    if request.method == 'POST':
-        form = PickSoundsForm(request.POST)
-        if form.is_valid():
-            sound_id = int(form.cleaned_data['sound_ids'])
-            user = FSWUser.objects.get(nickname=nickname)
-            user.sounds = json.dumps([sound_id])
-            user.save()
-            return HttpResponseRedirect(rurl('wars:queue'))
-    return rtr('wars/pick_sounds.html')
+
