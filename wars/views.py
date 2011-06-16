@@ -90,7 +90,14 @@ def compute(request, id1, id2, preset):
 
 @auth()
 def battle(request):
-    return HttpResponse(str(request))
+    algorithms.init()
+    user = FSWUser.objects.get(nickname = request.session[SESSION_NICKNAME])
+    player1 = FSWUser.objects.get(player_number=1)
+    player2 = FSWUser.objects.get(player_number=2)
+    p1_sound = json.loads(player1.sounds)[0]
+    p2_sound = json.loads(player2.sounds)[0]
+    
+    return rtr('wars/battle.html')
 
 
 def players_present():

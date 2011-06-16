@@ -1,4 +1,8 @@
-from freesound_python import *
+try:
+    from freesound_python import *
+except ImportError:
+    from freesound import *
+    
 from api_key import key
 import random
 import webbrowser
@@ -203,7 +207,7 @@ def rhythmRegularityAlgorithm(analysis1, analysis2):
 
 # BATTLES
 
-TIE_THRESHOLD = 0.075
+TIE_THRESHOLD = 0.0
 ALGORITHM_CLASSES = { 'LOUDNESS': loudnessAlgorithm,
                       'BRIGHTNESS': brightness2Algorithm,
                       'TONAL': tonalAlgorithm,
