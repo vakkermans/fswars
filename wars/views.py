@@ -48,14 +48,15 @@ def pick_name(request):
         try:
             user = FSWUser.objects.get(nickname = request.session[SESSION_NICKNAME])
             if user.player_number != 0:
-                return HttpResponseRedirect(rurl('wars:pick-sounds'))
-            else:
-                player1, player2 = players_present()
-                if player1 and player2:
-                    messages.add_message(request, messages.INFO, 'There are already 2 players.')
-                    return rtr('wars/pick_name.html')
-                user.player_number = (1 if player2 else 2)
+                user.player_number = 0
                 user.save()
+            player1, player2 = players_present()
+            if player1 and player2:
+                messages.add_message(request, messages.INFO, 'There are already 2 players.')
+                return rtr('wars/pick_name.html')
+            user.player_number = (1 if player2 else 2)
+            user.save()
+            return HttpResponseRedirect(rurl('wars:pick-sounds'))
         except FSWUser.DoesNotExist:
             del request.session[SESSION_NICKNAME]
 

@@ -8,4 +8,3 @@ class FSWUser(models.Model):
     sounds              = models.CharField(max_length=1024, db_index=False)
     player_number       = models.IntegerField(default=0)
     modified            = models.DateTimeField(auto_now=True)
-
