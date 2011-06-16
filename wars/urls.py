@@ -19,6 +19,10 @@ urlpatterns = patterns('',
         battle,
         name='battle'),
 
+    url(r'^compute/(?P<sound_id_pl1>\d+)/(?P<sound_id_pl2>\d+)/(?P<preset>\w+)/$',
+        compute,
+        name='compute'),
+
     url(r'^delete_users/$',
         delete_users,
         name='delete-users'),
