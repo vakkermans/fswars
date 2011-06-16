@@ -51,7 +51,7 @@ def frontpage(request):
             except Battle.DoesNotExist:
                 battle = Battle(player1=nickname)
                 battle.save()
-            return HttpResponseRedirect(rurl('wait-on-player', battle.id))
+            return HttpResponseRedirect(rurl('wars:wait-on-player', battle.id))
     return rtr('wars/frontpage.html')
 
 
