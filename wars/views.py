@@ -46,8 +46,9 @@ def frontpage(request):
             nickname = form.cleaned_data['nickname']
             request.session[SESSION_NICKNAME] = nickname
             try:
-                battle = Battle.objects.get(player2=None)
+                battle = Battle.objects.get(player2__isnull=True)
                 battle.player2 = nickname
+                battle.save()
             except Battle.DoesNotExist:
                 battle = Battle(player1=nickname)
                 battle.save()
@@ -59,7 +60,7 @@ def frontpage(request):
 def wait_on_player(request, battle_id):
     battle = get_object_or_404(Battle, id=battle_id)
     if battle.status_players():
-        return HttpResponseRedirect(rurl('pick-sounds', battle.id))
+        return HttpResponseRedirect(rurl('wars:pick-sounds', battle.id))
     return rtr('wars/wait_on_player.html')
 
 
