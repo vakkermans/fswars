@@ -83,7 +83,7 @@ def battle(request):
     player1 = FSWUser.objects.get(player_number=1)
     player2 = FSWUser.objects.get(player_number=2)
     
-    return HttpResponse(str(request))
+    return rtr('wars/battle.html')
 
 
 def players_present():
