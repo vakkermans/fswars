@@ -15,7 +15,7 @@ class Battle(models.Model):
     player2             = models.CharField(max_length=32, null=True)
     player1_sounds      = models.CharField(max_length=512, null=True) # json dumped list of ints
     player2_sounds      = models.CharField(max_length=512, null=True)
-    turn_owner          = models.IntegerField()
+    turn_owner          = models.IntegerField(default=1)
     history             = models.CharField(max_length=2048) # json dumped history
     finished            = models.BooleanField()
 

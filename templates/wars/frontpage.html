@@ -5,7 +5,11 @@
     <center>
         <h1>Freesound is your Battleground</h1>
         <p>explanation
-        <p><a href="{% url wars:pick-name %}">Play!</a>
+        <form action="." method="POST">{% csrf_token %}
+            {{ form.as_p }}
+            <br>
+            <input type="submit" value="Play!">
+        </form>
     </center>
 
 {% endblock content %}
