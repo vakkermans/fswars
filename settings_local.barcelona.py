@@ -5,7 +5,7 @@ DATA_DIR = '/home/vakkermans/data/fswars/'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(DATA_DIR, 'twobbler-server.db'),
+        'NAME': os.path.join(DATA_DIR, 'fswars.db'),
         'USER': '',
         'PASSWORD': '',
         'HOST': '',

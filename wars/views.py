@@ -70,6 +70,14 @@ def delete_users(request):
     return HttpResponseRedirect(rurl('frontpage'))
 
 @auth()
+def waiting_queue(request):
+    player1, player2 = players_present()
+    if player1 and player2:
+        return HttpResponseRedirect(rurl('wars:battle'))
+    else:
+        return rtr('wars/queue.html')
+
+@auth()
 def battle(request):
     return HttpResponse(str(request))
 
@@ -136,5 +144,5 @@ def pick_sounds(request):
             user = FSWUser.objects.get(nickname=nickname)
             user.sounds = json.dumps([sound_id])
             user.save()
-            return HttpResponseRedirect(rurl('wars:battle'))
+            return HttpResponseRedirect(rurl('wars:queue'))
     return rtr('wars/pick_sounds.html')
