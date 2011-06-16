@@ -46,6 +46,10 @@ def delete_users(request):
 
 
 def battle(request):
+    user = FSWUser.objects.get(nickname = request.session[SESSION_NICKNAME])
+    player1 = FSWUser.objects.get(player_number=1)
+    player2 = FSWUser.objects.get(player_number=2)
+    
     return HttpResponse(str(request))
 
 
@@ -101,7 +105,7 @@ def pick_name(request):
 
 @csrf_exempt
 def pick_sounds(request):
-    nickname = request.SESSION[SESSION_NICKNAME]
+    nickname = request.session[SESSION_NICKNAME]
     form = PickSoundsForm()
     if request.method == 'POST':
         form = PickSoundsForm(request.POST)
