@@ -48,21 +48,23 @@
 			$("#result").append(data);
 		});
     }
+
 	</script>
 {% endblock %}
 
 {% block content %}
 <div id="result"></div>
-<div class="content-container">
-	<div class="left">
+<div id="current_battle"></div>
+<div id="content-wrapper">
+	<div id="leftcolumn">
 		<label for="sound_p1">Player 1</label>
 		<div id="sound_p1">sound 1</div>
 	</div>
-	<div id="middle">
-		<label for="presets">Presets</label>
+	<div id="contentcolumn">
+		<label for="content">Presets</label>
 		<div id="presets">presets</div>
 	</div>
-	<div class="right">
+	<div id="rightcolumn">
 		<label for="sound_p2">Player 2</label>
 		<div id="sound_p2">sound 2</div>
 	</div>

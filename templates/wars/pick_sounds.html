@@ -44,7 +44,7 @@
 <script type="text/javascript">
     var sounds = [];
 	var num_sounds = 0;
-	var max_sounds = 1;
+	var max_sounds = 5;
 	// var username = {{ username }};
 	var freesound;
 	
@@ -70,16 +70,17 @@
 			console.log("query: " + $("#search-q").val());
 			var q = $("#search-q").val();
 			var p = 1;
-			var f = "";
-			var s = "";
+			var f = "duration:[0.1 TO 10.0]";
+			var s = "downloads_desc";
 			freesound.getSoundsFromQuery(q,p,f,s,displaySearchResults, errorSearch);
 			
 		}
 	}
 	function displaySearchResults(soundCollection) {
-		$("#search-results").append("<br>* number of results: " + soundCollection.properties['num_results']);
-		$("#search-results").append("<br>* number of pages: " + soundCollection.properties['num_pages']);
-		$("#search-results").append("<br>* sounds:");
+		$("#search-results").text("")
+		//$("#search-results").append("<br>* number of results: " + soundCollection.properties['num_results']);
+		//$("#search-results").append("<br>* number of pages: " + soundCollection.properties['num_pages']);
+		//$("#search-results").append("<br>* sounds:");
 		for (obj in soundCollection.properties['sounds']) {
 			//sound_id = soundCollection.properties['sounds'][obj]['id'];
 			// $("#search-results").append("<br>--- " + obj + ": " + sound_id + " - " + soundCollection.properties['sounds'][obj]['original_filename']);
@@ -93,17 +94,21 @@
 		// console.log("displaySoundInfo");
 		console.log(sound.properties['id']);
 		$("#search-results").append("<div id=" + sound.properties['id'] + " onclick='addSound(this," + sound.properties['id'] + ")'\>"); 
-		$("#"+sound.properties['id']).append("<br><br>Sound info (some)<br>**********");
+		//$("#"+sound.properties['id']).append("<br><br>Sound info (some)<br>**********");
+		$("#"+sound.properties['id']).append('<br><img src="'+ sound.properties['waveform_m'] + '" alt = "' + sound.properties['waveform_m'] + '"/>');
 		$("#"+sound.properties['id']).append("<br>- filename: " + sound.properties['original_filename']);
 		$("#"+sound.properties['id']).append("<br>- duration: " + sound.properties['duration']);
-		$("#"+sound.properties['id']).append("<br>- preview-url: " + sound.properties['preview-hq-mp3']);
+		//$("#"+sound.properties['id']).append("<br>- preview-url: " + sound.properties['preview-hq-mp3']);
 		$("#"+sound.properties['id']).append("<br>- tags: " + sound.properties['tags']);
-		$("#"+sound.properties['id']).append("<br>- description: " + sound.properties['description']);
-		$("#"+sound.properties['id']).append('<br>- visualization (waveform):  ' + sound.properties['waveform_m']
-							 + '<br><br><img src="'+ sound.properties['waveform_m'] + '" alt = "' + sound.properties['waveform_m'] + '"/>');			
+		//$("#"+sound.properties['id']).append("<br>- description: " + sound.properties['description']);			
+		
+		// TODO: make sounds able to play
+		/*
 		snd = new Audio(sound.properties['preview-hq-mp3']);
 		$("#"+sound.properties['id']).append('<br><button onclick="snd.play()">play</button><button onclick="snd.pause()">pause</button>')
+		*/
 		$("#search-results").append("</div>");
+		
 	}
 	function errorSearch() {
 	}
@@ -118,14 +123,19 @@
             console.log(num_sounds);
 	        if ($.inArray(soundId, sounds) == -1 && num_sounds <= max_sounds)
 	        {
-		        $("#id_sound_ids").attr("value", soundId);
 		        num_sounds = num_sounds + 1;  
 	            console.log("addSound");
 	            sounds.push(soundId);
+	            $("#id_sound_ids").attr("value", sounds);//.attr("value", str(sounds)); // TODO:
 				// TODO: change id and remove onclick handler
-	            $(element).closest("#search-results > div").clone().attr("id",soundId+"_choose").attr("onclick", "removeSound(this," +soundId+ ")").appendTo("#picked_sounds");
-	
-	            $("#id_sources").val(sources.join(","));
+	            $(element).closest("#search-results > div").clone()            								
+	            								.attr({
+	            								id: soundId+"_choose"//,
+	            								//onclick: "removeSound(this," +soundId+ ")"								
+	            								}).appendTo("#picked_sounds");
+	            
+	            $("#"+soundId+"_choose").removeAttr('onclick').click( function () { removeSound($("#"+soundId+"_choose"), soundId); return false} )
+	                     
 	        }
         }
         else {
@@ -135,15 +145,22 @@
 
     function removeSound(element, soundId)
     {
+    	console.log("removing sound: " + soundId)
         var index = $.inArray(soundId, sounds);
         // $(element).prev().attr("id)
         if (index != -1)
         {
-            sources.splice(index, 1);
 
+            sounds.splice(index, 1);
+			$("#id_sound_ids").attr("value", sounds);
             $(element).closest("#picked_sounds > div").remove();
-
-            //$("#id_sources").val(sources.join(","));
+            num_sounds = num_sounds - 1;
+            
+            if (num_sounds == -1){
+            	num_sounds = 0;
+            }
+			
+            
         }
     }
 </script>
@@ -174,7 +191,7 @@
     <h3>War files</h3>
     <div>
         <div>
-            <a class="remove" onclick="removeSound(this)">Remove</a>
+            <a class="remove" onclick="removeSound(this)">Click to remove</a>
         </div>
     </div>
 </div>
