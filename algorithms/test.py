@@ -56,15 +56,28 @@ def getSoundAnalysisData(id, filter):
 
 def computeBattle(id1, id2, descriptors):
     
-    print "\n\n"
+    
     print "Battle: " + str(descriptors)
     
     as1 = getSoundAnalysisData(id1, descriptors)
     as2 = getSoundAnalysisData(id2, descriptors)
     
-    v1 = as1['lowlevel']['average_loudness']
-    v2 = as2['lowlevel']['average_loudness']
+    filters = descriptors[0].split('.')
     
+    if len(filters) == 1:
+        v1 = as1[filters[0]]
+        v2 = as2[filters[0]]
+    elif len(filters) == 2:
+        v1 = as1[filters[0]][filters[1]]
+        v2 = as2[filters[0]][filters[1]]
+    elif len(filters) == 3:
+        v1 = as1[filters[0]][filters[1]][filters[2]]
+        v2 = as2[filters[0]][filters[1]][filters[2]]
+    elif len(filters) == 4:
+        v1 = as1[filters[0]][filters[1]][filters[2]][filters[3]]
+        v2 = as2[filters[0]][filters[1]][filters[2]][filters[3]]
+
+
     if v1 > v2:
         print "Sound " + str(id1) + " wins (" + str(v1) + " > " + str(v2) + ")" 
     elif v1 == v2:
@@ -72,14 +85,22 @@ def computeBattle(id1, id2, descriptors):
     else:
         print "Sound " + str(id2) + " wins (" + str(v2) + " > " + str(v1) + ")"
 
-    print "\n\n"
+    print ""
+
+
+
 LOUDNESS = [ 'lowlevel.average_loudness']
 RHYTHM = [ 'rhythm.beats_loudness.mean']
 TONALITY = [ 'tonal.key_strength']
-
+#NOISINESS = 
+#BRIGHTNESS = 
 
 
 if __name__ == '__main__':
     print "Algortithms for fsWars\n---------------------\n"
     init()
+    
+    
     computeBattle(6,7,LOUDNESS)
+    computeBattle(6,7,RHYTHM)
+    computeBattle(6,7,TONALITY)
