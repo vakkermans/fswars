@@ -3,7 +3,7 @@ try:
 except ImportError:
     from freesound import *
     
-from api_key import key
+from django.conf import settings
 import random
 import webbrowser
 import math
@@ -45,7 +45,7 @@ def init():
     print "init()\n------"
     
     # Set API key
-    Freesound.set_api_key(key)
+    Freesound.set_api_key(settings.API_KEY)
     
     # Retrieve API key
     print "Freesound API key is: " + Freesound.get_api_key()    
