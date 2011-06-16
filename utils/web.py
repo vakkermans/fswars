@@ -10,6 +10,5 @@ def rtr(template):
                               data,
                               context_instance=RequestContext(request))
 
-
 def rurl(name, *args):
     return reverse(name, args=args)
