@@ -113,11 +113,13 @@
     function addSound(element, soundId)
     {
         
-        if (num_sounds <= max_sounds) 
+        if (num_sounds < max_sounds) 
         {
+            console.log(num_sounds);
 	        if ($.inArray(soundId, sounds) == -1 && num_sounds <= max_sounds)
 	        {
-		        
+		        $("#id_sound_ids").attr("value", soundId);
+		        num_sounds = num_sounds + 1;  
 	            console.log("addSound");
 	            sounds.push(soundId);
 				// TODO: change id and remove onclick handler
@@ -146,7 +148,9 @@
     }
     function sendSounds() {
         console.log(sounds);
-    	$.post('sounds', {"sound_ids": sounds, "username": "warrior1"});
+    	$.post('sounds', {"sound_ids": sounds}, function(data) {
+			
+        });
     }
 </script>
 {% endblock head %}
@@ -159,18 +163,14 @@
 <p>
 </p>
 
-<form id="save-form">
-    {{form.as_p}}
+<div id="search-div">
     <p>
     	<input type="text" name="q" id="search-q" size="45" /> 
     	<!-- <input type="submit" name="submit" value="search sounds" onclick="search_sounds" id="search-button"/> -->
     	<a href="#" onclick="search_sounds()">Get!</a>
     </p>
     <p><input type="submit" name="send" value="SEND!" id="send-button" onclick="sendSounds()"/></p>
-    <p>
-        t
-    </p>
-</form>
+</div>
 
 <div id="search-results" class="sound_list_minimal">
     <h3>Search results:</h3>
@@ -186,4 +186,9 @@
     </div>
 </div>
 
+ <form action="." method="POST">{% csrf_token %}
+        {{ form.as_p }}
+        <br>
+        <input type="submit" value="Play!">
+    </form>
 {% endblock content %}
