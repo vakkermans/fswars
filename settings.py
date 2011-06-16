@@ -79,6 +79,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
     'wars',
+    'superuser', # this prevents a superuser to be created each time
 )
 
 # A sample logging configuration. The only tangible logging
