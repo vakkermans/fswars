@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 
-{% load display_sound %}
 {% block head %}
 {{ block.super }}
 <style type="text/css" media="all">
@@ -43,16 +42,38 @@
     }
 </style>
 <script type="text/javascript">
-    var sources = [];
+    var sounds = [];
 	var num_sounds = 0;
 	var max_sounds = 1;
+	// var username = {{ username }};
+	var freesound;
+	
+	$(document).ready(function(){
+	
+	apiKey = settings.apiKey;	
+	console.debug("key: " + apiKey);
+	
+	if(apiKey == "")
+	{
+		alert("no KEY no honey!"); 
+	}			
+	else 
+	{				
+		/*======= freesound object ========*/
+		//creating freesound object	
+		freesound = new Freesound(apiKey, true);
+	}
+	});
+	
 	function search_sounds() {
-		if ($("search-q").length) {
-			var q = $("search-q").val();
+		if ($("#search-q").length > 0) {
+			console.log("query: " + $("#search-q").val());
+			var q = $("#search-q").val();
 			var p = 1;
 			var f = "";
 			var s = "";
 			freesound.getSoundsFromQuery(q,p,f,s,displaySearchResults, errorSearch);
+			
 		}
 	}
 	function displaySearchResults(soundCollection) {
@@ -60,41 +81,59 @@
 		$("#search-results").append("<br>* number of pages: " + soundCollection.properties['num_pages']);
 		$("#search-results").append("<br>* sounds:");
 		for (obj in soundCollection.properties['sounds']) {
-			$("#search-results").append("<br>--- " + obj + ": " + soundCollection.properties['sounds'][obj]['id'] + " - " + soundCollection.properties['sounds'][obj]['original_filename']);
+			//sound_id = soundCollection.properties['sounds'][obj]['id'];
+			// $("#search-results").append("<br>--- " + obj + ": " + sound_id + " - " + soundCollection.properties['sounds'][obj]['original_filename']);
+			freesound.getSound(soundCollection.properties['sounds'][obj]['id'], displaySoundInfo, errorSound );	
 		}
 		 
 		sc = soundCollection;
 		// $("#respSearch").append('<br><br><button onclick="sc.previous(displaySearchResults);">previous</button><button onclick="sc.next(displaySearchResults);">next</button>')
 	}
+	function displaySoundInfo(sound) {
+		// console.log("displaySoundInfo");
+		console.log(sound.properties['id']);
+		$("#search-results").append("<div id=" + sound.properties['id'] + " onclick='addSound(this," + sound.properties['id'] + ")'\>"); 
+		$("#"+sound.properties['id']).append("<br><br>Sound info (some)<br>**********");
+		$("#"+sound.properties['id']).append("<br>- filename: " + sound.properties['original_filename']);
+		$("#"+sound.properties['id']).append("<br>- duration: " + sound.properties['duration']);
+		$("#"+sound.properties['id']).append("<br>- preview-url: " + sound.properties['preview-hq-mp3']);
+		$("#"+sound.properties['id']).append("<br>- tags: " + sound.properties['tags']);
+		$("#"+sound.properties['id']).append("<br>- description: " + sound.properties['description']);
+		$("#"+sound.properties['id']).append('<br>- visualization (waveform):  ' + sound.properties['waveform_m']
+							 + '<br><br><img src="'+ sound.properties['waveform_m'] + '" alt = "' + sound.properties['waveform_m'] + '"/>');			
+		snd = new Audio(sound.properties['preview-hq-mp3']);
+		$("#"+sound.properties['id']).append('<br><button onclick="snd.play()">play</button><button onclick="snd.pause()">pause</button>')
+		$("#search-results").append("</div>");
+	}
 	function errorSearch() {
 	}
-    function saveSources()
-    {
-        $("#save-button").attr("disabled", "disabled");
-
-        $("#id_sources").val(sources.join(","))
-
-        $.post("{% url sound-edit-sources sound.user.username sound.id %}", $("#save-form").serialize(), function ()
-        {
-            $("#save-button").removeAttr("disabled");
-        });
-    }
+	function errorSound() {
+	}
 
     function addSound(element, soundId)
     {
-        if ($.inArray(soundId, sources) == -1)
+        
+        if (num_sounds <= max_sounds) 
         {
-            sources.push(soundId);
-
-            $(element).closest("#search-results > div").clone().appendTo("#picked_sounds");
-
-            $("#id_sources").val(sources.join(","));
+	        if ($.inArray(soundId, sounds) == -1 && num_sounds <= max_sounds)
+	        {
+		        
+	            console.log("addSound");
+	            sounds.push(soundId);
+				// TODO: change id and remove onclick handler
+	            $(element).closest("#search-results > div").clone().attr("id",soundId+"_choose").attr("onclick", "removeSound(this,"+soundId+")'").appendTo("#picked_sounds");
+	
+	            $("#id_sources").val(sources.join(","));
+	        }
+        }
+        else {
+            alert("Reached your max sounds, don't be greedy warrior!!!");
         }
     }
 
     function removeSound(element, soundId)
     {
-        var index = $.inArray(soundId, sources);
+        var index = $.inArray(soundId, sounds);
 
         if (index != -1)
         {
@@ -102,46 +141,34 @@
 
             $(element).closest("#picked_sounds > div").remove();
 
-            $("#id_sources").val(sources.join(","));
+            //$("#id_sources").val(sources.join(","));
         }
     }
-
-    $(function()
-    {
-        sources = $.map($("#id_sources").val().split(","), function (soundId) { return parseInt(soundId) });
-
-        $("#save-button").click(function ()
-        {
-            saveSources();
-            return false;
-        });
-
-        $("#search-button").click(function ()
-        {
-            $("#search-results").load("{% url sounds-search %}", $.param({"q": $("#search-q").val(), "ajax": 1}));
-            return false;
-        });
-    });
+    function sendSounds() {
+        console.log(sounds);
+    	$.post('sounds', {"sound_ids": sounds, "username": "warrior1"});
+    }
 </script>
 {% endblock head %}
 
 {% block title %}Pick your sounds...{% endblock title %}
 
-{% block section_content %}
+{% block content %}
 
 <h2>Search sounds</h2>
 <p>
 </p>
 
-<form id="save-form">{% csrf_token %}
+<form id="save-form">
     {{form.as_p}}
     <p>
     	<input type="text" name="q" id="search-q" size="45" /> 
-    	<input type="submit" name="submit" value="search sounds" onclick="search_sounds" id="search-button"/>
+    	<!-- <input type="submit" name="submit" value="search sounds" onclick="search_sounds" id="search-button"/> -->
+    	<a href="#" onclick="search_sounds()">Get!</a>
     </p>
-    <p><input type="submit" name="save" value="save..." id="save-button"/></p>
+    <p><input type="submit" name="send" value="SEND!" id="send-button" onclick="sendSounds()"/></p>
     <p>
-        <a href="{% url sound-edit sound.user.username sound.id %}">Go back to edit page</a>
+        t
     </p>
 </form>
 
@@ -153,14 +180,10 @@
 <div id="picked_sounds" class="sound_list_minimal">
     <h3>War files</h3>
     <div>
-        <div class="sound_list_moderation">
-         	
-        </div>
         <div>
-            <a class="add" onclick="addSound(this, {{source.id}})">Add</a>
             <a class="remove" onclick="removeSound(this, {{source.id}})">Remove</a>
         </div>
     </div>
 </div>
 
-{% endblock section_content %}
+{% endblock content %}

@@ -75,7 +75,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+    #'django.contrib.staticfiles',
     'django.contrib.admin',
     'django.contrib.admindocs',
     'wars',
@@ -103,3 +103,5 @@ LOGGING = {
         },
     }
 }
+
+print STATIC_ROOT, STATIC_URL

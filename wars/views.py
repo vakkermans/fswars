@@ -6,6 +6,7 @@ from django.http import HttpResponseForbidden, HttpResponse, \
     HttpResponseNotAllowed, HttpResponseRedirect
 from utils.web import rtr, rurl
 from forms import *
+from django.views.decorators.csrf import csrf_exempt
 
 def pick_name(request):
     form = PickNameForm()
@@ -15,5 +16,12 @@ def pick_name(request):
             return HttpResponseRedirect(rurl('wars:pick-sounds'))
     return rtr('wars/pick_name.html')
 
+@csrf_exempt
 def pick_sounds(request):
-    return rtr('wars/pick_sounds.html')
+    # username = request.SESSION['username']
+    if request.method == 'POST':
+        print "post"
+        
+        return rtr('wars/pick_sounds.html')
+    else:
+        return rtr('wars/pick_sounds.html')
