@@ -2,3 +2,4 @@
 .*project*
 *~
 settings_local.py
+*.pyc
