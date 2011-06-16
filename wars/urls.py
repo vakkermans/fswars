@@ -7,7 +7,7 @@ urlpatterns = patterns('',
         pick_name,
         name='pick-name'),
 
-    url(r'^sounds$',
+    url(r'^sounds/$',
         pick_sounds,
         name='pick-sounds'),
 
