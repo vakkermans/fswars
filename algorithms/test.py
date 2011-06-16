@@ -2,35 +2,31 @@ from freesound_python import *
 import sys
 import os
 from algorithms_settings import key
+import random
+import webbrowser
+
 
 
 # UTILS
-def level_filter(d, fields, sep='.'):
-    new_d = {}
-    for f in fields:
-        fs = f.split(sep)
-        level_filter_set(new_d, fs, level_filter_get(d, fs))
-    return new_d
 
-def level_filter_set(d, levels, value):
-    if len(levels) <= 0:
-        return d
-    if len(levels) == 1:
-        d[levels[0]] = value
-    else:
-        if not d.has_key(levels[0]):
-            d[levels[0]] = {}
-        level_filter_set(d[levels[0]], levels[1:], value)
-    return d
+def random_id():
+    maxID = 100000
+    r = int(random.random()*maxID)
+    if r == 0:
+        r = 1 
+    return r
+        
+def displayWinner(id1,id2,v1,v2,winner):
+    print "Sound 1: " + str(id1) + " (" + str(v1) + ")"
+    print "Sound 2: " + str(id2) + " (" + str(v2) + ")"
+    if winner == 1:
+        print "Winner: " + str(id1)
+    elif winner == 2:
+        print "Winner: " + str(id2)
+    else :
+        print "Tie"
 
-def level_filter_get(d, levels):
-    if len(levels) <= 0:
-        return d
-    if len(levels) == 1:
-        return d.get(levels[0], '')
-    else:
-        return level_filter_get(d[levels[0]], levels[1:])
-
+# INIT
 
 def init():
     print "init()\n------"
@@ -43,64 +39,106 @@ def init():
     print "\n"
 
 
-def getSoundAnalysisData(id, filter):
+def getSoundAnalysisData(id):#, filter):
     s = Sound.get_sound(id)
-    
-    print "Sound " + str(id) + " " + s['preview-hq-mp3']
-    
+    webbrowser.open(s['url']);
     analysis = s.get_analysis(showall = True)
-    analysis = level_filter(analysis, filter)
+    #analysis = level_filter(analysis, filter)
 
-    return analysis
-
-
-def computeBattle(id1, id2, descriptors):
-    
-    
-    print "Battle: " + str(descriptors)
-    
-    as1 = getSoundAnalysisData(id1, descriptors)
-    as2 = getSoundAnalysisData(id2, descriptors)
-    
-    filters = descriptors[0].split('.')
-    
-    if len(filters) == 1:
-        v1 = as1[filters[0]]
-        v2 = as2[filters[0]]
-    elif len(filters) == 2:
-        v1 = as1[filters[0]][filters[1]]
-        v2 = as2[filters[0]][filters[1]]
-    elif len(filters) == 3:
-        v1 = as1[filters[0]][filters[1]][filters[2]]
-        v2 = as2[filters[0]][filters[1]][filters[2]]
-    elif len(filters) == 4:
-        v1 = as1[filters[0]][filters[1]][filters[2]][filters[3]]
-        v2 = as2[filters[0]][filters[1]][filters[2]][filters[3]]
+    return analysis, s['id']
 
 
-    if v1 > v2:
-        print "Sound " + str(id1) + " wins (" + str(v1) + " > " + str(v2) + ")" 
-    elif v1 == v2:
-        print "Tie (" + str(v1) + " = " + str(v2) + ")"
+def computeBattle(id1, id2, algorithm):
+     
+    as1, id1 = getSoundAnalysisData(id1)
+    as2, id2 = getSoundAnalysisData(id2)
+    
+    winner, v1, v2 = algorithm(as1, as2)
+    
+    print "\n\nBattle: " + str(algorithm)
+    displayWinner(id1,id2,v1,v2,winner)
+
+
+def templateAlgorithm(analysis1, analysis2):
+    b1 = analysis1['lowlevel']['spectral_centroid']['mean']
+    b2 = analysis2['lowlevel']['spectral_centroid']['mean']
+    
+    value1 = b1
+    value2 = b2
+    
+    if value1 > value2:
+        return 1, value1, value2 # sound 1 wins
+    elif value1 < value2:
+        return 2, value1, value2 # Sound 2 wins
     else:
-        print "Sound " + str(id2) + " wins (" + str(v2) + " > " + str(v1) + ")"
-
-    print ""
+        return 0, value1, value2 # Tie
 
 
+def brightness1Algorithm(analysis1, analysis2):
+    b1 = analysis1['lowlevel']['spectral_centroid']['mean']
+    b2 = analysis2['lowlevel']['spectral_centroid']['mean']
+    
+    value1 = b1
+    value2 = b2
+    
+    if value1 > value2:
+        return 1, value1, value2 # sound 1 wins
+    elif value1 < value2:
+        return 2, value1, value2 # Sound 2 wins
+    else:
+        return 0, value1, value2 # Tie
 
-LOUDNESS = [ 'lowlevel.average_loudness']
-RHYTHM = [ 'rhythm.beats_loudness.mean']
-TONALITY = [ 'tonal.key_strength']
-#NOISINESS = 
-#BRIGHTNESS = 
+
+def brightness2Algorithm(analysis1, analysis2):
+    b1 = analysis1['highlevel']['timbre']['all']['bright']
+    b2 = analysis2['highlevel']['timbre']['all']['bright']
+    
+    value1 = b1
+    value2 = b2
+    
+    if value1 > value2:
+        return 1, value1, value2 # sound 1 wins
+    elif value1 < value2:
+        return 2, value1, value2 # Sound 2 wins
+    else:
+        return 0, value1, value2 # Tie
+
+
+def darkness1Algorithm(analysis1, analysis2):
+    d1 = analysis1['highlevel']['timbre']['all']['dark']
+    d2 = analysis2['highlevel']['timbre']['all']['dark']
+    
+    value1 = d1
+    value2 = d2
+    
+    if value1 > value2:
+        return 1, value1, value2 # sound 1 wins
+    elif value1 < value2:
+        return 2, value1, value2 # Sound 2 wins
+    else:
+        return 0, value1, value2 # Tie
+
+def noisiness1Algorithm(analysis1, analysis2):
+    n1 = analysis1['lowlevel']['spectral_flatness_db']['mean']
+    n2 = analysis2['lowlevel']['spectral_flatness_db']['mean']
+    
+    value1 = n1
+    value2 = n2
+    
+    if value1 > value2:
+        return 1, value1, value2 # sound 1 wins
+    elif value1 < value2:
+        return 2, value1, value2 # Sound 2 wins
+    else:
+        return 0, value1, value2 # Tie
+
 
 
 if __name__ == '__main__':
     print "Algortithms for fsWars\n---------------------\n"
     init()
     
+    id1 = random_id()
+    id2 = random_id()
     
-    computeBattle(6,7,LOUDNESS)
-    computeBattle(6,7,RHYTHM)
-    computeBattle(6,7,TONALITY)
+    computeBattle(id1,id2,noisiness1Algorithm)
