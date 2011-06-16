@@ -11,6 +11,7 @@ from models import *
 from django.contrib import messages
 import json, datetime
 #import cachedb
+from algorithms import algorithms
 
 SESSION_NICKNAME = 'session_nickname'
 
@@ -76,6 +77,16 @@ def waiting_queue(request):
         return HttpResponseRedirect(rurl('wars:battle'))
     else:
         return rtr('wars/queue.html')
+
+@auth()
+def compute(request, id1, id2, preset):
+    ps = preset.upper()
+    if ps not in algorithms.ALGORITHM_CLASSES:
+        print 'ARG, not a valid preset'
+    return HttpResponse(json.dumps(algorithms.computeBattle(int(id1),
+                                                            int(id2),
+                                                            algorithms.ALGORITHM_CLASSES[ps])))
+
 
 @auth()
 def battle(request):
