@@ -1,0 +1,49 @@
+{% extends base.html %}
+
+{% block head %}
+	{{ block.super }}
+	<style type="text/css">
+        .p1 {
+          overflow: auto;
+          position: relative;
+          float: left;
+          width: 400px;
+          margin-right: 0px;
+        }
+        .p2 {
+            position: relative;
+            float: left;
+            width: 400px;
+            margin-top: 0px;
+        }
+        .center {
+            overflow: auto;
+            position: relative;
+            float: left;
+            width: 800px;
+        }
+    </style>
+    <script type="text/javascript">
+    $(document).ready(function(){
+    	apiKey = settings.apiKey;
+    	console.debug("key: " + apiKey); 
+    });
+	</script>
+{% endblock %}
+
+{% block content %}
+
+<div class="center">
+	<div class="p1">
+		<input id="p1_search_txt" type="text">
+		<input id="p1_">
+	</div>
+	<div class="p2">
+		<input id="p2_search_txt" type="text">
+	</div>
+</div>
+
+
+{% endblock %}
+
+

@@ -1,7 +1,59 @@
-{% extends base.html %}
+{% extends 'base.html' %}
+
+{% block head %}
+	{{ block.super }}
+	<style type="text/css">
+        .center {
+            overflow: auto;
+            position: relative;
+            float: left;
+            width: 800px;
+        }
+    </style>
+    <script type="text/javascript">
+    $(document).ready(function(){
+        // set API key
+    	apiKey = settings.apiKey;
+    	console.debug("key: " + apiKey); 
+
+    	// create django object
+    	freesound = new Freesound(apiKey, true);
+    });
+    function search_sound() {
+        if ($("search_txt").length > 0) {
+        	var q = $("search_txt").val();
+        	var p = 1;
+        	var f = "";
+        	var s = "";
+
+        	freesound.getSoundsFromQuery(q,p,f,s,displaySearchResults, errorSearch);
+        }
+        
+    }
+    function displaySearchResults(soundCollection) {
+    	for (obj in soundCollection.properties['sounds']) {
+    		$("#sound_list").append("<li>" + obj + ": " + soundCollection.properties['sounds'][obj]['id'] + " - " + soundCollection.properties['sounds'][obj]['original_filename'] + "</li>");
+    	}
+    }
+    function errorSearch() {
+    }
+	</script>
+{% endblock %}
 
 {% block content %}
 
+<div class="center">
+	<div id="search_sounds">
+		<input id="search_txt" type="text">
+		<input id="search_btn" type="button" value="get!">
+	</div>
+	<div id="sound_list">
+		<ul>
+			
+		</ul>
+	</div>
+	
+</div>
 
 
 {% endblock %}
