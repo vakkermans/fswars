@@ -4,27 +4,31 @@
     {{ block.super }}
     <link rel="stylesheet" type="text/css" href="/static_media/css/3-column-layout.css" />
     <style type="text/css">
-		/* Z-index of #mask must lower than #boxes .window */
 		#mask {
 		  position:absolute;
+		  left:0;
+		  top:0;
 		  z-index:9000;
 		  background-color:#000;
 		  display:none;
 		}
-		   
+		
 		#boxes .window {
 		  position:absolute;
+		  left:0;
+		  top:0;
 		  width:440px;
 		  height:200px;
 		  display:none;
 		  z-index:9999;
 		  padding:20px;
 		}
-		 
-		/* Customize your modal window here, you can add background image too */
+		
 		#boxes #dialog {
-		  width:375px;
+		  width:375px; 
 		  height:203px;
+		  padding:10px;
+		  background-color:#ffffff;
 		}
     </style>
     
@@ -82,33 +86,36 @@
     function displaySoundInfo(sound, player) {
         // console.log("displaySoundInfo");
         console.log(sound.properties['id']);
-        $("#sound_p"+player).append("<div id=" + sound.properties['id'] + "\>");
+        $("#sound_p"+player).append("<div id=" + sound.properties['id'] + "_"+player+"\>");
 
-        $("#"+sound.properties['id']).append('<div class="battle_sound_name"><h3>' + sound.properties['original_filename'] + '</h3></div>');
-        $("#"+sound.properties['id']).append('<div class="battle_sound_img"><img src="'+ sound.properties['waveform_m'] + '" alt = "' + sound.properties['waveform_m'] + '"/></div>');
+        $("#"+sound.properties['id']+"_"+player).append('<div class="battle_sound_name"><h3>' + sound.properties['original_filename'] + '</h3></div>');
+        $("#"+sound.properties['id']+"_"+player).append('<div class="battle_sound_img"><img src="'+ sound.properties['waveform_m'] + '" alt = "' + sound.properties['waveform_m'] + '"/></div>');
 
-        $("#"+sound.properties['id']).append('<div class="battle_tags">tags: ' + sound.properties['tags'].join(', ') + '</div>');
-        $("#"+sound.properties['id']).append('<br style="clear: both;"/>');
+        $("#"+sound.properties['id']+"_"+player).append('<div class="battle_tags">tags: ' + sound.properties['tags'].join(', ') + '</div>');
+        $("#"+sound.properties['id']+"_"+player).append('<br style="clear: both;"/>');
 
-        $("#"+sound.properties['id']).append("</div>");
+        $("#"+sound.properties['id']+"_"+player).append("</div>");
        
 		// add handler
-		$("#" + sound.properties['id']).bind("click", {soundId: sound.properties['id']}, function(event) {
+		$("#" + sound.properties['id']+"_"+player).bind("click", {soundId: sound.properties['id']}, function(event) {
 			// TODO: add length check and remove function 
 			// $("#current_battle").append(event.data.soundId + " ");
-			addToBattleCandidate(event.data.soundId);
+			addToBattleCandidate(event.data.soundId, player);
 		});
 	}
-	function addToBattleCandidate(soundId) {
+	function addToBattleCandidate(soundId, player) {
 		// 2nd sound		
-		if ($("#"+ soundId).parent().hasClass("p1")) {
+		// if ($("#"+ soundId + "_"+player).parent().hasClass("p1")) {
+		if (player == 1) {
 			$("#player1_sound").empty();
 			$("#player1_sound").append(soundId);
 			$("#player1_sound").click(function() { 
 													$(this).empty();
 													// $("#fight").hide(); 
 												});
-		} else if ($("#"+ soundId).parent().hasClass("p2")) {
+		// } else if ($("#"+ soundId).parent().hasClass("p2")) {
+		}
+		else if (player == 2) {
 			$("#player2_sound").empty();
 			$("#player2_sound").append(soundId);
 			$("#player2_sound").click(function() { 
@@ -176,9 +183,8 @@
 				parsed = jQuery.parseJSON(data);
 				// console.log(parsed['turn_owner']);
 				if (parsed['turn_owner'] == player_num) {
-					// console.log('my turn');
+					removeScreen();
 				} else {
-					// console.log('opponents turn');
 					coverScreen();
 				}
 				updateAfterBattle(parsed);
@@ -193,8 +199,8 @@
 		}
 		// console.log(battle_result['history'][battle_result['history'].length-1]);
 		// remove div with played sounds
-		$("#"+ last_round[0]).remove();
-		$("#"+ last_round[1]).remove();
+		$("#"+ last_round[0]+"_1").remove();
+		$("#"+ last_round[1]+"_2").remove();
 		$("#"+ last_round[2]).remove();
 	}
 	
@@ -209,8 +215,37 @@
 		return sResult;
 	}
 	function coverScreen() {
-		
+        //Get the A tag
+        var id = "cover";
+
+        //Get the screen height and width
+        var maskHeight = $(document).height();
+        var maskWidth = $(window).width();
+
+        //Set heigth and width to mask to fill up the whole screen
+        $('#mask').css({'width':maskWidth,'height':maskHeight});
+
+        //transition effect             
+        $('#mask').fadeIn(1000);        
+        $('#mask').fadeTo("slow",0.8);  
+
+        //Get the window height and width
+        var winH = $(window).height();
+        var winW = $(window).width();
+
+        //Set the popup window to center
+        $(id).css('top',  winH/2-$(id).height()/2);
+        $(id).css('left', winW/2-$(id).width()/2);
+
+        //transition effect
+        $(id).fadeIn(2000); 
+        $(id).html("Your opponent is preparing for attack...");
 	}
+	function removeScreen() {
+	    $('#mask').hide();
+        $('.window').hide();
+	}
+	      
 	
 	</script>
 {% endblock %}
@@ -243,6 +278,15 @@
     <br style="clear: both;" />
 </div>
 
+<div id="boxes">
+<div id="dialog" class="window">
+Simple Modal Window | 
+<a href="#"class="close"/>Close it</a>
+<p>Anything can go Here</p>
+</div>
+<!-- Mask to cover the whole screen -->
+  <div id="mask"></div>
+</div>
+
+
 {% endblock %}
-
-
