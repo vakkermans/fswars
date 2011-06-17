@@ -74,3 +74,9 @@ margin-top: 0;
     float: left;
     width: 279px;
     }
+
+#player2_sound, #player1_sound, #battle_preset {
+    width: 0px;
+    height: 0px;
+    visibility: hidden;
+}

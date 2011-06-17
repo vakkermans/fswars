@@ -261,10 +261,11 @@ def computeBattle(id1, id2, algorithm):
 
     # normalize values to calculate points
     v1 = v1/max(v1,v2,0.0001)
-    v2 = v2/max(v1,v2,0.0001)
+    v2 = v2/min(v1,v2,0.0001)
 
-    points = 10 + int(max(abs(v1-v2),1)*20)
-
+    points = 10 + int(min(abs(v1-v2),1)*20)
+    #points = points + int(random.random()*5)
+    
     result = {'winner': winner,
               'points': points
               }
