@@ -71,7 +71,7 @@
          {% if forloop.counter0|divisibleby:2 %}
              <div class="summaryO">
              <strong>{{ battle.player1 }}</strong> played sound <strong>{{ round.0 }}</strong> against
-             <strong>{{ battle.player2 }}</strong>'s sound {<strong>{ round.1 }}</strong> in round {{ round.2 }} and
+             <strong>{{ battle.player2 }}</strong>'s sound <strong>{{ round.1 }}</strong> in round {{ round.2 }} and
              {% if round.3 %}
                  {% if round.3 == 1 %} won {% else %} lost {% endif %}
                  by {{ round.4 }} points.

@@ -3,7 +3,7 @@ try:
 except ImportError:
     from freesound import *
     
-from django.conf import settings
+from api_key import key
 import random
 import webbrowser
 import math
@@ -14,13 +14,15 @@ import os
 
 # UTILS
 
+# generate random sound ID for testing
 def random_id():
     maxID = 100000
     r = int(random.random()*maxID)
     if r == 0:
         r = 1 
     return r
-        
+
+# print the result
 def displayWinner(id1,id2,v1,v2,winner):
     print "Sound 1: " + str(id1) + " (" + str(v1) + ")"
     print "Sound 2: " + str(id2) + " (" + str(v2) + ")"
@@ -31,6 +33,7 @@ def displayWinner(id1,id2,v1,v2,winner):
     else :
         print "Tie"
 
+# read the analysis data for a sound ID
 def getSoundAnalysisData(id):
     
     s = Sound.get_sound(id)
@@ -45,7 +48,7 @@ def init():
     print "init()\n------"
     
     # Set API key
-    Freesound.set_api_key(settings.API_KEY)
+    Freesound.set_api_key(key)
     
     # Retrieve API key
     print "Freesound API key is: " + Freesound.get_api_key()    
@@ -109,21 +112,25 @@ def brightness2Algorithm(analysis1, analysis2):
 
 
 def noisinessAlgorithm(analysis1, analysis2):
-
+    # spectral flatness
     flatness1 = analysis1['lowlevel']['spectral_flatness_db']['mean']
     flatness2 = analysis2['lowlevel']['spectral_flatness_db']['mean']
-   
+    # spectral kurtosis
     kurtosis1 = analysis1['lowlevel']['spectral_kurtosis']['mean']
     kurtosis2 = analysis2['lowlevel']['spectral_kurtosis']['mean']
-   
-    inharmonicity1 = analysis1['sfx']['inharmonicity']['mean']
-    inharmonicity2 = analysis2['sfx']['inharmonicity']['mean']
-
+    # key strength (to filter out tonal sounds)
+    keystrength1 = analysis1['tonal']['key_strength']
+    keystrength2 = analysis2['tonal']['key_strength']
+    # amount of silent frames
+    silencerate1 = analysis1['lowlevel']['silence_rate_60dB']['mean']
+    silencerate2 = analysis2['lowlevel']['silence_rate_60dB']['mean']
+    # dissonance measure
     dissonance1 = analysis1['lowlevel']['dissonance']['mean']
-    dissonance2 = analysis2['lowlevel']['dissonance']['mean']    
+    dissonance2 = analysis2['lowlevel']['dissonance']['mean']
 
-    value1 = ((1-flatness1)+dissonance1)/2
-    value2 = ((1-flatness2)+dissonance2)/2
+    # more weight is placed on flatness
+    value1 = ((2*(1-flatness1))+dissonance1+(1-keystrength1)+(1-silencerate1))/5
+    value2 = ((2*(1-flatness2))+dissonance2+(1-keystrength2)+(1-silencerate2))/5
    
     if math.fabs(value1-value2) < TIE_THRESHOLD :
         value2 = value1 # Make them tie
@@ -139,6 +146,7 @@ def noisinessAlgorithm(analysis1, analysis2):
 
 
 def tonalAlgorithm(analysis1, analysis2):
+    # simple, just the key strength
     n1 = analysis1['tonal']['key_strength']
     n2 = analysis2['tonal']['key_strength']
     
@@ -158,13 +166,25 @@ def tonalAlgorithm(analysis1, analysis2):
 
 def loudnessAlgorithm(analysis1, analysis2):
 
-    loudness1 = analysis1['lowlevel']['average_loudness']
-    loudness2 = analysis2['lowlevel']['average_loudness']
+    #root mean square spectral energy instead of loudness
+    loudness1 = analysis1['lowlevel']['spectral_rms']['mean']
+    loudness2 = analysis2['lowlevel']['spectral_rms']['mean']
+    # pseudonormalized based on the 'max' value
+    loudness1 = loudness1/0.0025
+    loudness2 = loudness2/0.0025
+    
     midhigh1 = analysis1['lowlevel']['spectral_energyband_middle_high']['mean']
+    # ditto
+    midhigh1 = midhigh1/0.004
     midhigh2 = analysis2['lowlevel']['spectral_energyband_middle_high']['mean']
-   
-    value1 = loudness1*midhigh1
-    value2 = loudness2*midhigh2
+    # ditto
+    midhigh2 = midhigh2/0.004
+    silencerate1 = analysis1['lowlevel']['silence_rate_60dB']['mean']
+    silencerate2 = analysis2['lowlevel']['silence_rate_60dB']['mean']
+
+    # more weight on spectral rms
+    value1 = (2*loudness1+midhigh1+(0.5*(1-silencerate1)))/3.5
+    value2 = (2*loudness2+midhigh2+(0.5*(1-silencerate2)))/3.5
 
     if math.fabs(value1-value2) < TIE_THRESHOLD :
         value2 = value1 # Make them tie
@@ -178,31 +198,43 @@ def loudnessAlgorithm(analysis1, analysis2):
    
 
 def rhythmRegularityAlgorithm(analysis1, analysis2):
-    b1 = analysis1['rhythm']['bpm_estimates']
-    b2 = analysis2['rhythm']['bpm_estimates']
-   
-    value1 = numpy.std(b1)
-    value2 = numpy.std(b2)
 
-    if abs(value1-value2) < 0.05:
-        value1 = -analysis1['rhythm']['beats_loudness']['mean']
-        value2 = -analysis2['rhythm']['beats_loudness']['mean']
+    #get the standard deviation of all estimated BPMs (regularity of estimated BPMs)
+    bpm1 = analysis1['rhythm']['bpm_estimates']
+    bpm2 = analysis2['rhythm']['bpm_estimates']
+    bpm1 = numpy.std(bpm1);
+    bpm2 = numpy.std(bpm2);
+
+    #get the weight of the first BPM peak (salience of rhythm)
+    weight1 = analysis1['rhythm']['first_peak_weight']
+    weight2 = analysis2['rhythm']['first_peak_weight']
+        
+    value1 = bpm1;
+    value2 = bpm2;
+
+    # if estimated BPM is suspiciously low, check for the peak weight
+    if bpm1<0.09 or bpm2<0.09:
+        value1 = (1-weight1)*bpm1
+        value2 = (1-weight2)*bpm2
     
+    # if the difference is too small, rely on the loudness of the beats
+    if abs(value1-value2)<0.05:
+       value1 = -analysis1['rhythm']['beats_loudness']['mean']
+       value2 = -analysis2['rhythm']['beats_loudness']['mean']     
+
+    # if one of the values is zero, just give the win to the other one
     if (value1==0 or value2==0) and (value1<>value2):
         if value1==0:
             return 2, value1,value2
         else:
             return 1, value1,value2
     
-    if math.fabs(value1-value2) < TIE_THRESHOLD :
-        value2 = value1 # Make them tie
-        
     if value1 < value2:
         return 1, value1, value2 # sound 1 wins
     elif value1 > value2:
         return 2, value1, value2 # Sound 2 wins
     else:
-        return False, value1, value2 # Tie
+        return 0, value1, value2 # Tie
 
 
 # BATTLES
@@ -221,21 +253,32 @@ def computeBattle(id1, id2, algorithm):
     as2, id2 = getSoundAnalysisData(id2)
     
     winner, v1, v2 = algorithm(as1, as2)
-    points = 10 + int(abs(v1 - v2) * 100)
+
+    # invert negative values
+    if (v1<0 and v2<0):
+        v1 = abs(v1)
+        v2 = abs(v2)
+
+    # normalize values to calculate points
+    v1 = v1/max(v1,v2,0.0001)
+    v2 = v2/max(v1,v2,0.0001)
+        
+    points = 10 + int(max(abs(v1-v2),1)*20)
     
     result = {'winner': winner,
               'points': points
               }
     
-    print "\n\nBattle: " + str(algorithm)
+    #print "\n\nBattle: " + str(algorithm)
     #displayWinner(id1,id2,v1,v2,winner)
-    print result
+    #print result
     
     return result
     
 
 if __name__ == '__main__':
     print "Algorithms for fsWars\n---------------------\n"
+    '''
     init()
     id1 = random_id()
     id2 = random_id()
@@ -245,4 +288,4 @@ if __name__ == '__main__':
     computeBattle(id1,id2, ALGORITHM_CLASSES['TONAL'] )
     computeBattle(id1,id2, ALGORITHM_CLASSES['NOISINESS'] )
     computeBattle(id1,id2, ALGORITHM_CLASSES['LOUDNESS'] )
-    
+    '''
