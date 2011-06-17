@@ -135,6 +135,11 @@ def calculate_final_scores(history):
     return player1, player2
 
 
+@auth()
+def battle_status(request, battle_id):
+    battle = get_object_or_404(Battle, id=battle_id)
+    return HttpResponse(battle.do_json())
+
 
 @auth()
 def battle_result(request, battle_id):
