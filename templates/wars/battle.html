@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block head %}
-	{{ block.super }}
+    {{ block.super }}
     <link rel="stylesheet" type="text/css" href="/static_media/css/3-column-layout.css" />
     <script type="text/javascript">
     var presets = {{ presets|safe }};
@@ -10,137 +10,143 @@
     var current_fight = 0;
     // ----------- ON READY
     $(document).ready(function(){
-    	apiKey = settings.apiKey;
-    	if(apiKey == "")
-    	{
-    		alert("no KEY!"); 
-    	}			
-    	else 
-    	{				
-    		/*======= freesound object ========*/
-    		//creating freesound object	
-    		freesound = new Freesound(apiKey, true);
-    	}
-    	
-    	populate(battleObj);
-    	setPoll(); 
+        apiKey = settings.apiKey;
+        if(apiKey == "")
+        {
+            alert("no KEY!");
+        }
+        else
+        {
+            /*======= freesound object ========*/
+            //creating freesound object
+            freesound = new Freesound(apiKey, true);
+        }
+
+        populate(battleObj);
+        setPoll();
     });
-	function populate(battle) {
-		// ---------- populate player1
-		var temp = battle['player1_sounds'];
-		for (i in temp) {
-			freesound.getSound(temp[i], function(data) {displaySoundInfo(data, 1);}, errorSound );
-			// $("#sound_p1").append("<div id='" + temp[i] + "'>" + temp[i] + "</div>");
-		}
-		// ---------- populate presets
-		for (i in presets) {
-			$("#presets").append("<div id='" + presets[i] + "'>" + presets[i] + "</div>");
-			$("#"+ presets[i]).bind("click", {preset: presets[i]}, function(event) {
-					$("#preset_for_battle").empty();
-					$("#preset_for_battle").append(event.data.preset);
-				});
-		}
-		// ---------- populate player2
-		temp = battle['player2_sounds'];
-		for (i in temp) {
-			freesound.getSound(temp[i], function(data) {displaySoundInfo(data, 2);}, errorSound );
-			//$("#sound_p2").append("<div id='" + temp[i] + "'>" + temp[i] + "</div>");
-		}
-	}
-	function errorSound() {
-	}
-	function displaySoundInfo(sound, player) {
-		// console.log("displaySoundInfo");
-		console.log(sound.properties['id']);
-		$("#sound_p"+player).append("<div id=" + sound.properties['id'] + "\>"); 
-		//$("#"+sound.properties['id']).append("<br><br>Sound info (some)<br>**********");
-		$("#"+sound.properties['id']).append('<br><img src="'+ sound.properties['waveform_m'] + '" alt = "' + sound.properties['waveform_m'] + '"/>');
-		$("#"+sound.properties['id']).append("<br>- filename: " + sound.properties['original_filename']);
-		$("#"+sound.properties['id']).append("<br>- duration: " + sound.properties['duration']);
-		//$("#"+sound.properties['id']).append("<br>- preview-url: " + sound.properties['preview-hq-mp3']);
-		$("#"+sound.properties['id']).append("<br>- tags: " + sound.properties['tags']);
-		$("#"+sound.properties['id']).append("</div>");
+    function populate(battle) {
+        // ---------- populate player1
+        var temp = battle['player1_sounds'];
+        for (i in temp) {
+            freesound.getSound(temp[i], function(data) {displaySoundInfo(data, 1);}, errorSound );
+            // $("#sound_p1").append("<div id='" + temp[i] + "'>" + temp[i] + "</div>");
+        }
+        // ---------- populate presets
+        for (i in presets) {
+            $("#presets").append("<div id='" + presets[i] + "'>" + presets[i] + "</div>");
+            $("#"+ presets[i]).bind("click", {preset: presets[i]}, function(event) {
+                    $("#preset_for_battle").empty();
+                    $("#preset_for_battle").append(event.data.preset);
+                });
+        }
+        // ---------- populate player2
+        temp = battle['player2_sounds'];
+        for (i in temp) {
+            freesound.getSound(temp[i], function(data) {displaySoundInfo(data, 2);}, errorSound );
+            //$("#sound_p2").append("<div id='" + temp[i] + "'>" + temp[i] + "</div>");
+        }
+    }
+    function errorSound() {
+    }
+    function displaySoundInfo(sound, player) {
+        // console.log("displaySoundInfo");
+        console.log(sound.properties['id']);
+        $("#sound_p"+player).append("<div id=" + sound.properties['id'] + "\>");
 
-		// add handler
-		$("#" + sound.properties['id']).bind("click", {soundId: sound.properties['id']}, function(event) {
-			// TODO: add length check and remove function 
-			// $("#current_battle").append(event.data.soundId + " ");
-			addToBattleCandidate(event.data.soundId);
-		});
-	}
-	function addToBattleCandidate(soundId) {
-		// 2nd sound		
-		if ($("#"+ soundId).parent().hasClass("p1")) {
-			$("#player1_sound").empty();
-			$("#player1_sound").append(soundId);
-		} else if ($("#"+ soundId).parent().hasClass("p2")) {
-			$("#player2_sound").empty();
-			$("#player2_sound").append(soundId);
-		}
-		current_fight++;
-		// $("#current_battle").append(soundId);
-		if (current_fight == 2) {
-			$("#fight").show();
-		}
-	}
-	function fight() {
-		var ids = $("#current_battle").html().split(" ");
-		var url = "/battle/"+ battleObj['id'] +"/fight/"+ ids[0] +"/"+ ids[1] +"/"+ $("#preset_for_battle").html();
-		$.get(url, function (data) {
-				$("#result").append(data);
-			});		
-	}
-	function setPoll() {
-		var sURL = "/battle/" + battleObj['id'] +"/status/";
-		$.ajax({
-			  type: "GET",
-			  url: sURL,
-			  dataType: "json",
-			  success: function(xhr_data) {
-				  console.log(xhr_data);
-				  if (xhr_data.status == 'pending') {
-				    setTimeout(function() { console.log("pending"); }, 3000); // wait 15 seconds than call ajax request again
-				  } else {
-					// TODO: I don't get the right data...
-					setInterval(function(xhr_data) {
-						battleStatus(); 
-						// console.log(xhr_data); 
-					}, 2000); // wait 15 seconds than call ajax request again
-			  	  }
-				}
-			});
-	}
-	function battleStatus() {
-		var sURL = "/battle/" + battleObj['id'] +"/status/";
-		var parsed;
-		var turnPlayerNick
-		var player_num = (myPlayer == battleObj['player1']) ? 1 : 2;
-		// console.log(player_num);
-		$.get(sURL, function(data) {
-				parsed = jQuery.parseJSON(data);
-				// console.log(parsed['turn_owner']);
+        $("#"+sound.properties['id']).append('<div class="battle_sound_name"><h3>' + sound.properties['original_filename'] + '</h3></div>');
+        $("#"+sound.properties['id']).append('<div class="battle_sound_img"><img src="'+ sound.properties['waveform_m'] + '" alt = "' + sound.properties['waveform_m'] + '"/></div>');
 
-				if (parsed['turn_owner'] == player_num) {
-					// console.log('my turn');
-				} else {
-					// console.log('opponents turn');
-				}
-				updateAfterBattle(parsed);
-			});
-	}
-	function updateAfterBattle(battle) {
-		// show turn result
-		$("#result").replaceWith(parsed['winner'] + parsed['points']);
-	}
-	// TODO:
-	function findWinner() {
-		
-	}
-	function displayControl() {
-		
-	}
-	
-	</script>
+        /*
+        //$("#"+sound.properties['id']).append("<br>- duration: " + sound.properties['duration']);
+        //$("#"+sound.properties['id']).append("<br>- preview-url: " + sound.properties['preview-hq-mp3']);
+        */
+
+        $("#"+sound.properties['id']).append('<div class="battle_tags">tags: ' + sound.properties['tags'].join(', ') + '</div>');
+        $("#"+sound.properties['id']).append('<br style="clear: both;"/>');
+
+        $("#"+sound.properties['id']).append("</div>");
+
+        // add handler
+        $("#" + sound.properties['id']).bind("click", {soundId: sound.properties['id']}, function(event) {
+            // TODO: add length check and remove function
+            // $("#current_battle").append(event.data.soundId + " ");
+            addToBattleCandidate(event.data.soundId);
+        });
+    }
+    function addToBattleCandidate(soundId) {
+        // 2nd sound
+        if ($("#"+ soundId).parent().hasClass("p1")) {
+            $("#player1_sound").empty();
+            $("#player1_sound").append(soundId);
+        } else if ($("#"+ soundId).parent().hasClass("p2")) {
+            $("#player2_sound").empty();
+            $("#player2_sound").append(soundId);
+        }
+        current_fight++;
+        // $("#current_battle").append(soundId);
+        if (current_fight == 2) {
+            $("#fight").show();
+        }
+    }
+    function fight() {
+        var ids = $("#current_battle").html().split(" ");
+        var url = "/battle/"+ battleObj['id'] +"/fight/"+ ids[0] +"/"+ ids[1] +"/"+ $("#preset_for_battle").html();
+        $.get(url, function (data) {
+                $("#result").append(data);
+            });
+    }
+    function setPoll() {
+        var sURL = "/battle/" + battleObj['id'] +"/status/";
+        $.ajax({
+              type: "GET",
+              url: sURL,
+              dataType: "json",
+              success: function(xhr_data) {
+                  console.log(xhr_data);
+                  if (xhr_data.status == 'pending') {
+                    setTimeout(function() { console.log("pending"); }, 3000); // wait 15 seconds than call ajax request again
+                  } else {
+                    // TODO: I don't get the right data...
+                    setInterval(function(xhr_data) {
+                        battleStatus();
+                        // console.log(xhr_data);
+                    }, 2000); // wait 15 seconds than call ajax request again
+                    }
+                }
+            });
+    }
+    function battleStatus() {
+        var sURL = "/battle/" + battleObj['id'] +"/status/";
+        var parsed;
+        var turnPlayerNick
+        var player_num = (myPlayer == battleObj['player1']) ? 1 : 2;
+        // console.log(player_num);
+        $.get(sURL, function(data) {
+                parsed = jQuery.parseJSON(data);
+                // console.log(parsed['turn_owner']);
+
+                if (parsed['turn_owner'] == player_num) {
+                    // console.log('my turn');
+                } else {
+                    // console.log('opponents turn');
+                }
+                updateAfterBattle(parsed);
+            });
+    }
+    function updateAfterBattle(battle) {
+        // show turn result
+        $("#result").replaceWith(parsed['winner'] + parsed['points']);
+    }
+    // TODO:
+    function findWinner() {
+
+    }
+    function displayControl() {
+
+    }
+
+    </script>
 {% endblock %}
 
 {% block content %}
@@ -150,25 +156,25 @@
 <div id="preset_for_battle"></div>
 <br />
 <div id="fight" style="display: none;">
-	<a href="#" onclick="fight()">Fight!</a>
+    <a href="#" onclick="fight()">Fight!</a>
 </div>
 <br />
 <div id="maincontainer">
-	<div id="leftcolumn" class="battlecolumn">
-		<div id="player1_sound"></div>
-		<label for="sound_p1">Player 1</label>
-		<div id="sound_p1" class="p1">sound 1</div>
-	</div>
-	<div id="contentcolumn" class="battlecolumn">
-		<label for="content">Presets</label>
-		<div id="presets">presets</div>
-	</div>
-	<div id="rightcolumn" class="battlecolumn">
-		<div id="player2_sound"></div>
-		<label for="sound_p2">Player 2</label>
-		<div id="sound_p2" class="p2">sound 2</div>
-	</div>
-	<br style="clear: both;" />
+    <div id="leftcolumn" class="battlecolumn">
+        <div id="player1_sound"></div>
+        <label for="sound_p1">Player 1</label>
+        <div id="sound_p1" class="p1"></div>
+    </div>
+    <div id="contentcolumn" class="battlecolumn">
+        <label for="content">Presets</label>
+        <div id="presets">presets</div>
+    </div>
+    <div id="rightcolumn" class="battlecolumn">
+        <div id="player2_sound"></div>
+        <label for="sound_p2">Player 2</label>
+        <div id="sound_p2" class="p2"></div>
+    </div>
+    <br style="clear: both;" />
 </div>
 <br /><br /><br /><a href="#" onclick="fight()">Fight!</a>
 

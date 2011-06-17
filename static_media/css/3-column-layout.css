@@ -18,21 +18,21 @@ width: 100%;
 }
 
 .battlecolumn {
-	float: left;
+    float: left;
 }
 
-#contentcolumn{
+#contentcolumn {
 /*margin: 0 190px 0 180px; */
-width: 500px;
+width: 200px;
 
 }
 
 #leftcolumn{
-width: 180px; /*Width of left column in pixel*/
+width: 410px; /*Width of left column in pixel*/
 }
 
 #rightcolumn{
-width: 190px; /*Width of right column*/
+width: 410px; /*Width of right column*/
 }
 
 #footer{
@@ -52,3 +52,18 @@ color: #FFFF80;
 margin: 10px; /*Margins for inner DIV inside each column (to provide padding)*/
 margin-top: 0;
 }
+
+
+.battle_sound_name {
+
+    }
+
+.battle_sound_img {
+    float: left;
+    width: 121px;
+    }
+
+.battle_tags {
+    float: left;
+    width: 279px;
+    }
