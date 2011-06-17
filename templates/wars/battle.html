@@ -135,7 +135,9 @@
             $("#fight").hide();
             console.log("all ready for battle");
             var url = "/battle/"+ battleObj['id'] +"/fight/"+ $("#player1_sound").html() +"/"+ $("#player2_sound").html() +"/"+ $("#battle_preset").html();
-            $.get(url);
+            $.get(url, function (data) {
+                    $("#result").append(data);
+                });
             // clean controls
             $("#player1_sound").empty();
             $("#player2_sound").empty();
