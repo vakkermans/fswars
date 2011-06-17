@@ -29,27 +29,27 @@
     {% if scores.0 == scores.1 %}
         <!-- War has no winners... -->
         <!-- show TIE IMAGE -->
-        
+        <img src="{{ STATIC_URL }}images/end_tieT.png">
     {% else %}
         {% if scores.0 > scores.1 %}
             <!--  <span class="winner">{{ battle.player1 }}</span><br> -->
             
             {% if request.user ==  battle.player1 %}
             	<!-- show WINNER IMAGE -->
-            	<img src="{{ STATIC_URL }}images/end_lose.png">
+            	<img src="{{ STATIC_URL }}images/end_winT.png">
             	
             {% else %}
             	<!-- show LOOSER IMAGE -->
-            	<img src="{{ STATIC_URL }}images/end_lose.png">
+            	<img src="{{ STATIC_URL }}images/end_loseT.png">
             {% endif %}
         {% else %}
             <!-- <span class="winner">{{ battle.player2 }}</span><br> -->
             {% if request.user ==  battle.player2 %}
             	<!-- show WINNER IMAGE -->
-            	<img src="{{ STATIC_URL }}images/end_lose.png">
+            	<img src="{{ STATIC_URL }}images/end_winT.png">
             {% else %}
             	<!-- show LOOSER IMAGE -->
-            	<img src="{{ STATIC_URL }}images/end_lose.png">
+            	<img src="{{ STATIC_URL }}images/end_loseT.png">
             {% endif %}
         {% endif %}
         <!-- has won the Freesound War! -->
