@@ -24,6 +24,9 @@ width: 100%;
 #contentcolumn {
 /*margin: 0 190px 0 180px; */
 width: 200px;
+border-radius: 15px;
+background-color: gainsboro;
+margin-right: 20px;
 }
 
 #contentcolumn img {
@@ -64,6 +67,7 @@ margin-top: 0;
 .battle_sound_img {
     float: left;
     width: 121px;
+    margin-right: 5px;
     }
 
 .battle_tags {

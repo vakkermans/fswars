@@ -35,7 +35,7 @@
         // ---------- populate presets
         for (i in presets) {
             //$("#presets").append("<div id='" + presets[i] + "'>" + presets[i] + "</div>");
-            $("#presets").append('<div id="' + presets[i] + '"><img src="{{ STATIC_URL }}images/' + presets[i].toLowerCase() + '_btn.png" /></div>');
+            $("#presets").append('<div id="' + presets[i] + '"><img src="{{ STATIC_URL }}images/' + presets[i].toLowerCase() + '_btn.png" /></div><br><br><br>');
             $("#"+ presets[i]).bind("click", {preset: presets[i]}, function(event) {
                     $("#preset_for_battle").empty();
                     $("#preset_for_battle").append(event.data.preset);
@@ -157,7 +157,7 @@
 <div id="preset_for_battle"></div>
 <br />
 <div id="fight" style="display: none;">
-    <a href="#" onclick="fight()">Fight!</a>
+    <center><h1><a href="#" onclick="fight()">Fight!</a></h1></center>
 </div>
 <br />
 <div id="maincontainer">
@@ -167,7 +167,7 @@
         <div id="sound_p1" class="p1"></div>
     </div>
     <div id="contentcolumn" class="battlecolumn">
-        <label for="content"><h2>Battle</h2></label>
+        <label for="content"><center><h2>Battle with..</h2></center></label>
         <div id="presets"></div>
     </div>
     <div id="rightcolumn" class="battlecolumn">
