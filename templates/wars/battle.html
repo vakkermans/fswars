@@ -136,7 +136,11 @@
 			console.log("all ready for battle");
 			var url = "/battle/"+ battleObj['id'] +"/fight/"+ $("#player1_sound").html() +"/"+ $("#player2_sound").html() +"/"+ $("#battle_preset").html();
 			$.get(url, function (data) {
-					$("#result").append(data);
+					// TODO: this needs fix, check error in firefox
+					var battle_result = jQuery.parseJSON(data);
+					console.log(battle_result['history']);
+					var last_round = battle_result['history'][battle_result['history'].length-1];
+					$("#result").append(findWinnerAndPoints(last_round));
 				});
 			// clean controls
 			$("#player1_sound").empty();
