@@ -115,10 +115,13 @@ def fight(request, battle_id, id1, id2, preset):
         print 'ARG, not a valid preset'
     battle_result = algorithms.computeBattle(int(id1), int(id2), algorithms.ALGORITHM_CLASSES[ps])
     history = json.loads(battle.history) if battle.history else []
-    history.append([id1, id2, ps, battle_result['winner'], battle_result['points']])
+    history.append([int(id1), int(id2), ps, battle_result['winner'], battle_result['points']])
     battle.history = json.dumps(history)
     # N.B. player1 always starts! 1-indexed, so 1 or 2
     battle.turn_owner = 2 if len(history) % 2 == 1 else 1
+    if len(history) >= len(json.loads(battle.player1_sounds)) or \
+       len(history) >= len(json.loads(battle.player2_sounds)):
+        battle.finished = True
     battle.save()
     return HttpResponse(battle.do_json())
 
