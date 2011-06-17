@@ -162,16 +162,16 @@
 <div id="maincontainer">
     <div id="leftcolumn" class="battlecolumn">
         <div id="player1_sound"></div>
-        <label for="sound_p1">Player 1</label>
+        <label for="sound_p1"><h2>P1: {% if my_nickname == battle.player1 %}You!{% else %}{{ battle.player1 }}{% endif %}</h2></label>
         <div id="sound_p1" class="p1"></div>
     </div>
     <div id="contentcolumn" class="battlecolumn">
-        <label for="content">Presets</label>
-        <div id="presets">presets</div>
+        <label for="content"><h2>Battle</h2></label>
+        <div id="presets"></div>
     </div>
     <div id="rightcolumn" class="battlecolumn">
         <div id="player2_sound"></div>
-        <label for="sound_p2">Player 2</label>
+        <label for="sound_p2"><h2>P2: {% if my_nickname == battle.player2 %}You!{% else %}{{ battle.player2 }}{% endif %}</h2></label>
         <div id="sound_p2" class="p2"></div>
     </div>
     <br style="clear: both;" />
