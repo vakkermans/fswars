@@ -14,6 +14,8 @@ from algorithms import algorithms
 
 SESSION_NICKNAME = 'session_nickname'
 
+from algorithms import algorithms
+algorithms.init()
 
 class auth():
 
@@ -70,7 +72,7 @@ def pick_sounds(request, battle_id):
     if request.method == 'POST':
         form = PickSoundsForm(request.POST)
         if form.is_valid():
-            sound_ids = form.cleaned_data.get('sound_ids',[])
+            sound_ids = [int(x) for x in form.cleaned_data.get('sound_ids').split(',')]
             if battle.player1 == request.user:
                 battle.player1_sounds = json.dumps(sound_ids)
             else:
@@ -93,13 +95,13 @@ def wait_on_sounds(request, battle_id):
     return rtr('wars/wait_on_sounds.html')
 
 
-def compute(request, id1, id2, preset):
-    ps = preset.upper()
-    if ps not in algorithms.ALGORITHM_CLASSES:
-        print 'ARG, not a valid preset'
-    return HttpResponse(json.dumps(algorithms.computeBattle(int(id1),
-                                                            int(id2),
-                                                            algorithms.ALGORITHM_CLASSES[ps])))
+#def compute(request, id1, id2, preset):
+#    ps = preset.upper()
+#    if ps not in algorithms.ALGORITHM_CLASSES:
+#        print 'ARG, not a valid preset'
+#    return HttpResponse(json.dumps(algorithms.computeBattle(int(id1),
+#                                                            int(id2),
+#                                                            algorithms.ALGORITHM_CLASSES[ps])))
 
 
 @auth()
@@ -110,7 +112,7 @@ def fight(request, battle_id, id1, id2, preset):
         print 'ARG, not a valid preset'
     battle_result = algorithms.computeBattle(int(id1), int(id2), algorithms.ALGORITHM_CLASSES[ps])
     history = json.loads(battle.history) if battle.history else []
-    history.append([id1, id2, ps, battle_result['winner'], battle_result['number']])
+    history.append([id1, id2, ps, battle_result['winner'], battle_result['points']])
     battle.history = json.dumps(history)
     # N.B. player1 always starts! 1-indexed, so 1 or 2
     battle.turn_owner = 2 if len(history) % 2 == 1 else 1
