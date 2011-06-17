@@ -11,6 +11,7 @@ from models import *
 from django.contrib import messages
 import json
 from algorithms import algorithms
+from django.core import serializers
 
 SESSION_NICKNAME = 'session_nickname'
 
@@ -84,6 +85,8 @@ def pick_sounds(request, battle_id):
 
 @auth()
 def battle(request, battle_id):
+    battle = get_object_or_404(Battle, id=battle_id)
+    battle_json = battle.do_json()
     return rtr('wars/battle.html')
 
 

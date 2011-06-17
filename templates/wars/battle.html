@@ -2,31 +2,9 @@
 
 {% block head %}
 	{{ block.super }}
-	<style type="text/css">
-        /*
-        .p1 {
-          overflow: auto;
-          position: relative;
-          float: left;
-          width: 250px;
-          margin-right: 0px;
-        }
-        .p2 {
-            position: relative;
-            float: left;
-            width: 250px;
-            margin-top: 0px;
-        }
-        .center {
-            overflow: auto;
-            position: relative;
-            float: left;
-            width: 800px;
-        }
-        */
-    </style>
-     <link rel="stylesheet" type="text/css" href="/static_media/css/3-column-layout.css" />
+    <link rel="stylesheet" type="text/css" href="/static_media/css/3-column-layout.css" />
     <script type="text/javascript">
+    var presets = ['loudness', 'brightness'];
     $(document).ready(function(){
     	apiKey = settings.apiKey;
     	if(apiKey == "")
@@ -38,7 +16,9 @@
     		/*======= freesound object ========*/
     		//creating freesound object	
     		freesound = new Freesound(apiKey, true);
-    	} 
+    	}
+    	var battleObj = {{battle_json|safe}};
+    	populate(battleObj); 
     });
     function fight() {
         // TODO: implement preset
@@ -48,26 +28,43 @@
 			$("#result").append(data);
 		});
     }
-
+	function populate(battle) {
+		// ---------- populate player1
+		var temp = battle['player1_sounds'].split(",");
+		for (i in temp) {
+			$("#sound_p1").append("<div id='" + temp[i] + "'>" + temp[i] + "</div>");
+		}
+		// ---------- populate presets
+		for (i in presets) {
+			$("#presets").append("<div id='" + presets[i] + "'>" + presets[i] + "</div>");
+		}
+		// ---------- populate player2
+		temp = battle['player2_sounds'].split(",");
+		for (i in temp) {
+			$("#sound_p2").append("<div id='" + temp[i] + "'>" + temp[i] + "</div>");
+		}
+	}
 	</script>
 {% endblock %}
 
 {% block content %}
+
 <div id="result"></div>
 <div id="current_battle"></div>
-<div id="content-wrapper">
-	<div id="leftcolumn">
+<div id="maincontainer">
+	<div id="leftcolumn" class="battlecolumn">
 		<label for="sound_p1">Player 1</label>
 		<div id="sound_p1">sound 1</div>
 	</div>
-	<div id="contentcolumn">
+	<div id="contentcolumn" class="battlecolumn">
 		<label for="content">Presets</label>
 		<div id="presets">presets</div>
 	</div>
-	<div id="rightcolumn">
+	<div id="rightcolumn" class="battlecolumn">
 		<label for="sound_p2">Player 2</label>
 		<div id="sound_p2">sound 2</div>
 	</div>
+	<br style="clear: both;" />
 </div>
 <br /><br /><br /><a href="#" onclick="fight()">Fight!</a>
 

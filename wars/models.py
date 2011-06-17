@@ -27,3 +27,15 @@ class Battle(models.Model):
 
     def status(self):
         return json.dumps(self)
+    
+    def do_json(self):
+        data = {}
+        data['player1'] = self.player1
+        data['player2'] = self.player2
+        data['player1_sounds'] = self.player1_sounds
+        data['player2_sounds'] = self.player2_sounds
+        data['turn_owner'] = self.turn_owner
+        data['history'] = self.history
+        data['finished'] = self.finished
+        
+        return json.dumps(data)
