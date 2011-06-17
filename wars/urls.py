@@ -14,21 +14,20 @@ urlpatterns = patterns('',
     url(r'^battle/(?P<battle_id>\d+)/pick-sounds/$',
         pick_sounds,
         name='pick-sounds'),
-        
+
     url(r'^battle/(?P<battle_id>\d+)/$',
         battle,
         name='battle'),
 
-#    url(r'^battle/$',
-#        battle,
-#        name='battle'),
-#
+    url(r'^battle/(?P<battle_id>\d+)/wait-on-sounds/$',
+        wait_on_sounds,
+        name='wait-on-sounds'),
+
 #    url(r'^compute/(?P<id1>\d+)/(?P<id2>\d+)/(?P<preset>\w+)/$',
 #        compute,
 #        name='compute'),
-#
-#    url(r'^delete_users/$',
-#        delete_users,
-#        name='delete-users'),
 
+    url(r'^battle/(?P<battle_id>\d+)/fight/(?P<id1>\d+)/(?P<id2>\d+)/(?P<preset>\w+)/$',
+        fight,
+        name='fight'),
 )
