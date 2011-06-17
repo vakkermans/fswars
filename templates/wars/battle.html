@@ -3,6 +3,31 @@
 {% block head %}
     {{ block.super }}
     <link rel="stylesheet" type="text/css" href="/static_media/css/3-column-layout.css" />
+    <style type="text/css">
+		/* Z-index of #mask must lower than #boxes .window */
+		#mask {
+		  position:absolute;
+		  z-index:9000;
+		  background-color:#000;
+		  display:none;
+		}
+		   
+		#boxes .window {
+		  position:absolute;
+		  width:440px;
+		  height:200px;
+		  display:none;
+		  z-index:9999;
+		  padding:20px;
+		}
+		 
+		/* Customize your modal window here, you can add background image too */
+		#boxes #dialog {
+		  width:375px;
+		  height:203px;
+		}
+    </style>
+    
     <script type="text/javascript">
     var presets = {{ presets|safe }};
     var battleObj = {{battle_json|safe}};
@@ -154,6 +179,7 @@
 					// console.log('my turn');
 				} else {
 					// console.log('opponents turn');
+					coverScreen();
 				}
 				updateAfterBattle(parsed);
 			});
@@ -174,7 +200,7 @@
 	
 	function findWinnerAndPoints(last_round) {
 		var sResult = "And the winner is... ";
-		if (last_round[0] == 1) {
+		if (last_round[3] == 1) {
 			sResult += battleObj['player1'];
 		} else {
 			sResult += battleObj['player2'];
@@ -182,7 +208,7 @@
 		sResult += " with " + last_round[4] + " points!!!";
 		return sResult;
 	}
-	function displayControl() {
+	function coverScreen() {
 		
 	}
 	
