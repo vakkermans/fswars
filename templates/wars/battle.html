@@ -26,40 +26,37 @@
         setPoll();
     });
 
-	function populate(battle) {
-		// ---------- populate player1
-		var temp = battle['player1_sounds'];
-		for (i in temp) {
-			freesound.getSound(temp[i], function(data) {displaySoundInfo(data, 1);}, errorSound );
-			// $("#sound_p1").append("<div id='" + temp[i] + "'>" + temp[i] + "</div>");
-		}
-		// ---------- populate presets
-		for (i in presets) {
-			$("#presets").append('<div id="' + presets[i] + '"><img src="{{ STATIC_URL }}images/' + presets[i].toLowerCase() + '_btn.png" /></div><br><br><br>');
-			$("#"+ presets[i]).bind("click", {preset: presets[i]}, function(event) {
-					$("#battle_preset").empty();
-					$("#battle_preset").append(event.data.preset);
-					$("#battle_preset").click(function() { 
-									$(this).empty();
-									//$("#fight").hide();
-					});
-					if (isReadyToFight()) {
-						$("#fight").show();
-					}
-				});
-		}
-		// ---------- populate player2
-		temp = battle['player2_sounds'];
-		for (i in temp) {
-			freesound.getSound(temp[i], function(data) {displaySoundInfo(data, 2);}, errorSound );
-			//$("#sound_p2").append("<div id='" + temp[i] + "'>" + temp[i] + "</div>");
-		}
-	}
-	function errorSound() {
-	}
-	function displaySoundInfo(sound, player) {
-		// console.log("displaySoundInfo");
-		console.log(sound.properties['id']);
+    function populate(battle) {
+        // ---------- populate player1
+        var temp = battle['player1_sounds'];
+        for (i in temp) {
+            freesound.getSound(temp[i], function(data) {displaySoundInfo(data, 1);}, errorSound );
+            // $("#sound_p1").append("<div id='" + temp[i] + "'>" + temp[i] + "</div>");
+        }
+        // ---------- populate presets
+        for (i in presets) {
+            $("#presets").append('<div id="' + presets[i] + '"><img src="{{ STATIC_URL }}images/' + presets[i].toLowerCase() + '_btn.png" /></div><br><br><br>');
+            $("#"+ presets[i]).bind("click", {preset: presets[i]}, function(event) {
+                    $("#battle_preset").empty();
+                    $("#battle_preset").append(event.data.preset);
+                    $("#battle_preset").click(function() { $(this).empty(); });
+                    });
+                    if (isReadyToFight()) {
+                        $("#fight").show();
+                    }
+        }
+        // ---------- populate player2
+        temp = battle['player2_sounds'];
+        for (i in temp) {
+            freesound.getSound(temp[i], function(data) {displaySoundInfo(data, 2);}, errorSound );
+            //$("#sound_p2").append("<div id='" + temp[i] + "'>" + temp[i] + "</div>");
+        }
+    }
+    function errorSound() {
+    }
+    function displaySoundInfo(sound, player) {
+        // console.log("displaySoundInfo");
+        console.log(sound.properties['id']);
         $("#sound_p"+player).append("<div id=" + sound.properties['id'] + "\>");
 
         $("#"+sound.properties['id']).append('<div class="battle_sound_name"><h3>' + sound.properties['original_filename'] + '</h3></div>');
@@ -194,32 +191,31 @@
 
 {% block content %}
 <p><h2>Warrior: {{my_nickname}}</h2></p>
-<div id="result"></div>
+<center><h1><div id="result"></div></h1></center>
 <div id="status"></div>
 <br />
 <div id="fight" style="display: none;">
-    <center><h1><a href="#" onclick="fight()">Fight!</a></h1></center>
+    <center><h1><a href="#" onclick="fight()"><img src="{{ STATIC_URL}}images/fight.png" /></a></h1></center>
 </div>
 <br />
 <div id="maincontainer">
-	<div id="leftcolumn" class="battlecolumn">
-		<div id="player1_sound"></div>
-		<label for="sound_p1"><h2>P1: {% if my_nickname == battle.player1 %}You!{% else %}{{ battle.player1 }}{% endif %}</h2></label>
-		<div id="sound_p1" class="p1"></div>
-	</div>
-	<div id="contentcolumn" class="battlecolumn">
-		<div id="battle_preset"></div>
-		<label for="content"><center><h2>Battle with..</h2></center></label>
-		<div id="presets"></div>
-	</div>
-	<div id="rightcolumn" class="battlecolumn">
-		<div id="player2_sound"></div>
-		<label for="sound_p2"><h2>P2: {% if my_nickname == battle.player2 %}You!{% else %}{{ battle.player2 }}{% endif %}</h2></label>
-		<div id="sound_p2" class="p2"></div>
-	</div>
-	<br style="clear: both;" />
+    <div id="leftcolumn" class="battlecolumn">
+        <div id="player1_sound"></div>
+        <label for="sound_p1"><h2>P1: {% if my_nickname == battle.player1 %}You!{% else %}{{ battle.player1 }}{% endif %}</h2></label>
+        <div id="sound_p1" class="p1"></div>
+    </div>
+    <div id="contentcolumn" class="battlecolumn">
+        <div id="battle_preset"></div>
+        <label for="content"><center><h2>Battle with..</h2></center></label>
+        <div id="presets"></div>
+    </div>
+    <div id="rightcolumn" class="battlecolumn">
+        <div id="player2_sound"></div>
+        <label for="sound_p2"><h2>P2: {% if my_nickname == battle.player2 %}You!{% else %}{{ battle.player2 }}{% endif %}</h2></label>
+        <div id="sound_p2" class="p2"></div>
+    </div>
+    <br style="clear: both;" />
 </div>
-<br /><br /><br /><a href="#" onclick="fight()">Fight!</a>
 
 {% endblock %}
 

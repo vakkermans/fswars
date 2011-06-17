@@ -5,138 +5,146 @@ body {
     margin-top: 7px;
 }
 
-.header_title { 
-	position: fixed;
-  	font-family:Helvetica,arial; 
-  	font-size: 28pt; 
-  	font-weight: bold;
-  	background-color:rgb(76,76,76);
-	border-radius: 15px;
-	padding:10px;
-	width:1112px;
-	color:white;
+.header_title {
+    position: fixed;
+      font-family:Helvetica,arial;
+      font-size: 28pt;
+      font-weight: bold;
+      background-color:rgb(76,76,76);
+    border-radius: 15px;
+    padding:10px;
+    width:1112px;
+    color:white;
 }
 
-.title { 
-  	font-family:Helvetica,arial; 
-  	font-size: 26pt; 
+.title {
+      font-family:Helvetica,arial;
+      font-size: 26pt;
 }
 
-.title_small { 
-  	font-family:Helvetica,arial; 
-  	font-size: 16pt;
-  	font-weight: bold;
+.title_small {
+      font-family:Helvetica,arial;
+      font-size: 16pt;
+      font-weight: bold;
 }
 
-.winner { 
-  	font-family:Helvetica,arial; 
-  	font-size: 38pt;
-  	font-weight: bold;
+.winner {
+      font-family:Helvetica,arial;
+      font-size: 38pt;
+      font-weight: bold;
 }
 
-.over { 
-  	font-family:Helvetica,arial; 
-  	font-size: 16pt; 
+.over {
+      font-family:Helvetica,arial;
+      font-size: 16pt;
 }
 
-.results_summary { 
-  	font-family:Helvetica,arial; 
-  	font-size: 16pt;
-  	
-}
-
-.summaryO { 
-  	font-family:Helvetica,arial; 
-  	font-size: 12pt;
-  	background-color:rgb(220,220,220);
-  	padding:10px;
-  	width:500px;
-  	border-radius: 5px;
-}
-
-.summaryE { 
-  	font-family:Helvetica,arial; 
-  	font-size: 12pt; 
-  	background-color:rgb(196,196,196);
-  	padding:10px;
-  	width:500px;
-  	border-radius: 5px;
-}
-
-.section_title { 
-  	font-family:Helvetica,arial; 
-  	font-size: 22pt; 
-}
-
-.explanation { 
-  	font-family:Helvetica,arial; 
-  	font-size: 12pt; 
-}
-
-.nickname { 
-  	font-family:Helvetica,arial; 
-  	font-size: 10pt; 
-  	background-color:rgb(76,76,76);
-	border-radius: 25px;
-	padding:10px;
-	width:150px;
-	color:white;
-}
-
-.waiting { 
-  	font-family:Helvetica,arial; 
-  	font-size: 15pt; 
-  	background-color:rgb(76,76,76);
-	border-radius: 25px;
-	padding:10px;
-	width:270px;
-	color:white;
-}
-
-.waitingFinal { 
-  	font-family:Helvetica,arial; 
-  	font-size: 15pt; 
-  	background-color:rgb(76,76,76);
-	border-radius: 25px;
-	padding:10px;
-	width:350px;
-	color:white;
-}
-
-.scores { 
-   	/*background-color:rgb(196,196,196);*/
-   	background-color:rgb(76,76,76);
-	border-radius: 25px;
-	padding:10px;
-	width:550px;
-	color:white;
+.results_summary {
+      font-family:Helvetica,arial;
+      font-size: 16pt;
 
 }
 
+.summaryO {
+      font-family:Helvetica,arial;
+      font-size: 12pt;
+      background-color:rgb(220,220,220);
+      padding:10px;
+      width:500px;
+      border-radius: 5px;
+}
 
-.description { 
-  	font-family:Helvetica,arial; 
-  	font-size: 10pt;
+.summaryE {
+      font-family:Helvetica,arial;
+      font-size: 12pt;
+      background-color:rgb(196,196,196);
+      padding:10px;
+      width:500px;
+      border-radius: 5px;
+}
+
+.section_title {
+      font-family:Helvetica,arial;
+      font-size: 22pt;
+}
+
+.explanation {
+      font-family:Helvetica,arial;
+      font-size: 12pt;
+}
+
+.nickname {
+      font-family:Helvetica,arial;
+      font-size: 10pt;
+      background-color:rgb(76,76,76);
+    border-radius: 25px;
+    padding:10px;
+    width:150px;
+    color:white;
+}
+
+.waiting {
+      font-family:Helvetica,arial;
+      font-size: 15pt;
+      background-color:rgb(76,76,76);
+    border-radius: 25px;
+    padding:10px;
+    width:270px;
+    color:white;
+}
+
+.waitingFinal {
+      font-family:Helvetica,arial;
+      font-size: 15pt;
+      background-color:rgb(76,76,76);
+    border-radius: 25px;
+    padding:10px;
+    width:350px;
+    color:white;
+}
+
+.scores {
+       /*background-color:rgb(196,196,196);*/
+       background-color:rgb(76,76,76);
+    border-radius: 25px;
+    padding:10px;
+    width:550px;
+    color:white;
+
+}
+
+
+.description {
+      font-family:Helvetica,arial;
+      font-size: 10pt;
 }
 
 .tags {
-	/*background-color:rgb(255,184,0);*/
-	background-color:rgb(255,221,127);
-  	color:black;
-  	border-radius:2px;
-  	padding:1px;
-  	line-height:150%;
+    /*background-color:rgb(255,184,0);*/
+    background-color:rgb(255,221,127);
+      color:black;
+      border-radius:2px;
+      padding:1px;
+      line-height:150%;
 }
 
 #boy1 {
-	position:fixed;
-	bottom:0px;
-	left:5px;
+    position:fixed;
+    bottom:0px;
+    left:5px;
 }
 
 #boy2 {
-	position:fixed;
-	bottom:-10px;
-	right:-30px;
+    position:fixed;
+    bottom:-10px;
+    right:-30px;
 }
 
+#footer {
+    position: absolute;
+    bottom: 20px;
+    font-size: 0.7em;
+    margin-left: 300px;
+    height: 0px;
+    color: #999;
+}
