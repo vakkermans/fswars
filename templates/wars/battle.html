@@ -70,19 +70,18 @@
 	}
 	function addToBattleCandidate(soundId) {
 		// 2nd sound		
-		if (current_fight == 1) {
-			current_fight = 0;
-			$("#current_battle").append(soundId);
+		if ($("#"+ soundId).parent().hasClass("p1")) {
+			$("#player1_sound").empty();
+			$("#player1_sound").append(soundId);
+		} else if ($("#"+ soundId).parent().hasClass("p2")) {
+			$("#player2_sound").empty();
+			$("#player2_sound").append(soundId);
+		}
+		current_fight++;
+		// $("#current_battle").append(soundId);
+		if (current_fight == 2) {
 			$("#fight").show();
 		}
-		// 1st sound 
-		else if (current_fight == 0) {
-			$("#current_battle").empty();
-			$("#current_battle").append(soundId + " ");
-			current_fight = current_fight + 1;
-		}
-		
-		
 	}
 	function fight() {
 		var ids = $("#current_battle").html().split(" ");
@@ -126,14 +125,12 @@
 				} else {
 					// console.log('opponents turn');
 				}
-				
-				// show turn result
-				$("#result").replaceWith(parsed['winner'] + parsed['points']);
-				
+				updateAfterBattle(parsed);
 			});
 	}
-	function updateStatus(turn_owner) {
-		
+	function updateAfterBattle(battle) {
+		// show turn result
+		$("#result").replaceWith(parsed['winner'] + parsed['points']);
 	}
 	// TODO:
 	function findWinner() {
@@ -150,7 +147,6 @@
 <p><h2>Warrior: {{my_nickname}}</h2></p>
 <div id="result"></div>
 <div id="status"></div>
-<div id="current_battle"></div>
 <div id="preset_for_battle"></div>
 <br />
 <div id="fight" style="display: none;">
@@ -159,16 +155,18 @@
 <br />
 <div id="maincontainer">
 	<div id="leftcolumn" class="battlecolumn">
+		<div id="player1_sound"></div>
 		<label for="sound_p1">Player 1</label>
-		<div id="sound_p1">sound 1</div>
+		<div id="sound_p1" class="p1">sound 1</div>
 	</div>
 	<div id="contentcolumn" class="battlecolumn">
 		<label for="content">Presets</label>
 		<div id="presets">presets</div>
 	</div>
 	<div id="rightcolumn" class="battlecolumn">
+		<div id="player2_sound"></div>
 		<label for="sound_p2">Player 2</label>
-		<div id="sound_p2">sound 2</div>
+		<div id="sound_p2" class="p2">sound 2</div>
 	</div>
 	<br style="clear: both;" />
 </div>
