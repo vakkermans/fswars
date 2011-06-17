@@ -32,10 +32,10 @@ class Battle(models.Model):
         data = {}
         data['player1'] = self.player1
         data['player2'] = self.player2
-        data['player1_sounds'] = json.loads(self.player1_sounds)
-        data['player2_sounds'] = json.loads(self.player2_sounds)
+        data['player1_sounds'] = json.loads(self.player1_sounds) if self.player1_sounds else False
+        data['player2_sounds'] = json.loads(self.player2_sounds) if self.player2_sounds else False
         data['turn_owner'] = self.turn_owner
-        data['history'] = json.loads(self.history)
+        data['history'] = json.loads(self.history) if self.history else []
         data['finished'] = self.finished
         data['id'] = self.id
 

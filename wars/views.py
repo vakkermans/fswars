@@ -111,8 +111,6 @@ def wait_on_sounds(request, battle_id):
 def fight(request, battle_id, id1, id2, preset):
     battle = get_object_or_404(Battle, id=battle_id)
     ps = preset.upper()
-    if ps not in algorithms.ALGORITHM_CLASSES:
-        print 'ARG, not a valid preset'
     battle_result = algorithms.computeBattle(int(id1), int(id2), algorithms.ALGORITHM_CLASSES[ps])
     history = json.loads(battle.history) if battle.history else []
     history.append([int(id1), int(id2), ps, battle_result['winner'], battle_result['points']])
@@ -130,7 +128,7 @@ def calculate_final_scores(history):
     player1 = 0
     player2 = 0
     for i in range(len(history)):
-        if history[3] == 1:
+        if history[i][3] == 1:
             player1 += history[i][4]
         else:
             player2 += history[i][4]
