@@ -30,4 +30,8 @@ urlpatterns = patterns('',
     url(r'^battle/(?P<battle_id>\d+)/fight/(?P<id1>\d+)/(?P<id2>\d+)/(?P<preset>\w+)/$',
         fight,
         name='fight'),
+
+    url(r'^battle/(?P<battle_id>\d+)/result/$',
+        battle_result,
+        name='result'),
 )

@@ -37,5 +37,6 @@ class Battle(models.Model):
         data['turn_owner'] = self.turn_owner
         data['history'] = json.loads(self.history)
         data['finished'] = self.finished
+        data['id'] = self.id
 
         return json.dumps(data)

@@ -126,5 +126,22 @@ def fight(request, battle_id, id1, id2, preset):
     return HttpResponse(battle.do_json())
 
 
+def calculate_final_scores(history):
+    player1 = 0
+    player2 = 0
+    for i in range(len(history)):
+        if history[3] == 1:
+            player1 += history[i][4]
+        else:
+            player2 += history[i][4]
+    return player1, player2
 
+
+
+@auth()
+def battle_result(request, battle_id):
+    battle = get_object_or_404(Battle, id=battle_id)
+    history = json.loads(battle.history)
+    scores = calculate_final_scores(history)
+    return rtr('wars/battle_result.html')
 
