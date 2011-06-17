@@ -1,28 +1,77 @@
 {% extends "base.html" %}
 
-{% block content %}
-    <h1>Battle is over!</h1>
-
-    <p>
+{% block header %}
+	<div class="header_title">
+    Battle is over!!!
+    
     {% if scores.0 == scores.1 %}
-        War has no winners..
+        War has no winners...   
     {% else %}
         {% if scores.0 > scores.1 %}
-            {{ battle.player1 }}
+           {{ battle.player1 }}
         {% else %}
             {{ battle.player2 }}
         {% endif %}
         has won the Freesound War!
     {% endif %}
-    </p>
+    
+    </div>
+{% endblock header %}
 
-    <p>{{ battle.player1 }} - {{ scores.0 }} V.S. {{ scores.1 }} - {{ battle.player2 }}</p>
 
-    <p>
+{% block content %}
+   	<center>
+   	<br>
+   	<br>
+   	<br>
+   	<br>
+    <div>
+    {% if scores.0 == scores.1 %}
+        <!-- War has no winners... -->
+        <!-- show TIE IMAGE -->
+        
+    {% else %}
+        {% if scores.0 > scores.1 %}
+            <!--  <span class="winner">{{ battle.player1 }}</span><br> -->
+            
+            {% if request.user ==  battle.player1 %}
+            	<!-- show WINNER IMAGE -->
+            	<img src="{{ STATIC_URL }}images/end_lose.png">
+            	
+            {% else %}
+            	<!-- show LOOSER IMAGE -->
+            	<img src="{{ STATIC_URL }}images/end_lose.png">
+            {% endif %}
+        {% else %}
+            <!-- <span class="winner">{{ battle.player2 }}</span><br> -->
+            {% if request.user ==  battle.player2 %}
+            	<!-- show WINNER IMAGE -->
+            	<img src="{{ STATIC_URL }}images/end_lose.png">
+            {% else %}
+            	<!-- show LOOSER IMAGE -->
+            	<img src="{{ STATIC_URL }}images/end_lose.png">
+            {% endif %}
+        {% endif %}
+        <!-- has won the Freesound War! -->
+    {% endif %}
+    </div>
+	
+	<!-- p class="title_small">Score:</p-->
+    <div class="scores">
+    <span class="title">{{ battle.player1 }}</span> scored <span class="title">{{ scores.0 }}</span> points<br>
+    <span class="title">{{ battle.player2 }}</span> scored <span class="title">{{ scores.1 }}</span> points
+	</div>
+    <!-- p class="over">{{ battle.player1 }} - {{ scores.0 }} V.S. {{ scores.1 }} - {{ battle.player2 }}</p-->
+	
+	<p class="title_small">Summary:</p>
+    <p class="results_summary">
+    
+    
     {% for round in history %}
          {% if forloop.counter0|divisibleby:2 %}
-             {{ battle.player1 }} played sound {{ round.0 }} against
-             {{ battle.player2 }}'s sound {{ round.1 }} in round {{ round.2 }} and
+             <div class="summaryO">
+             <strong>{{ battle.player1 }}</strong> played sound <strong>{{ round.0 }}</strong> against
+             <strong>{{ battle.player2 }}</strong>'s sound {<strong>{ round.1 }}</strong> in round {{ round.2 }} and
              {% if round.3 %}
                  {% if round.3 == 1 %} won {% else %} lost {% endif %}
                  by {{ round.4 }} points.
@@ -30,8 +79,9 @@
                  tied.
              {% endif %}
           {% else %}
-             {{ battle.player2 }} played sound {{ round.1 }} against
-             {{ battle.player1 }}'s sound {{ round.0 }} in round {{ round.2 }} and
+          	  <div class="summaryE">
+             <strong>{{ battle.player2 }}</strong> played sound <strong>{{ round.1 }}</strong> against
+             <strong>{{ battle.player1 }}</strong>'s sound <strong>{{ round.0 }}</strong> in round {{ round.2 }} and
              {% if round.3 %}
                  {% if round.3 == 2 %} won {% else %}lost{% endif %}
                  by {{ round.4 }} points.
@@ -40,7 +90,10 @@
              {% endif %}
           {% endif %}
          <br>
+         
+         </div>
     {% endfor %}
+    </center>
     </p>
 
 {% endblock content %}
