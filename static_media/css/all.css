@@ -6,6 +6,7 @@ body {
 }
 
 .header_title { 
+	position: fixed;
   	font-family:Helvetica,arial; 
   	font-size: 28pt; 
   	font-weight: bold;
@@ -64,3 +65,16 @@ body {
   	padding:1px;
   	line-height:150%;
 }
+
+#boy1 {
+	position:fixed;
+	bottom:0px;
+	left:5px;
+}
+
+#boy2 {
+	position:fixed;
+	bottom:-10px;
+	right:-30px;
+}
+

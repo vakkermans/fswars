@@ -56,7 +56,7 @@
         border: 0px solid black;
         float:left;
         padding: 5px;
-    }
+        }
 
     #search-results .add
     {
@@ -68,6 +68,18 @@
         display: none;
     }
     
+    #search-div
+    {
+    	left: 8px;
+		top: 70px;
+		position:fixed;
+		background-color:#EDEDED;
+		border-radius: 15px;
+		padding:2px;
+		
+
+		
+	}    
  	.alignRight
  	{
  		font-family:Helvetica,arial;
@@ -208,7 +220,8 @@
 		currently_displayed_search_result = 0;
 		
 		$("#search-results").text("")
-		$("#search-results").append("<div class=space>Click over sounds to add to your team.</div>")
+		$("#search-results").append("<br><br><br><br><br>")
+		//$("#search-results").append("<div class=space>Click over sounds to add to your team.</div>")
 		//$("#search-results").append("<br>* number of results: " + soundCollection.properties['num_results']);
 		//$("#search-results").append("<br>* number of pages: " + soundCollection.properties['num_pages']);
 		//$("#search-results").append("<br>* sounds:");
@@ -319,7 +332,7 @@
 
 {% block content %}
 
-<h2 id="title" class="section_title">Search sounds</h2>
+<h2 id="title" class="section_title"></h2>
 <p>
 </p>
 
@@ -327,7 +340,7 @@
     <p>
     	<input type="text" name="q" id="search-q" size="45" /> 
     	<!-- <input type="submit" name="submit" value="search sounds" onclick="search_sounds" id="search-button"/> -->
-    	<button onclick="search_sounds()">Get!</button>
+    	<button onclick="search_sounds()">Search!</button>
     </p>
 </div>
 
