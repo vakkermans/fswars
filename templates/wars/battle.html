@@ -21,17 +21,9 @@
     	
     	populate(battleObj); 
     });
-    function fight() {
-        // TODO: implement preset
-        console.log($("#sound_p1").val());
-		var url = "/wars/compute/{{p1_sound}}/{{p2_sound}}/loudness/"; 
-		$.get(url, function(data) {
-			$("#result").append(data);
-		});
-    }
 	function populate(battle) {
 		// ---------- populate player1
-		var temp = battle['player1_sounds'].split(",");
+		var temp = battle['player1_sounds'];
 		for (i in temp) {
 			freesound.getSound(temp[i], function(data) {displaySoundInfo(data, 1);}, errorSound );
 			// $("#sound_p1").append("<div id='" + temp[i] + "'>" + temp[i] + "</div>");
@@ -41,7 +33,7 @@
 			$("#presets").append("<div id='" + presets[i] + "'>" + presets[i] + "</div>");
 		}
 		// ---------- populate player2
-		temp = battle['player2_sounds'].split(",");
+		temp = battle['player2_sounds'];
 		for (i in temp) {
 			freesound.getSound(temp[i], function(data) {displaySoundInfo(data, 2);}, errorSound );
 			//$("#sound_p2").append("<div id='" + temp[i] + "'>" + temp[i] + "</div>");
@@ -72,10 +64,18 @@
 		$("#current_battle").append(soundId.soundId + " ");
 	}
 	function fight() {
-		var url = "/wars/battle"+ battleObj['id'] +"/"+ $("#current_battle").val().split(" ")[0] +"/"+ $("#current_battle")..val().split(" ")[1] + "/loudness/";
-		alert(url);
+		var ids = $("#current_battle").html().split(" ");
+		var url = "/battle/"+ battleObj['id'] +"/fight/"+ ids[0] +"/"+ ids[1] + "/loudness/";
+		$.get(url, function (data) {
+				// $("#result").clear();
+				$("#result").append(data);
+			});		
+	}
+	// TODO:
+	function findWinner() {
 	}
 	function displayControl() {
+		
 	}
 	</script>
 {% endblock %}
