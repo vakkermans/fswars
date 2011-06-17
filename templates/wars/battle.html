@@ -169,13 +169,12 @@
 			$("#result").html(findWinnerAndPoints(last_round));
 		}
 		// console.log(battle_result['history'][battle_result['history'].length-1]);
-		
+		// remove div with played sounds
 		$("#"+ last_round[0]).remove();
 		$("#"+ last_round[1]).remove();
-		// $("#fight").hide();
-		// var history = parsed[''];
+		$("#"+ last_round[2]).remove();
 	}
-	// TODO:
+	
 	function findWinnerAndPoints(last_round) {
 		var sResult = "And the winner is... ";
 		if (last_round[0] == 1) {
