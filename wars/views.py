@@ -139,7 +139,7 @@ def calculate_final_scores(history):
 @auth()
 def battle_result(request, battle_id):
     battle = get_object_or_404(Battle, id=battle_id)
-    history = json.loads(battle.history)
+    history = json.loads(battle.history) if battle.history and battle.history != '' else []
     scores = calculate_final_scores(history)
     return rtr('wars/battle_result.html')
 
