@@ -87,6 +87,7 @@ def pick_sounds(request, battle_id):
 def battle(request, battle_id):
     battle = get_object_or_404(Battle, id=battle_id)
     battle_json = battle.do_json()
+    my_nickname = request.session[SESSION_NICKNAME];
     return rtr('wars/battle.html')
 
 

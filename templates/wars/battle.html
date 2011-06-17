@@ -4,8 +4,11 @@
 	{{ block.super }}
     <link rel="stylesheet" type="text/css" href="/static_media/css/3-column-layout.css" />
     <script type="text/javascript">
-    var presets = ['loudness', 'brightness'];
+    var presets = {{ presets|safe }};
     var battleObj = {{battle_json|safe}};
+    var myPlayer = "{{ my_nickname }}";
+    var current_fight = 0;
+    // ----------- ON READY
     $(document).ready(function(){
     	apiKey = settings.apiKey;
     	if(apiKey == "")
@@ -19,7 +22,8 @@
     		freesound = new Freesound(apiKey, true);
     	}
     	
-    	populate(battleObj); 
+    	populate(battleObj);
+    	setPoll(); 
     });
 	function populate(battle) {
 		// ---------- populate player1
@@ -31,6 +35,10 @@
 		// ---------- populate presets
 		for (i in presets) {
 			$("#presets").append("<div id='" + presets[i] + "'>" + presets[i] + "</div>");
+			$("#"+ presets[i]).bind("click", {preset: presets[i]}, function(event) {
+					$("#preset_for_battle").empty();
+					$("#preset_for_battle").append(event.data.preset);
+				});
 		}
 		// ---------- populate player2
 		temp = battle['player2_sounds'];
@@ -56,35 +64,94 @@
 		// add handler
 		$("#" + sound.properties['id']).bind("click", {soundId: sound.properties['id']}, function(event) {
 			// TODO: add length check and remove function 
-			$("#current_battle").append(event.data.soundId + " ");
-			$("#fight").show();
+			// $("#current_battle").append(event.data.soundId + " ");
+			addToBattleCandidate(event.data.soundId);
 		});
 	}
 	function addToBattleCandidate(soundId) {
-		$("#current_battle").append(soundId.soundId + " ");
+		// 2nd sound		
+		if (current_fight == 1) {
+			current_fight = 0;
+			$("#current_battle").append(soundId);
+			$("#fight").show();
+		}
+		// 1st sound 
+		else if (current_fight == 0) {
+			$("#current_battle").empty();
+			$("#current_battle").append(soundId + " ");
+			current_fight = current_fight + 1;
+		}
+		
+		
 	}
 	function fight() {
 		var ids = $("#current_battle").html().split(" ");
-		var url = "/battle/"+ battleObj['id'] +"/fight/"+ ids[0] +"/"+ ids[1] + "/loudness/";
+		var url = "/battle/"+ battleObj['id'] +"/fight/"+ ids[0] +"/"+ ids[1] +"/"+ $("#preset_for_battle").html();
 		$.get(url, function (data) {
-				// $("#result").clear();
 				$("#result").append(data);
 			});		
 	}
+	function setPoll() {
+		var sURL = "/battle/" + battleObj['id'] +"/status/";
+		$.ajax({
+			  type: "GET",
+			  url: sURL,
+			  dataType: "json",
+			  success: function(xhr_data) {
+				  console.log(xhr_data);
+				  if (xhr_data.status == 'pending') {
+				    setTimeout(function() { console.log("pending"); }, 3000); // wait 15 seconds than call ajax request again
+				  } else {
+					// TODO: I don't get the right data...
+					setInterval(function(xhr_data) {
+						battleStatus(); 
+						// console.log(xhr_data); 
+					}, 2000); // wait 15 seconds than call ajax request again
+			  	  }
+				}
+			});
+	}
+	function battleStatus() {
+		var sURL = "/battle/" + battleObj['id'] +"/status/";
+		var parsed;
+		var turnPlayerNick
+		var player_num = (myPlayer == battleObj['player1']) ? 1 : 2;
+		// console.log(player_num);
+		$.get(sURL, function(data) {
+				parsed = jQuery.parseJSON(data);
+				// console.log(parsed['turn_owner']);
+
+				if (parsed['turn_owner'] == player_num) {
+					// console.log('my turn');
+				} else {
+					// console.log('opponents turn');
+				}
+				
+				// show turn result
+				$("#result").replaceWith(parsed['winner'] + parsed['points']);
+				
+			});
+	}
+	function updateStatus(turn_owner) {
+		
+	}
 	// TODO:
 	function findWinner() {
+		
 	}
 	function displayControl() {
 		
 	}
+	
 	</script>
 {% endblock %}
 
 {% block content %}
-
+<p><h2>Warrior: {{my_nickname}}</h2></p>
 <div id="result"></div>
 <div id="status"></div>
 <div id="current_battle"></div>
+<div id="preset_for_battle"></div>
 <br />
 <div id="fight" style="display: none;">
 	<a href="#" onclick="fight()">Fight!</a>
