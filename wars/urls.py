@@ -34,4 +34,9 @@ urlpatterns = patterns('',
     url(r'^battle/(?P<battle_id>\d+)/result/$',
         battle_result,
         name='result'),
+
+    url(r'^battle/(?P<battle_id>\d+)/status/$',
+        battle_status,
+        name='status'),
+
 )
