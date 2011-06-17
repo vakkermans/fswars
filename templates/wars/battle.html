@@ -4,34 +4,34 @@
     {{ block.super }}
     <link rel="stylesheet" type="text/css" href="/static_media/css/3-column-layout.css" />
     <style type="text/css">
-		#mask {
-		  position:absolute;
-		  left:0;
-		  top:0;
-		  z-index:9000;
-		  background-color:#000;
-		  display:none;
-		}
-		
-		#boxes .window {
-		  position:absolute;
-		  left:0;
-		  top:0;
-		  width:440px;
-		  height:200px;
-		  display:none;
-		  z-index:9999;
-		  padding:20px;
-		}
-		
-		#boxes #dialog {
-		  width:375px; 
-		  height:203px;
-		  padding:10px;
-		  background-color:#ffffff;
-		}
+        #mask {
+          position:absolute;
+          left:0;
+          top:0;
+          z-index:9000;
+          background-color:#000;
+          display:none;
+        }
+
+        #boxes .window {
+          position:absolute;
+          left:0;
+          top:0;
+          width:440px;
+          height:200px;
+          display:none;
+          z-index:9999;
+          padding:20px;
+        }
+
+        #boxes #dialog {
+          width:375px;
+          height:203px;
+          padding:10px;
+          background-color:#ffffff;
+        }
     </style>
-    
+
     <script type="text/javascript">
     var presets = {{ presets|safe }};
     var battleObj = {{battle_json|safe}};
@@ -218,7 +218,7 @@
 		sResult += " with " + last_round[4] + " points!!!";
 		return sResult;
 	}
-	function coverScreen() {
+    function coverScreen() {
         //Get the A tag
         var id = "cover";
 
@@ -229,9 +229,9 @@
         //Set heigth and width to mask to fill up the whole screen
         $('#mask').css({'width':maskWidth,'height':maskHeight});
 
-        //transition effect             
-        $('#mask').fadeIn(1000);        
-        $('#mask').fadeTo("slow",0.8);  
+        //transition effect
+        $('#mask').fadeIn(1000);
+        $('#mask').fadeTo("slow",0.8);
 
         //Get the window height and width
         var winH = $(window).height();
@@ -242,16 +242,16 @@
         $(id).css('left', winW/2-$(id).width()/2);
 
         //transition effect
-        $(id).fadeIn(2000); 
+        $(id).fadeIn(2000);
         $(id).html("Your opponent is preparing for attack...");
-	}
-	function removeScreen() {
-	    $('#mask').hide();
+    }
+    function removeScreen() {
+        $('#mask').hide();
         $('.window').hide();
-	}
-	      
-	
-	</script>
+    }
+
+
+    </script>
 {% endblock %}
 
 {% block content %}
@@ -284,7 +284,7 @@
 
 <div id="boxes">
 <div id="dialog" class="window">
-Simple Modal Window | 
+Simple Modal Window |
 <a href="#"class="close"/>Close it</a>
 <p>Anything can go Here</p>
 </div>
