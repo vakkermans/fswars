@@ -3,14 +3,35 @@
 {% block head %}
 {{ block.super }}
 <style type="text/css" media="all">
+    #title
+    {
+		font-family:arial;
+    }
+
     #picked_sounds
     {
-        width: 450px;
+		font-family:arial;
+        width: 500px;
         overflow: hidden;
-        border: 1px solid black;
+        float:right;
+        padding: 0px;
+
+    }
+    
+    #picked_sounds_menu
+    {
+		font-family:arial;
+        width: 500px;
+        overflow: hidden;
+        border: 0px solid black;
         float:right;
         padding: 5px;
+        position: fixed;
+        left:600px;
+        top:25px;
+        background-color:rgb(235,235,235);
     }
+    
 
     #picked_sounds .add
     {
@@ -21,12 +42,14 @@
     {
         display: inline;
     }
-
+    
+    
     #search-results
     {
-        width: 450px;
+ 		font-family:arial;
+        width: 500px;
         overflow: hidden;
-        border: 1px solid black;
+        border: 0px solid black;
         float:left;
         padding: 5px;
     }
@@ -40,15 +63,71 @@
     {
         display: none;
     }
+    
+ 	.alignRight
+ 	{
+ 		font-family:arial;
+ 		text-align: right;
+ 	}
+      
+  	.search_resultE { 
+  		font-family:arial; 
+  		font-size: 10pt; 
+  		background-color:rgb(255,255,255);
+	}
+ 
+	.search_resultE:hover{
+		font-family:arial;
+		background-color:rgb(200,255,200);
+		font-size: 10pt; 
+	}	
+
+	.search_resultO { 
+  		font-family:arial; 
+  		font-size: 10pt; 
+  		background-color:rgb(235,235,235);
+	}
+ 
+	.search_resultO:hover{
+		font-family:arial;
+		background-color:rgb(200,255,200);
+		font-size: 10pt; 
+	}
+	
+	.picked_result { 
+  		font-family:arial; 
+  		font-size: 10pt; 
+	}
+	
+	.picked_result:hover { 
+  		font-family:arial; 
+  		font-size: 10pt; 
+  		background-color:rgb(255,200,200);
+	}
+	
+	
+	.space {		
+		height: 20pt; 
+	}
+	
+
+
 </style>
 <script type="text/javascript">
     var sounds = [];
 	var num_sounds = 0;
 	var max_sounds = 5;
+	var currently_displayed_search_result = 0;
 	// var username = {{ username }};
 	var freesound;
 	
 	$(document).ready(function(){
+	
+	
+	$("#id_sound_ids").hide();
+	$("#id_sound_ids").prev().hide();
+	$("#send_form").hide();
+	$("#remove_sounds_label").hide();
 	
 	apiKey = settings.apiKey;	
 	console.debug("key: " + apiKey);
@@ -77,7 +156,10 @@
 		}
 	}
 	function displaySearchResults(soundCollection) {
+		currently_displayed_search_result = 0;
+		
 		$("#search-results").text("")
+		$("#search-results").append("<div class=space>Click over sounds to add to your team</div>")
 		//$("#search-results").append("<br>* number of results: " + soundCollection.properties['num_results']);
 		//$("#search-results").append("<br>* number of pages: " + soundCollection.properties['num_pages']);
 		//$("#search-results").append("<br>* sounds:");
@@ -93,20 +175,26 @@
 	function displaySoundInfo(sound) {
 		// console.log("displaySoundInfo");
 		console.log(sound.properties['id']);
-		$("#search-results").append("<div id=" + sound.properties['id'] + " onclick='addSound(this," + sound.properties['id'] + ")'\>"); 
-		//$("#"+sound.properties['id']).append("<br><br>Sound info (some)<br>**********");
-		$("#"+sound.properties['id']).append('<br><img src="'+ sound.properties['waveform_m'] + '" alt = "' + sound.properties['waveform_m'] + '"/>');
-		$("#"+sound.properties['id']).append("<br>- filename: " + sound.properties['original_filename']);
-		$("#"+sound.properties['id']).append("<br>- duration: " + sound.properties['duration']);
-		//$("#"+sound.properties['id']).append("<br>- preview-url: " + sound.properties['preview-hq-mp3']);
-		$("#"+sound.properties['id']).append("<br>- tags: " + sound.properties['tags']);
-		//$("#"+sound.properties['id']).append("<br>- description: " + sound.properties['description']);			
+		
+		currently_displayed_search_result = currently_displayed_search_result + 1;
+		if ((currently_displayed_search_result % 2) == 1){
+			classEO='search_resultE';
+		}else{
+			classEO='search_resultO';
+		} 
+		
+		$("#search-results").append("<div class='" + classEO + "' id=" + sound.properties['id'] + " onclick='addSound(this," + sound.properties['id'] + ")'\>"); 
+		
+		$("#"+sound.properties['id']).append(
+		'<table><tr><td><img src="'+ sound.properties['waveform_m'] + '" alt = "' + sound.properties['waveform_m'] + '"/></td><td valign=top> - filename: "' + sound.properties['original_filename'] + '" <br>- tags: "' + sound.properties['tags'] + '" </td></tr></table>'
+		)
 		
 		// TODO: make sounds able to play
 		/*
 		snd = new Audio(sound.properties['preview-hq-mp3']);
 		$("#"+sound.properties['id']).append('<br><button onclick="snd.play()">play</button><button onclick="snd.pause()">pause</button>')
 		*/
+		//$("#"+sound.properties['id']).append("</td></tr></table>");
 		$("#search-results").append("</div>");
 		
 	}
@@ -117,6 +205,8 @@
 
     function addSound(element, soundId)
     {
+    	$("#send_form").show();
+    	$("#remove_sounds_label").show();
         
         if (num_sounds < max_sounds) 
         {
@@ -130,8 +220,8 @@
 				// TODO: change id and remove onclick handler
 	            $(element).closest("#search-results > div").clone()            								
 	            								.attr({
-	            								id: soundId+"_choose"//,
-	            								//onclick: "removeSound(this," +soundId+ ")"								
+	            								id: soundId+"_choose",
+	            								"class": "picked_result"							
 	            								}).appendTo("#picked_sounds");
 	            
 	            $("#"+soundId+"_choose").removeAttr('onclick').click( function () { removeSound($("#"+soundId+"_choose"), soundId); return false} )
@@ -156,9 +246,12 @@
             $(element).closest("#picked_sounds > div").remove();
             num_sounds = num_sounds - 1;
             
-            if (num_sounds == -1){
+            if (num_sounds <= 0){
             	num_sounds = 0;
+            	$("#send_form").hide();
+            	$("#remove_sounds_label").hide();
             }
+			
 			
             
         }
@@ -170,7 +263,7 @@
 
 {% block content %}
 
-<h2>Search sounds</h2>
+<h2 id="title">Search sounds</h2>
 <p>
 </p>
 
@@ -178,27 +271,32 @@
     <p>
     	<input type="text" name="q" id="search-q" size="45" /> 
     	<!-- <input type="submit" name="submit" value="search sounds" onclick="search_sounds" id="search-button"/> -->
-    	<a href="#" onclick="search_sounds()">Get!</a>
+    	<button onclick="search_sounds()">Get!</button>
     </p>
 </div>
 
 <div id="search-results" class="sound_list_minimal">
-    <h3>Search results:</h3>
     
 </div>
 
+<div id="picked_sounds_menu">
 <div id="picked_sounds" class="sound_list_minimal">
-    <h3>War files</h3>
+    <h2>War files</h2>
     <div>
-        <div>
-            <a class="remove" onclick="removeSound(this)">Click to remove</a>
+        <div id="remove_sounds_label"class="space">
+            Click over sounds to remove from your team
         </div>
-    </div>
+    </div>    
+</div>
+<div>
+	<form id="send_form" action="." method="POST">{% csrf_token %}
+        {{ form.as_p }}
+        <div class="alignRight">
+        <input class="alignRight" type="submit" value="I'm ready to play!" halign="right">
+        </div>
+ 	</form>
+</div>
 </div>
 
- <form id="send_form" action="." method="POST">{% csrf_token %}
-        {{ form.as_p }}
-        <br>
-        <input type="submit" value="Play!">
-    </form>
+ 
 {% endblock content %}
