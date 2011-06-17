@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Battle is over!</h1>
+
+    <p>
+    {% if scores.0 == scores.1 %}
+        War has no winners..
+    {% else %}
+        {% if scores.0 > scores.1 %}
+            {{ battle.player1 }}
+        {% else %}
+            {{ battle.player2 }}
+        {% endif %}
+        has won the Freesound War!
+    {% endif %}
+    </p>
+
+    <p>{{ battle.player1 }} - {{ scores.0 }} V.S. {{ scores.1 }} - {{ battle.player2 }}</p>
+
+    <p>
+    {% for round in history %}
+         {% if forloop.counter0|divisibleby:2 %}
+             {{ battle.player1 }} played sound {{ round.0 }} against
+             {{ battle.player2 }}'s sound {{ round.1 }} in round {{ round.2 }} and
+             {% if round.3 %}
+                 {% if round.3 == 1 %} won {% else %} lost {% endif %}
+                 by {{ round.4 }} points.
+             {% else %}
+                 tied.
+             {% endif %}
+          {% else %}
+             {{ battle.player2 }} played sound {{ round.1 }} against
+             {{ battle.player1 }}'s sound {{ round.0 }} in round {{ round.2 }} and
+             {% if round.3 %}
+                 {% if round.3 == 2 %} won {% else %}lost{% endif %}
+                 by {{ round.4 }} points.
+             {% else %}
+                 tied.
+             {% endif %}
+          {% endif %}
+         <br>
+    {% endfor %}
+    </p>
+
+{% endblock content %}

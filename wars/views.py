@@ -11,12 +11,12 @@ from models import *
 from django.contrib import messages
 import json
 from algorithms import algorithms
+from django.core import serializers
 
 SESSION_NICKNAME = 'session_nickname'
 
-
-
-
+from algorithms import algorithms
+algorithms.init()
 
 class auth():
 
@@ -44,14 +44,15 @@ def frontpage(request):
         form = PickNameForm(request.POST)
         if form.is_valid():
             nickname = form.cleaned_data['nickname']
-            request.session[SESSION_NICKNAME] = nickname
             try:
                 battle = Battle.objects.get(player2__isnull=True)
+                nickname = nickname+'2' if battle.player1 == nickname else nickname
                 battle.player2 = nickname
                 battle.save()
             except Battle.DoesNotExist:
                 battle = Battle(player1=nickname)
                 battle.save()
+            request.session[SESSION_NICKNAME] = nickname
             return HttpResponseRedirect(rurl('wars:wait-on-player', battle.id))
     return rtr('wars/frontpage.html')
 
@@ -72,42 +73,73 @@ def pick_sounds(request, battle_id):
     if request.method == 'POST':
         form = PickSoundsForm(request.POST)
         if form.is_valid():
-            sound_id = int(form.cleaned_data['sound_ids'])
+            sound_ids = [int(x) for x in form.cleaned_data.get('sound_ids').split(',')]
             if battle.player1 == request.user:
-                battle.player1_sounds = [sound_id]
+                battle.player1_sounds = json.dumps(sound_ids)
             else:
-                battle.player2_sounds = [sound_id]
+                battle.player2_sounds = json.dumps(sound_ids)
             battle.save()
-            return HttpResponseRedirect(rurl('wars:wait-on-sounds'))
+            return HttpResponseRedirect(rurl('wars:wait-on-sounds', battle.id))
     return rtr('wars/pick_sounds.html')
 
 
+@auth()
+def battle(request, battle_id):
+    battle = get_object_or_404(Battle, id=battle_id)
+    battle_json = battle.do_json()
+    return rtr('wars/battle.html')
 
-def compute(request, id1, id2, preset):
+
+@auth()
+def wait_on_sounds(request, battle_id):
+    battle = get_object_or_404(Battle, id=battle_id)
+    if battle.status_sounds():
+        return HttpResponseRedirect(rurl('wars:battle', battle.id))
+    return rtr('wars/wait_on_sounds.html')
+
+
+#def compute(request, id1, id2, preset):
+#    ps = preset.upper()
+#    if ps not in algorithms.ALGORITHM_CLASSES:
+#        print 'ARG, not a valid preset'
+#    return HttpResponse(json.dumps(algorithms.computeBattle(int(id1),
+#                                                            int(id2),
+#                                                            algorithms.ALGORITHM_CLASSES[ps])))
+
+
+@auth()
+def fight(request, battle_id, id1, id2, preset):
+    battle = get_object_or_404(Battle, id=battle_id)
     ps = preset.upper()
-    if ps not in algorithms.ALGORITHM_CLASSES:
-        print 'ARG, not a valid preset'
-    return HttpResponse(json.dumps(algorithms.computeBattle(int(id1),
-                                                            int(id2),
-                                                            algorithms.ALGORITHM_CLASSES[ps])))
+    battle_result = algorithms.computeBattle(int(id1), int(id2), algorithms.ALGORITHM_CLASSES[ps])
+    history = json.loads(battle.history) if battle.history else []
+    history.append([int(id1), int(id2), ps, battle_result['winner'], battle_result['points']])
+    battle.history = json.dumps(history)
+    # N.B. player1 always starts! 1-indexed, so 1 or 2
+    battle.turn_owner = 2 if len(history) % 2 == 1 else 1
+    if len(history) >= len(json.loads(battle.player1_sounds)) or \
+       len(history) >= len(json.loads(battle.player2_sounds)):
+        battle.finished = True
+    battle.save()
+    return HttpResponse(battle.do_json())
 
 
-#@auth()
-#def battle(request):
-#    algorithms.init()
-#    user = FSWUser.objects.get(nickname = request.session[SESSION_NICKNAME])
-#    player1 = FSWUser.objects.get(player_number=1)
-#    player2 = FSWUser.objects.get(player_number=2)
-#    p1_sound = json.loads(player1.sounds)[0]
-#    p2_sound = json.loads(player2.sounds)[0]
-#
-#    return rtr('wars/battle.html')
+def calculate_final_scores(history):
+    player1 = 0
+    player2 = 0
+    for i in range(len(history)):
+        if history[i][3] == 1:
+            player1 += history[i][4]
+        else:
+            player2 += history[i][4]
+    return player1, player2
 
 
-#def players_present():
-#    player1 = True if FSWUser.objects.filter(player_number=1).count() > 0 else False
-#    player2 = True if FSWUser.objects.filter(player_number=2).count() > 0 else False
-#    return player1, player2
 
-
+@auth()
+def battle_result(request, battle_id):
+    battle = get_object_or_404(Battle, id=battle_id)
+    history = json.loads(battle.history) if battle.history and battle.history != '' else []
+    scores = calculate_final_scores(history)
+    return rtr('wars/battle_result.html')
 

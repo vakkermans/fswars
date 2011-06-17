@@ -2,31 +2,10 @@
 
 {% block head %}
 	{{ block.super }}
-	<style type="text/css">
-        /*
-        .p1 {
-          overflow: auto;
-          position: relative;
-          float: left;
-          width: 250px;
-          margin-right: 0px;
-        }
-        .p2 {
-            position: relative;
-            float: left;
-            width: 250px;
-            margin-top: 0px;
-        }
-        .center {
-            overflow: auto;
-            position: relative;
-            float: left;
-            width: 800px;
-        }
-        */
-    </style>
-     <link rel="stylesheet" type="text/css" href="/static_media/css/3-column-layout.css" />
+    <link rel="stylesheet" type="text/css" href="/static_media/css/3-column-layout.css" />
     <script type="text/javascript">
+    var presets = ['loudness', 'brightness'];
+    var battleObj = {{battle_json|safe}};
     $(document).ready(function(){
     	apiKey = settings.apiKey;
     	if(apiKey == "")
@@ -38,34 +17,93 @@
     		/*======= freesound object ========*/
     		//creating freesound object	
     		freesound = new Freesound(apiKey, true);
-    	} 
+    	}
+    	
+    	populate(battleObj); 
     });
-    function fight() {
-        // TODO: implement preset
-        console.log($("#sound_p1").val());
-		var url = "/wars/compute/{{p1_sound}}/{{p2_sound}}/loudness/"; 
-		$.get(url, function(data) {
-			$("#result").append(data);
+	function populate(battle) {
+		// ---------- populate player1
+		var temp = battle['player1_sounds'];
+		for (i in temp) {
+			freesound.getSound(temp[i], function(data) {displaySoundInfo(data, 1);}, errorSound );
+			// $("#sound_p1").append("<div id='" + temp[i] + "'>" + temp[i] + "</div>");
+		}
+		// ---------- populate presets
+		for (i in presets) {
+			$("#presets").append("<div id='" + presets[i] + "'>" + presets[i] + "</div>");
+		}
+		// ---------- populate player2
+		temp = battle['player2_sounds'];
+		for (i in temp) {
+			freesound.getSound(temp[i], function(data) {displaySoundInfo(data, 2);}, errorSound );
+			//$("#sound_p2").append("<div id='" + temp[i] + "'>" + temp[i] + "</div>");
+		}
+	}
+	function errorSound() {
+	}
+	function displaySoundInfo(sound, player) {
+		// console.log("displaySoundInfo");
+		console.log(sound.properties['id']);
+		$("#sound_p"+player).append("<div id=" + sound.properties['id'] + "\>"); 
+		//$("#"+sound.properties['id']).append("<br><br>Sound info (some)<br>**********");
+		$("#"+sound.properties['id']).append('<br><img src="'+ sound.properties['waveform_m'] + '" alt = "' + sound.properties['waveform_m'] + '"/>');
+		$("#"+sound.properties['id']).append("<br>- filename: " + sound.properties['original_filename']);
+		$("#"+sound.properties['id']).append("<br>- duration: " + sound.properties['duration']);
+		//$("#"+sound.properties['id']).append("<br>- preview-url: " + sound.properties['preview-hq-mp3']);
+		$("#"+sound.properties['id']).append("<br>- tags: " + sound.properties['tags']);
+		$("#"+sound.properties['id']).append("</div>");
+
+		// add handler
+		$("#" + sound.properties['id']).bind("click", {soundId: sound.properties['id']}, function(event) {
+			// TODO: add length check and remove function 
+			$("#current_battle").append(event.data.soundId + " ");
+			$("#fight").show();
 		});
-    }
+	}
+	function addToBattleCandidate(soundId) {
+		$("#current_battle").append(soundId.soundId + " ");
+	}
+	function fight() {
+		var ids = $("#current_battle").html().split(" ");
+		var url = "/battle/"+ battleObj['id'] +"/fight/"+ ids[0] +"/"+ ids[1] + "/loudness/";
+		$.get(url, function (data) {
+				// $("#result").clear();
+				$("#result").append(data);
+			});		
+	}
+	// TODO:
+	function findWinner() {
+	}
+	function displayControl() {
+		
+	}
 	</script>
 {% endblock %}
 
 {% block content %}
+
 <div id="result"></div>
-<div class="content-container">
-	<div class="left">
+<div id="status"></div>
+<div id="current_battle"></div>
+<br />
+<div id="fight" style="display: none;">
+	<a href="#" onclick="fight()">Fight!</a>
+</div>
+<br />
+<div id="maincontainer">
+	<div id="leftcolumn" class="battlecolumn">
 		<label for="sound_p1">Player 1</label>
 		<div id="sound_p1">sound 1</div>
 	</div>
-	<div id="middle">
-		<label for="presets">Presets</label>
+	<div id="contentcolumn" class="battlecolumn">
+		<label for="content">Presets</label>
 		<div id="presets">presets</div>
 	</div>
-	<div class="right">
+	<div id="rightcolumn" class="battlecolumn">
 		<label for="sound_p2">Player 2</label>
 		<div id="sound_p2">sound 2</div>
 	</div>
+	<br style="clear: both;" />
 </div>
 <br /><br /><br /><a href="#" onclick="fight()">Fight!</a>
 

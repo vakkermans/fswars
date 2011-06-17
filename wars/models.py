@@ -27,3 +27,16 @@ class Battle(models.Model):
 
     def status(self):
         return json.dumps(self)
+
+    def do_json(self):
+        data = {}
+        data['player1'] = self.player1
+        data['player2'] = self.player2
+        data['player1_sounds'] = json.loads(self.player1_sounds) if self.player1_sounds and self.player1_sounds != '' else False
+        data['player2_sounds'] = json.loads(self.player2_sounds) if self.player2_sounds and self.player2_sounds != '' else False
+        data['turn_owner'] = self.turn_owner
+        data['history'] = json.loads(self.history) if self.history and self.history != '' else []
+        data['finished'] = self.finished
+        data['id'] = self.id
+
+        return json.dumps(data)
