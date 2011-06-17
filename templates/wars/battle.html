@@ -106,6 +106,10 @@
             $.get(url, function (data) {
                     $("#result").append(data);
                 });
+            // clean controls
+            $("#player1_sound").empty();
+            $("#player2_sound").empty();
+            $("#battle_preset").empty();
         }
     }
     function isReadyToFight() {
