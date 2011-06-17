@@ -18,6 +18,7 @@
             <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-jsonp.js"></script>
             <script type="text/javascript" src="{{ STATIC_URL }}js/settings.js"></script>
             <script type="text/javascript" src="{{ STATIC_URL }}js/freesoundLib.js"></script>
+            <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.jplayer.min.js"></script>
         {% endblock %}
     </head>
 
@@ -37,6 +38,11 @@
 
             <div id="header">
                 {% block header %}
+                <!--  img height="80px" src="{{ STATIC_URL }}images/freesound_logo2.png" -->
+                <div class="header_title">
+                Battle #{{ battle.id }}: {{ battle.player1 }} VS {{ battle.player2 }} !!!
+                </div>
+
                 {% endblock header %}
                 <br style="clear: both;" />
             </div> <!-- /#header -->

@@ -1,15 +1,22 @@
 {% extends "base.html" %}
 
+{% block header %}
+{% endblock header %}
+
 {% block content %}
 
     <center>
-        <h1>Freesound is your Battleground</h1>
-        <p>explanation
-        <form action="." method="POST">{% csrf_token %}
+        <img src="{{ STATIC_URL }}images/freesound_wars2.png">
+        <img src="{{ STATIC_URL }}images/battleground.png">
+        <!-- <p class="explanation">explanation  -->
+        <br><br><br>
+        <form class="nickname" action="." method="POST">{% csrf_token %}
             {{ form.as_p }}
-            <br>
+
             <input type="submit" value="Play!">
         </form>
+        {% include "wars/backdrops.html" %}
+
     </center>
 
 {% endblock content %}
