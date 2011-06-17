@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block head %}
-	{{ block.super }}
+    {{ block.super }}
     <link rel="stylesheet" type="text/css" href="/static_media/css/3-column-layout.css" />
     <script type="text/javascript">
     var presets = {{ presets|safe }};
@@ -10,21 +10,22 @@
     var current_fight = 0;
     // ----------- ON READY
     $(document).ready(function(){
-    	apiKey = settings.apiKey;
-    	if(apiKey == "")
-    	{
-    		alert("no KEY!"); 
-    	}			
-    	else 
-    	{				
-    		/*======= freesound object ========*/
-    		//creating freesound object	
-    		freesound = new Freesound(apiKey, true);
-    	}
-    	
-    	populate(battleObj);
-    	setPoll(); 
+        apiKey = settings.apiKey;
+        if(apiKey == "")
+        {
+            alert("no KEY!");
+        }
+        else
+        {
+            /*======= freesound object ========*/
+            //creating freesound object
+            freesound = new Freesound(apiKey, true);
+        }
+
+        populate(battleObj);
+        setPoll();
     });
+
 	function populate(battle) {
 		// ---------- populate player1
 		var temp = battle['player1_sounds'];
@@ -34,7 +35,7 @@
 		}
 		// ---------- populate presets
 		for (i in presets) {
-			$("#presets").append("<div id='" + presets[i] + "'>" + presets[i] + "</div>");
+			$("#presets").append('<div id="' + presets[i] + '"><img src="{{ STATIC_URL }}images/' + presets[i].toLowerCase() + '_btn.png" /></div><br><br><br>');
 			$("#"+ presets[i]).bind("click", {preset: presets[i]}, function(event) {
 					$("#battle_preset").empty();
 					$("#battle_preset").append(event.data.preset);
@@ -53,14 +54,15 @@
 	function displaySoundInfo(sound, player) {
 		// console.log("displaySoundInfo");
 		console.log(sound.properties['id']);
-		$("#sound_p"+player).append("<div id=" + sound.properties['id'] + "\>"); 
-		//$("#"+sound.properties['id']).append("<br><br>Sound info (some)<br>**********");
-		$("#"+sound.properties['id']).append('<br><img src="'+ sound.properties['waveform_m'] + '" alt = "' + sound.properties['waveform_m'] + '"/>');
-		$("#"+sound.properties['id']).append("<br>- filename: " + sound.properties['original_filename']);
-		$("#"+sound.properties['id']).append("<br>- duration: " + sound.properties['duration']);
-		//$("#"+sound.properties['id']).append("<br>- preview-url: " + sound.properties['preview-hq-mp3']);
-		$("#"+sound.properties['id']).append("<br>- tags: " + sound.properties['tags']);
-		$("#"+sound.properties['id']).append("</div>");
+        $("#sound_p"+player).append("<div id=" + sound.properties['id'] + "\>");
+
+        $("#"+sound.properties['id']).append('<div class="battle_sound_name"><h3>' + sound.properties['original_filename'] + '</h3></div>');
+        $("#"+sound.properties['id']).append('<div class="battle_sound_img"><img src="'+ sound.properties['waveform_m'] + '" alt = "' + sound.properties['waveform_m'] + '"/></div>');
+
+        $("#"+sound.properties['id']).append('<div class="battle_tags">tags: ' + sound.properties['tags'].join(', ') + '</div>');
+        $("#"+sound.properties['id']).append('<br style="clear: both;"/>');
+
+        $("#"+sound.properties['id']).append("</div>");
 
 		// add handler
 		$("#" + sound.properties['id']).bind("click", {soundId: sound.properties['id']}, function(event) {
@@ -97,6 +99,8 @@
 					$("#result").append(data);
 				});
 		}		
+	}
+	function readyForFight() {
 	}
 	function setPoll() {
 		var sURL = "/battle/" + battleObj['id'] +"/status/";
@@ -172,24 +176,24 @@
 <div id="status"></div>
 <br />
 <div id="fight" style="display: none;">
-	<a href="#" onclick="fight()">Fight!</a>
+    <center><h1><a href="#" onclick="fight()">Fight!</a></h1></center>
 </div>
 <br />
 <div id="maincontainer">
 	<div id="leftcolumn" class="battlecolumn">
 		<div id="player1_sound"></div>
-		<label for="sound_p1">Player 1</label>
-		<div id="sound_p1" class="p1">sound 1</div>
+		<label for="sound_p1"><h2>P1: {% if my_nickname == battle.player1 %}You!{% else %}{{ battle.player1 }}{% endif %}</h2></label>
+		<div id="sound_p1" class="p1"></div>
 	</div>
 	<div id="contentcolumn" class="battlecolumn">
 		<div id="battle_preset"></div>
-		<label for="content">Presets</label>
-		<div id="presets">presets</div>
+		<label for="content"><center><h2>Battle with..</h2></center></label>
+		<div id="presets"></div>
 	</div>
 	<div id="rightcolumn" class="battlecolumn">
 		<div id="player2_sound"></div>
-		<label for="sound_p2">Player 2</label>
-		<div id="sound_p2" class="p2">sound 2</div>
+		<label for="sound_p2"><h2>P2: {% if my_nickname == battle.player2 %}You!{% else %}{{ battle.player2 }}{% endif %}</h2></label>
+		<div id="sound_p2" class="p2"></div>
 	</div>
 	<br style="clear: both;" />
 </div>

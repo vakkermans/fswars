@@ -22,6 +22,47 @@ body {
   	font-size: 26pt; 
 }
 
+.title_small { 
+  	font-family:Helvetica,arial; 
+  	font-size: 16pt;
+  	font-weight: bold;
+}
+
+.winner { 
+  	font-family:Helvetica,arial; 
+  	font-size: 38pt;
+  	font-weight: bold;
+}
+
+.over { 
+  	font-family:Helvetica,arial; 
+  	font-size: 16pt; 
+}
+
+.results_summary { 
+  	font-family:Helvetica,arial; 
+  	font-size: 16pt;
+  	
+}
+
+.summaryO { 
+  	font-family:Helvetica,arial; 
+  	font-size: 12pt;
+  	background-color:rgb(220,220,220);
+  	padding:10px;
+  	width:500px;
+  	border-radius: 5px;
+}
+
+.summaryE { 
+  	font-family:Helvetica,arial; 
+  	font-size: 12pt; 
+  	background-color:rgb(196,196,196);
+  	padding:10px;
+  	width:500px;
+  	border-radius: 5px;
+}
+
 .section_title { 
   	font-family:Helvetica,arial; 
   	font-size: 22pt; 
@@ -51,6 +92,27 @@ body {
 	width:270px;
 	color:white;
 }
+
+.waitingFinal { 
+  	font-family:Helvetica,arial; 
+  	font-size: 15pt; 
+  	background-color:rgb(76,76,76);
+	border-radius: 25px;
+	padding:10px;
+	width:350px;
+	color:white;
+}
+
+.scores { 
+   	/*background-color:rgb(196,196,196);*/
+   	background-color:rgb(76,76,76);
+	border-radius: 25px;
+	padding:10px;
+	width:550px;
+	color:white;
+
+}
+
 
 .description { 
   	font-family:Helvetica,arial; 
