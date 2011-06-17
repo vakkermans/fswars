@@ -105,12 +105,13 @@
   		background-color:rgb(255,200,200);
 	}
 	
-	
 	.space {		
 		height: 20pt; 
 	}
 	
-
+	.playButton {		
+		height: 25pt; 
+	}
 
 </style>
 <script type="text/javascript">
@@ -118,11 +119,18 @@
 	var num_sounds = 0;
 	var max_sounds = 5;
 	var currently_displayed_search_result = 0;
+	var snd;
 	// var username = {{ username }};
 	var freesound;
 	
 	$(document).ready(function(){
 	
+	$("#jquery_jplayer_1").jPlayer({
+            ready: function() {
+            },
+            swfPath: "{{ STATIC_URL }}swf",
+            supplied: "mp3, ogg"
+    });
 	
 	$("#id_sound_ids").hide();
 	$("#id_sound_ids").prev().hide();
@@ -143,6 +151,25 @@
 		freesound = new Freesound(apiKey, true);
 	}
 	});
+	
+	function playPreview(url_mp3, url_ogg) {
+		 snd = new Audio(url_mp3);
+		 snd.play()
+		 
+		 
+		 /*
+		 stopPreview();
+		 console.log(url_mp3)
+         $("#jquery_jplayer_1").jPlayer("setMedia", {
+                mp3: url_mp3,
+                oga: url_ogg
+         }).jPlayer("play");
+         */
+    }
+    function stopPreview() {
+        snd.pause()
+        //$("#jquery_jplayer_1").jPlayer("stop");
+    }
 	
 	function search_sounds() {
 		if ($("#search-q").length > 0) {
@@ -183,20 +210,16 @@
 			classEO='search_resultO';
 		} 
 		
-		$("#search-results").append("<div class='" + classEO + "' id=" + sound.properties['id'] + " onclick='addSound(this," + sound.properties['id'] + ")'\>"); 
+		$("#search-results").append('<div id="test">')
+		$("#search-results").append('<div id="' + sound.properties["id"] + '" class="' + classEO + '" onclick="addSound(this,' + sound.properties["id"] + ')"><table><tr><td><img src="'+ sound.properties['waveform_m'] + '" alt = "' + sound.properties['waveform_m'] + '"/></td><td valign=top><strong>filename:</strong> "' + sound.properties['original_filename'] + '" <br><strong>tags:</strong> "' + sound.properties['tags'] + '" </td></tr></table></div>')
+		$("#search-results").append('<div class="playButton"><button id="pbutton' + sound.properties['id'] + '">Play</button></div>');	
+		$("#search-results").append('</div>')
+		$("#pbutton" + sound.properties['id']).click( function () { playPreview(sound.properties['preview-hq-mp3'],sound.properties['preview-hq-ogg']); return false} )
 		
-		$("#"+sound.properties['id']).append(
-		'<table><tr><td><img src="'+ sound.properties['waveform_m'] + '" alt = "' + sound.properties['waveform_m'] + '"/></td><td valign=top> - filename: "' + sound.properties['original_filename'] + '" <br>- tags: "' + sound.properties['tags'] + '" </td></tr></table>'
-		)
 		
-		// TODO: make sounds able to play
-		/*
-		snd = new Audio(sound.properties['preview-hq-mp3']);
-		$("#"+sound.properties['id']).append('<br><button onclick="snd.play()">play</button><button onclick="snd.pause()">pause</button>')
-		*/
-		//$("#"+sound.properties['id']).append("</td></tr></table>");
-		$("#search-results").append("</div>");
-		
+		//$("#search-results").append('<br><button onclick="snd.play()">play</button><button onclick="snd.pause()">pause</button>')
+		//$("#search-results").append('<div id="jquery_jplayer_1"></div><div id="jp_interface_1"><a href="#" class="jp-play">Play</a><a href="#" class="jp-pause">Pause</a></div>')	
+	
 	}
 	function errorSearch() {
 	}
@@ -205,7 +228,10 @@
 
     function addSound(element, soundId)
     {
-    	$("#send_form").show();
+    	if (num_sounds == 5){
+            $("#send_form").show();
+        }
+        
     	$("#remove_sounds_label").show();
         
         if (num_sounds < max_sounds) 
@@ -216,8 +242,8 @@
 		        num_sounds = num_sounds + 1;  
 	            console.log("addSound");
 	            sounds.push(soundId);
-	            $("#id_sound_ids").attr("value", sounds);//.attr("value", str(sounds)); // TODO:
-				// TODO: change id and remove onclick handler
+	            $("#id_sound_ids").attr("value", sounds);
+				
 	            $(element).closest("#search-results > div").clone()            								
 	            								.attr({
 	            								id: soundId+"_choose",
@@ -246,9 +272,12 @@
             $(element).closest("#picked_sounds > div").remove();
             num_sounds = num_sounds - 1;
             
-            if (num_sounds <= 0){
-            	num_sounds = 0;
+            if (num_sounds <= 4){
             	$("#send_form").hide();
+            }
+            
+            if (num_sounds <= 0){
+            	num_sounds = 0;            
             	$("#remove_sounds_label").hide();
             }
 			
