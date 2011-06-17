@@ -5,31 +5,35 @@
 <style type="text/css" media="all">
     #title
     {
-		font-family:arial;
+		font-family:Helvetica,arial;
     }
 
     #picked_sounds
     {
-		font-family:arial;
-        width: 500px;
+		font-family:Helvetica,arial;
+        width: 525px;
         overflow: hidden;
         float:right;
         padding: 0px;
+        
 
     }
     
     #picked_sounds_menu
     {
-		font-family:arial;
-        width: 500px;
+		color: white;
+		font-family:Helvetica,arial;
+        width: 525px;
         overflow: hidden;
         border: 0px solid black;
         float:right;
-        padding: 5px;
         position: fixed;
-        left:600px;
-        top:25px;
-        background-color:rgb(235,235,235);
+        left:575px;
+        top:35px;
+        background-color:rgb(76,76,76);
+		font-size: 10pt; 
+		border-radius: 25px;
+		padding:20px;
     }
     
 
@@ -46,8 +50,8 @@
     
     #search-results
     {
- 		font-family:arial;
-        width: 500px;
+ 		font-family:Helvetica,arial;
+        width: 525px;
         overflow: hidden;
         border: 0px solid black;
         float:left;
@@ -66,47 +70,65 @@
     
  	.alignRight
  	{
- 		font-family:arial;
+ 		font-family:Helvetica,arial;
  		text-align: right;
  	}
       
   	.search_resultE { 
-  		font-family:arial; 
+  		font-family:Helvetica,arial; 
   		font-size: 10pt; 
-  		background-color:rgb(255,255,255);
+  		background-color:rgb(220,220,220);
+  		border-radius: 15px;
+  		padding:4px;
 	}
  
 	.search_resultE:hover{
-		font-family:arial;
-		background-color:rgb(200,255,200);
-		font-size: 10pt; 
+		font-family:Helvetica,arial;
+		background-color:rgb(110,225,110);
+		font-size: 10pt;
+		border-radius: 15px;
+		padding:4px; 
 	}	
 
 	.search_resultO { 
-  		font-family:arial; 
+  		font-family:Helvetica,arial; 
   		font-size: 10pt; 
-  		background-color:rgb(235,235,235);
+  		background-color:rgb(220,220,220);
+  		border-radius: 15px;
+  		padding:4px;
 	}
  
 	.search_resultO:hover{
-		font-family:arial;
-		background-color:rgb(200,255,200);
+		font-family:Helvetica,arial;
+		background-color:rgb(110,225,110);
 		font-size: 10pt; 
+		border-radius: 15px;
+		padding:4px;
 	}
 	
 	.picked_result { 
-  		font-family:arial; 
+  		font-family:Helvetica,arial; 
   		font-size: 10pt; 
+  		border-radius: 15px;
+  		padding:4px;
 	}
 	
 	.picked_result:hover { 
-  		font-family:arial; 
+  		font-family:Helvetica,arial; 
   		font-size: 10pt; 
-  		background-color:rgb(255,200,200);
+  		background-color:rgb(225,100,100);
+  		border-radius: 15px;
+  		padding:4px;
 	}
 	
 	.space {		
 		height: 20pt; 
+		font-size: 10pt; 
+	}
+	
+	.instructions {
+		font-size: 13pt; 
+		height: 18pt; 
 	}
 	
 	.playButton {		
@@ -186,7 +208,7 @@
 		currently_displayed_search_result = 0;
 		
 		$("#search-results").text("")
-		$("#search-results").append("<div class=space>Click over sounds to add to your team</div>")
+		$("#search-results").append("<div class=space>Click over sounds to add to your team.</div>")
 		//$("#search-results").append("<br>* number of results: " + soundCollection.properties['num_results']);
 		//$("#search-results").append("<br>* number of pages: " + soundCollection.properties['num_pages']);
 		//$("#search-results").append("<br>* sounds:");
@@ -210,8 +232,10 @@
 			classEO='search_resultO';
 		} 
 		
+		var tags = sound.properties['tags'].join('</span>&nbsp <span class="tags">')
+		
 		$("#search-results").append('<div id="test">')
-		$("#search-results").append('<div id="' + sound.properties["id"] + '" class="' + classEO + '" onclick="addSound(this,' + sound.properties["id"] + ')"><table><tr><td><img src="'+ sound.properties['waveform_m'] + '" alt = "' + sound.properties['waveform_m'] + '"/></td><td valign=top><strong>filename:</strong> "' + sound.properties['original_filename'] + '" <br><strong>tags:</strong> "' + sound.properties['tags'] + '" </td></tr></table></div>')
+		$("#search-results").append('<div id="' + sound.properties["id"] + '" class="' + classEO + '" onclick="addSound(this,' + sound.properties["id"] + ')"><table><tr><td><img src="'+ sound.properties['waveform_m'] + '" alt = "' + sound.properties['waveform_m'] + '"/></td><td class="description" valign=top><strong>filename:</strong> ' + sound.properties['original_filename'] + ' <br><span class="tags">' + tags + ' </span></td></tr></table></div>')
 		$("#search-results").append('<div class="playButton"><button id="pbutton' + sound.properties['id'] + '">Play</button></div>');	
 		$("#search-results").append('</div>')
 		$("#pbutton" + sound.properties['id']).click( function () { playPreview(sound.properties['preview-hq-mp3'],sound.properties['preview-hq-ogg']); return false} )
@@ -228,9 +252,7 @@
 
     function addSound(element, soundId)
     {
-    	if (num_sounds == 5){
-            $("#send_form").show();
-        }
+    	
         
     	$("#remove_sounds_label").show();
         
@@ -239,7 +261,12 @@
             console.log(num_sounds);
 	        if ($.inArray(soundId, sounds) == -1 && num_sounds <= max_sounds)
 	        {
-		        num_sounds = num_sounds + 1;  
+		        num_sounds = num_sounds + 1; 
+		        
+		        if (num_sounds == max_sounds){
+         		   $("#send_form").show();
+        		}
+		         
 	            console.log("addSound");
 	            sounds.push(soundId);
 	            $("#id_sound_ids").attr("value", sounds);
@@ -292,7 +319,7 @@
 
 {% block content %}
 
-<h2 id="title">Search sounds</h2>
+<h2 id="title" class="section_title">Search sounds</h2>
 <p>
 </p>
 
@@ -310,10 +337,13 @@
 
 <div id="picked_sounds_menu">
 <div id="picked_sounds" class="sound_list_minimal">
-    <h2>War files</h2>
+    <h2 class="section_title">War files</h2>
     <div>
-        <div id="remove_sounds_label"class="space">
-            Click over sounds to remove from your team
+    	<div class="instructions">
+            You need to choose 5 sounds for your battle.
+        </div>
+        <div id="remove_sounds_label" class="space">
+            Click over sounds to remove from your team.
         </div>
     </div>    
 </div>

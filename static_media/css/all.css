@@ -1,0 +1,66 @@
+body {
+    background: #EDEDED;
+    font-family: Helvetica, sans-serif;
+    font-size: 100%;
+    margin-top: 7px;
+}
+
+.header_title { 
+  	font-family:Helvetica,arial; 
+  	font-size: 28pt; 
+  	font-weight: bold;
+  	background-color:rgb(76,76,76);
+	border-radius: 15px;
+	padding:10px;
+	width:1112px;
+	color:white;
+}
+
+.title { 
+  	font-family:Helvetica,arial; 
+  	font-size: 26pt; 
+}
+
+.section_title { 
+  	font-family:Helvetica,arial; 
+  	font-size: 22pt; 
+}
+
+.explanation { 
+  	font-family:Helvetica,arial; 
+  	font-size: 12pt; 
+}
+
+.nickname { 
+  	font-family:Helvetica,arial; 
+  	font-size: 10pt; 
+  	background-color:rgb(76,76,76);
+	border-radius: 25px;
+	padding:10px;
+	width:150px;
+	color:white;
+}
+
+.waiting { 
+  	font-family:Helvetica,arial; 
+  	font-size: 15pt; 
+  	background-color:rgb(76,76,76);
+	border-radius: 25px;
+	padding:10px;
+	width:270px;
+	color:white;
+}
+
+.description { 
+  	font-family:Helvetica,arial; 
+  	font-size: 10pt;
+}
+
+.tags {
+	/*background-color:rgb(255,184,0);*/
+	background-color:rgb(255,221,127);
+  	color:black;
+  	border-radius:2px;
+  	padding:1px;
+  	line-height:150%;
+}
