@@ -40,7 +40,10 @@
                     $("#battle_preset").empty();
                     $("#battle_preset").append(event.data.preset);
                     $("#battle_preset").click(function() { $(this).empty(); });
-                });
+                    });
+                    if (isReadyToFight()) {
+                        $("#fight").show();
+                    }
         }
         // ---------- populate player2
         temp = battle['player2_sounds'];
@@ -76,23 +79,28 @@
         if ($("#"+ soundId).parent().hasClass("p1")) {
             $("#player1_sound").empty();
             $("#player1_sound").append(soundId);
-            $("#player1_sound").click(function() { $(this).empty(); });
+            $("#player1_sound").click(function() {
+                                                    $(this).empty();
+                                                    // $("#fight").hide();
+                                                });
         } else if ($("#"+ soundId).parent().hasClass("p2")) {
             $("#player2_sound").empty();
             $("#player2_sound").append(soundId);
-            $("#player2_sound").click(function() { $(this).empty(); });
+            $("#player2_sound").click(function() {
+                                                    $(this).empty();
+                                                    // $("#fight").hide();
+                                                });
         }
         current_fight++;
         // $("#current_battle").append(soundId);
-        if (current_fight == 2) {
+        if (isReadyToFight()) {
             $("#fight").show();
         }
     }
     function fight() {
-        if ($("#player1_sound").html() != ""
-                && $("#player2_sound").html() != ""
-                && $("#battle_preset").html() != "")
+        if (isReadyToFight())
         {
+            $("#fight").hide();
             console.log("all ready for battle");
             var url = "/battle/"+ battleObj['id'] +"/fight/"+ $("#player1_sound").html() +"/"+ $("#player2_sound").html() +"/"+ $("#battle_preset").html();
             $.get(url, function (data) {
@@ -100,7 +108,14 @@
                 });
         }
     }
-    function readyForFight() {
+    function isReadyToFight() {
+        if ($("#player1_sound").html() != ""
+            && $("#player2_sound").html() != ""
+            && $("#battle_preset").html() != "")
+        {
+            return true;
+        }
+        return false;
     }
     function setPoll() {
         var sURL = "/battle/" + battleObj['id'] +"/status/";
@@ -150,11 +165,12 @@
 
         $("#"+ last_round[0]).remove();
         $("#"+ last_round[1]).remove();
+        // $("#fight").hide();
         // var history = parsed[''];
     }
     // TODO:
     function findWinnerAndPoints(last_round) {
-        var sResult = "This round was won by... ";
+        var sResult = "And the winner is... ";
         if (last_round[0] == 1) {
             sResult += battleObj['player1'];
         } else {
@@ -168,6 +184,7 @@
     }
 
     </script>
+
 {% endblock %}
 
 {% block content %}
@@ -197,7 +214,6 @@
     </div>
     <br style="clear: both;" />
 </div>
-<br /><br /><br /><a href="#" onclick="fight()">Fight!</a>
 
 {% endblock %}
 
