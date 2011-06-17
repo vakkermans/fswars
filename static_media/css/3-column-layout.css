@@ -24,7 +24,10 @@ width: 100%;
 #contentcolumn {
 /*margin: 0 190px 0 180px; */
 width: 200px;
+}
 
+#contentcolumn img {
+    margin-left: 50px;
 }
 
 #leftcolumn{

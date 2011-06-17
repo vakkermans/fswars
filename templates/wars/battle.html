@@ -34,7 +34,8 @@
         }
         // ---------- populate presets
         for (i in presets) {
-            $("#presets").append("<div id='" + presets[i] + "'>" + presets[i] + "</div>");
+            //$("#presets").append("<div id='" + presets[i] + "'>" + presets[i] + "</div>");
+            $("#presets").append('<div id="' + presets[i] + '"><img src="{{ STATIC_URL }}images/' + presets[i].toLowerCase() + '_btn.png" /></div>');
             $("#"+ presets[i]).bind("click", {preset: presets[i]}, function(event) {
                     $("#preset_for_battle").empty();
                     $("#preset_for_battle").append(event.data.preset);
