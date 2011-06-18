@@ -198,22 +198,15 @@
 	});
 	
 	function playPreview(url_mp3, url_ogg) {
-		 snd = new Audio(url_mp3);
-		 snd.play()
-		 
-		 
-		 /*
 		 stopPreview();
 		 console.log(url_mp3)
          $("#jquery_jplayer_1").jPlayer("setMedia", {
                 mp3: url_mp3,
-                oga: url_ogg
+                ogg: url_ogg
          }).jPlayer("play");
-         */
     }
     function stopPreview() {
-        snd.pause()
-        //$("#jquery_jplayer_1").jPlayer("stop");
+        $("#jquery_jplayer_1").jPlayer("stop");
     }
 	
 	function search_sounds() {
@@ -260,10 +253,11 @@
 		
 		$("#search-results").append('<div id="test">')
 		$("#search-results").append('<div id="' + sound.properties["id"] + '" class="' + classEO + '" onclick="addSound(this,' + sound.properties["id"] + ')"><table><tr><td><img src="'+ sound.properties['waveform_m'] + '" alt = "' + sound.properties['waveform_m'] + '"/></td><td class="description" valign=top><strong>filename:</strong> ' + sound.properties['original_filename'] + ' <br><span class="tags">' + tags + ' </span></td></tr></table></div>')
-		$("#search-results").append('<div class="playButton"><button id="pbutton' + sound.properties['id'] + '">Play</button></div>');	
+		$("#search-results").append('<div class="playButton"><button id="pbutton' + sound.properties['id'] + '">Play</button></div>');
+		$("#search-results").append('<div class="playButton"><button id="sbutton' + sound.properties['id'] + '">Stop</button></div>');	
 		$("#search-results").append('</div>')
 		$("#pbutton" + sound.properties['id']).click( function () { playPreview(sound.properties['preview-hq-mp3'],sound.properties['preview-hq-ogg']); return false} )
-		
+		$("#sbutton" + sound.properties['id']).click( function () { stopPreview(); return false} )
 		
 		//$("#search-results").append('<br><button onclick="snd.play()">play</button><button onclick="snd.pause()">pause</button>')
 		//$("#search-results").append('<div id="jquery_jplayer_1"></div><div id="jp_interface_1"><a href="#" class="jp-play">Play</a><a href="#" class="jp-pause">Pause</a></div>')	
@@ -382,6 +376,6 @@
  	</form>
 </div>
 </div>
-
+<div id="jquery_jplayer_1" style="height: 0px; width: 0px;"></div>
  
 {% endblock content %}
