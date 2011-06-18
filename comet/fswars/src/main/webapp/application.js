@@ -46,16 +46,13 @@
         // when the server has lost the state of this client
         function _metaHandshake(handshake)
         {
-            if (handshake.successful === true)
-            {
-                cometd.batch(function()
-                {
-                    cometd.subscribe('/hello', function(message)
-                    {
-                        $('#body').append('<div>Server Says: ' + message.data.greeting + '</div>');
+            if (handshake.successful === true) {
+                cometd.batch(function() {
+                    cometd.subscribe('/updates', function(message) {
+                        $('#body').append('<div>Server Says: ' + message.data.battle + '</div>');
                     });
                     // Publish on a service channel since the message is for the server only
-                    cometd.publish('/service/hello', { name: 'World' });
+                    cometd.publish('/service/updates', { battle_id: '1' });
                 });
             }
         }
