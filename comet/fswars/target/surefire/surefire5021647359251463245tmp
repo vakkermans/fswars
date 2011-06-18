@@ -1,0 +1,34 @@
+#surefire
+#Sat Jun 18 19:28:18 CEST 2011
+testClassesDirectory=/Users/vakkermans/src/fswars/comet/fswars/target/test-classes
+classPathUrl.4=/Users/vakkermans/.m2/repository/org/cometd/java/cometd-java-server/2.2.0/cometd-java-server-2.2.0.jar
+classPathUrl.3=/Users/vakkermans/.m2/repository/org/cometd/java/bayeux-api/2.2.0/bayeux-api-2.2.0.jar
+classPathUrl.2=/Users/vakkermans/.m2/repository/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar
+useManifestOnlyJar=true
+classPathUrl.1=/Users/vakkermans/src/fswars/comet/fswars/target/classes
+reportsDirectory=/Users/vakkermans/src/fswars/comet/fswars/target/surefire-reports
+classPathUrl.0=/Users/vakkermans/src/fswars/comet/fswars/target/test-classes
+dirscanner.0=directoryScannerOptions
+providerConfiguration=org.apache.maven.surefire.junit.JUnit3Provider
+testSuiteDefinitionTestSourceDirectory=/Users/vakkermans/src/fswars/comet/fswars/src/test/java
+surefireClassPathUrl.1=/Users/vakkermans/.m2/repository/org/apache/maven/surefire/surefire-api/2.7.1/surefire-api-2.7.1.jar
+surefireClassPathUrl.0=/Users/vakkermans/.m2/repository/org/apache/maven/surefire/surefire-junit3/2.7.1/surefire-junit3-2.7.1.jar
+report.2=org.apache.maven.surefire.report.XMLReporter
+useSystemClassLoader=true
+report.1=org.apache.maven.surefire.report.BriefFileReporter
+report.0=org.apache.maven.surefire.report.ForkingConsoleReporter
+excludes0=**/*$*
+isTrimStackTrace=true
+dirscanner.0.params=/Users/vakkermans/src/fswars/comet/fswars/target/test-classes|[**/Test*.java, **/*Test.java, **/*TestCase.java]|[**/*$*]
+includes2=**/*TestCase.java
+enableAssertions=true
+includes1=**/*Test.java
+failIfNoTests=false
+includes0=**/Test*.java
+dirscanner.0.types=java.io.File|java.util.ArrayList|java.util.ArrayList
+classPathUrl.9=/Users/vakkermans/.m2/repository/org/eclipse/jetty/jetty-servlets/7.4.0.v20110414/jetty-servlets-7.4.0.v20110414.jar
+classPathUrl.8=/Users/vakkermans/.m2/repository/org/eclipse/jetty/jetty-jmx/7.4.0.v20110414/jetty-jmx-7.4.0.v20110414.jar
+classPathUrl.7=/Users/vakkermans/.m2/repository/org/eclipse/jetty/jetty-util/7.4.0.v20110414/jetty-util-7.4.0.v20110414.jar
+childDelegation=false
+classPathUrl.6=/Users/vakkermans/.m2/repository/org/eclipse/jetty/jetty-continuation/7.4.0.v20110414/jetty-continuation-7.4.0.v20110414.jar
+classPathUrl.5=/Users/vakkermans/.m2/repository/org/cometd/java/cometd-java-common/2.2.0/cometd-java-common-2.2.0.jar
