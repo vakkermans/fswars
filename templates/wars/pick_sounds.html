@@ -160,7 +160,8 @@
 
 </style>
 <script type="text/javascript">
-    var sounds = [];
+	// ----------- GLOBAL_VARS
+	var sounds = [];
 	var num_sounds = 0;
 	var max_sounds = 5;
 	var currently_displayed_search_result = 0;
@@ -168,23 +169,27 @@
 	// var username = {{ username }};
 	var freesound;
 	
+	// ------------------ ON_READY-START
 	$(document).ready(function(){
-	
+
+	// jPlayer setup
 	$("#jquery_jplayer_1").jPlayer({
             ready: function() {
             },
             swfPath: "{{ STATIC_URL }}swf",
             supplied: "mp3, ogg"
     });
-	
+
+	// hide things
 	$("#id_sound_ids").hide();
 	$("#id_sound_ids").prev().hide();
 	$("#send_form").hide();
 	$("#remove_sounds_label").hide();
+	$("#search_indicator").hide();
 	
+	// Freesound API setup
 	apiKey = settings.apiKey;	
 	console.debug("key: " + apiKey);
-	
 	if(apiKey == "")
 	{
 		alert("no KEY no honey!"); 
@@ -195,8 +200,11 @@
 		//creating freesound object	
 		freesound = new Freesound(apiKey, true);
 	}
-	});
 	
+	});
+	// ---------------- ON_READY-END
+	
+	// ---------------- JPLAYER-START
 	function playPreview(url_mp3, url_ogg) {
 		 stopPreview();
 		 console.log(url_mp3)
@@ -208,9 +216,11 @@
     function stopPreview() {
         $("#jquery_jplayer_1").jPlayer("stop");
     }
-	
+ 	// ---------- JPLAYER-END
 	function search_sounds() {
 		if ($("#search-q").length > 0) {
+			showSearchingAnim();
+			
 			console.log("query: " + $("#search-q").val());
 			var q = $("#search-q").val();
 			var p = 1;
@@ -222,13 +232,15 @@
 	}
 	function displaySearchResults(soundCollection) {
 		currently_displayed_search_result = 0;
-		
+		hideSearchingAnim();
 		$("#search-results").text("")
 		$("#search-results").append("<br><br><br><br><br>")
 		//$("#search-results").append("<div class=space>Click over sounds to add to your team.</div>")
 		//$("#search-results").append("<br>* number of results: " + soundCollection.properties['num_results']);
 		//$("#search-results").append("<br>* number of pages: " + soundCollection.properties['num_pages']);
 		//$("#search-results").append("<br>* sounds:");
+		
+		// TODO: add check and display msg for 0 results...
 		for (obj in soundCollection.properties['sounds']) {
 			//sound_id = soundCollection.properties['sounds'][obj]['id'];
 			// $("#search-results").append("<br>--- " + obj + ": " + sound_id + " - " + soundCollection.properties['sounds'][obj]['original_filename']);
@@ -267,11 +279,20 @@
 	}
 	function errorSound() {
 	}
-
-    function addSound(element, soundId)
-    {
-    	
-        
+	function showSearchingAnim() {
+		$("#search_indicator").show();
+		// loop the pulsate effect
+		function pulsate() {
+			$("#search_indicator").animate({opacity: 0.2}, 1000)
+								  .animate({opacity: 1}, 1000, pulsate);
+		}
+		pulsate();
+	}
+	function hideSearchingAnim() {
+		$("#search_indicator").hide().stop();
+		$("#search_indicator").css("opacity: 0;");
+	}
+    function addSound(element, soundId) {
     	$("#remove_sounds_label").show();
         
         if (num_sounds < max_sounds) 
@@ -304,14 +325,12 @@
         }
     }
 
-    function removeSound(element, soundId)
-    {
+    function removeSound(element, soundId) {
     	console.log("removing sound: " + soundId)
         var index = $.inArray(soundId, sounds);
         // $(element).prev().attr("id)
         if (index != -1)
         {
-
             sounds.splice(index, 1);
 			$("#id_sound_ids").attr("value", sounds);
             $(element).closest("#picked_sounds > div").remove();
@@ -325,9 +344,6 @@
             	num_sounds = 0;            
             	$("#remove_sounds_label").hide();
             }
-			
-			
-            
         }
     }
 </script>
@@ -349,6 +365,7 @@
     	<!-- <input type="submit" name="submit" value="search sounds" onclick="search_sounds" id="search-button"/> -->
     	<button onclick="search_sounds()">Search!</button>
     </p>
+    <span id="search_indicator">fetching sounds...</span>
 </div>
 
 <div id="search-results" class="sound_list_minimal">
