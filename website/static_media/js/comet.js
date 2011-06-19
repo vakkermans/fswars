@@ -4,7 +4,7 @@
 
     $(document).ready(function()
     {
-        if(config.battleId != null)
+        if(config.battleId != null) {
             function _connectionEstablished()
             {
                 $('#comet_status').html('<div>CometD Connection Established</div>');
