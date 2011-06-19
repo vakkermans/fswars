@@ -8,19 +8,19 @@
         if(config.battleId != null) {
             function _connectionEstablished()
             {
-                $('#comet_status').html('<div>CometD Connection Established</div>');
+                $('#comet_status').html('Connection Established');
                 // request battle info, to not lose any data
                 $.get('/battle/'+config.battleId+'/request-battle-status/');
             }
 
             function _connectionBroken()
             {
-                $('#comet_status').html('<div>CometD Connection Broken</div>');
+                $('#comet_status').html('Connection Broken');
             }
 
             function _connectionClosed()
             {
-                $('#comet_status').html('<div>CometD Connection Closed</div>');
+                $('#comet_status').html('Connection Closed');
             }
 
             // Function that manages the connection status with the Bayeux server
@@ -47,7 +47,14 @@
             }
 
             function _page_comet_handler_helper(m) {
-                page_comet_handler(jQuery.parseJSON(jQuery.parseJSON(m.data.command)));
+                console.debug(m);
+                var command = jQuery.parseJSON(m.data.command);
+                console.debug(command);
+                if (command.command == 'updateChat') {
+                    fswars.add_chat(command.message);
+                } else {
+                    page_comet_handler(command);
+                }
             }
 
             // Function invoked when first contacting the server and

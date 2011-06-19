@@ -199,15 +199,16 @@ def battle_result(request, battle_id):
     return rtr('wars/battle_result.html')
 
 
-
+@csrf_exempt
 @require_POST
 def browser2browser(request, battle_id):
-    form = UpdateBattleForm(request.POST)
-    if form.is_valid():
-        send_message(battle_id, form.cleaned_data['message'])
+    print request.POST['message']
+    if 'message' in request.POST:
+        send_message(battle_id, str(request.POST['message']), True)
         return HttpResponse('updating through comet..')
     else:
         return HttpResponse('update form was not valid..')
+
 
 def request_battle_status(request, battle_id):
     battle = get_object_or_404(Battle, id=battle_id)

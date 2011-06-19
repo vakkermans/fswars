@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load absurl %}
 
 {% block header %}
 {% endblock header %}
@@ -26,13 +27,35 @@ function page_comet_handler(update) {
         <p>You can now share the following link with the person you want to
            play with. The game will begin as soon as she follows the link.
 
-        <p><a href="{% url wars:wait-on-player battle.id %}">
-            {% url wars:wait-on-player battle.id %}</a>
+        <p><a href="{% absurl wars:wait-on-player battle.id %}">
+            {% absurl wars:wait-on-player battle.id %}</a>
+
+            <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
+                    width="110"
+                    height="14"
+                    id="clippy" >
+                <param name="movie" value="{{ STATIC_URL }}swf/clippy.swf"/>
+                <param name="allowScriptAccess" value="always" />
+                <param name="quality" value="high" />
+                <param name="scale" value="noscale" />
+                <param NAME="FlashVars" value="text={% absurl wars:wait-on-player battle.id %}">
+                <param name="bgcolor" value="#ededed">
+                <embed src="{{ STATIC_URL }}swf/clippy.swf"
+                       width="110"
+                       height="14"
+                       name="clippy"
+                       quality="high"
+                       allowScriptAccess="always"
+                       type="application/x-shockwave-flash"
+                       pluginspage="http://www.macromedia.com/go/getflashplayer"
+                       FlashVars="text={% absurl wars:wait-on-player battle.id %}"
+                       bgcolor="#ededed" />
+            </object>
 
     {% else %}
         <h1>Pick a name and start playing</h1>
 
-        <form action="." method="POST">{% csrf_token %}
+        <form id="second_player_name_form" action="." method="POST">{% csrf_token %}
             {{ form.as_p }} <br>
             <input type="submit" value="Play!">
         </form>

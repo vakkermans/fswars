@@ -36,10 +36,39 @@
             <script type="text/javascript">
             {% block comet_handler %}
                 function page_comet_handler(update) {
-                    $('#comet_incoming').html(update);
+                    fswars.add_notification(update);
                 }
             {% endblock %}
             </script>
+
+            {% if battle %}
+            <script type="text/javascript">
+                $(document).ready(function() {
+
+
+                    // prevent enter from sending forms
+                    $('input, form').keypress(function(e) {
+                        if(e.keyCode === 13) {
+                            e.preventDefault();
+                            var message = $('#comet_send').val();
+                            if (message != '') {
+                                send_chat(message);
+                                $('#comet_send').val('')
+                            }
+                            return false;
+                        }
+                    });
+
+                    send_chat = function(message) {
+                        var data = {'command': 'updateChat',
+                                    'message': '{{request.user}}: '+message};
+                        $.post('{% url wars:browser2browser battle.id %}',
+                                {message: JSON.stringify(data)});
+                    };
+
+                });
+            </script>
+            {% endif %}
 
             <script type="text/javascript" src="{{ STATIC_URL }}js/comet.js"></script>
 
@@ -61,8 +90,6 @@
             {% endif %}
 
             <div id="header">
-                <div id="comet_status"></div>
-                <div id="comet_incoming"></div>
 
                 {% block header %}
                 <!--  img height="80px" src="{{ STATIC_URL }}images/freesound_logo2.png" -->
@@ -88,6 +115,15 @@
                 </center>
             </div> <!-- /#footer -->
 
+            {% if battle %}
+            <div id="comet">
+                <div id="comet_status"></div>
+                <div id="comet_incoming"></div>
+                <form id="comet_send_form" action="{% url wars:browser2browser battle.id %}">
+                    <input id="comet_send" type="text">
+                </form>
+            </div>
+            {% endif %}
         {% endblock body %}
     </body>
 
