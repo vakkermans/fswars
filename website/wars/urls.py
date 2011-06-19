@@ -15,6 +15,13 @@ urlpatterns = patterns('',
         pick_sounds,
         name='pick-sounds'),
 
+    # for setting the chosen sounds.
+    url(r'^battle/(?P<battle_id>\d+)/pick-sounds-helper/$',
+        pick_sounds_helper,
+        name='pick-sounds-helper'),
+
+
+
     url(r'^battle/(?P<battle_id>\d+)/$',
         battle,
         name='battle'),

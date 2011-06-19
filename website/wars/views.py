@@ -88,17 +88,30 @@ def wait_on_player(request, battle_id):
 def pick_sounds(request, battle_id):
     battle = get_object_or_404(Battle, id=battle_id)
     form = PickSoundsForm()
-    if request.method == 'POST':
-        form = PickSoundsForm(request.POST)
-        if form.is_valid():
-            sound_ids = [int(x) for x in form.cleaned_data.get('sound_ids').split(',')]
-            if battle.player1 == request.user:
-                battle.player1_sounds = json.dumps(sound_ids)
-            else:
-                battle.player2_sounds = json.dumps(sound_ids)
-            battle.save()
-            return HttpResponseRedirect(rurl('wars:wait-on-sounds', battle.id))
     return rtr('wars/pick_sounds.html')
+
+
+@csrf_exempt
+@require_POST
+@auth()
+def pick_sounds_helper(request, battle_id):
+    '''This function is only used by jQuery'''
+    battle = get_object_or_404(Battle, id=battle_id)
+    form = PickSoundsForm(request.POST)
+    if form.is_valid():
+        sound_ids = [int(x) for x in form.cleaned_data.get('sound_ids').split(',')]
+        if battle.player1_uuid == request.uuid:
+            battle.player1_sounds = json.dumps(sound_ids)
+        elif battle.player2_uuid == request.uuid:
+            battle.player2_sounds = json.dumps(sound_ids)
+        else:
+            # This shouldn't happen but perhaps does when session is invalid
+            return HttpResponse('Hmm.. you do not seem to be one of the players.')
+        battle.save()
+        return HttpResponse('Sounds saved, updating through comet.')
+    else:
+        return HttpResponse('Form was not valid.')
+
 
 
 @auth()
