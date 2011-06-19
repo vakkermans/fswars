@@ -11,11 +11,14 @@ function page_comet_handler(update) {
        update['command'] == 'updateBattleStatus' &&
        update['battle'][0]['fields']['player1_uuid'] &&
        update['battle'][0]['fields']['player2_uuid']) {
+        console.debug('test ok');
         window.location = '{% url wars:pick-sounds battle.id %}';
+        $('#comet_incoming').html(window.location);
     } else {
+        console.debug('test fail');
         $('#comet_incoming').html('Received message, but the battle cannot start yet.');
     }
-}
+};
 
 {% endblock %}
 

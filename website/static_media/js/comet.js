@@ -44,7 +44,7 @@
             }
 
             function _page_comet_handler_helper(m) {
-                page_comet_handler(jQuery.parseJSON(m.data.command));
+                page_comet_handler(jQuery.parseJSON(jQuery.parseJSON(m.data.command)));
             }
 
             // Function invoked when first contacting the server and
