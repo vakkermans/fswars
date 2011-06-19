@@ -61,7 +61,7 @@
 
                     send_chat = function(message) {
                         var data = {'command': 'updateChat',
-                                    'message': message};
+                                    'message': '{{request.user}}: '+message};
                         $.post('{% url wars:browser2browser battle.id %}',
                                 {message: JSON.stringify(data)});
                     };
