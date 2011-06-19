@@ -27,11 +27,7 @@ class Battle(models.Model):
         return serializers.serialize('json', [self])
 
     def send_update_battle_status(self):
-        send_message(self.id,
-'''
-{"command": "updateBattleStatus",
-"battle": %s }
-''' % self.to_json())
+        send_message(self.id, '{"command": "updateBattleStatus", "battle": %s }' % self.to_json(), True)
 
 
 class BattleRound(models.Model):

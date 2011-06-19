@@ -32,7 +32,7 @@ function page_comet_handler(update) {
     {% else %}
         <h1>Pick a name and start playing</h1>
 
-        <form action="." method="POST">{% csrf_token %}
+        <form id="second_player_name_form" action="." method="POST">{% csrf_token %}
             {{ form.as_p }} <br>
             <input type="submit" value="Play!">
         </form>
