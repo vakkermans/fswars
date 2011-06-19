@@ -120,7 +120,7 @@ def battle(request, battle_id):
     battle_json = battle.to_json()
     my_nickname = request.session[SESSION_NICKNAME];
     presets = algorithms.ALGORITHM_CLASSES.keys()
-
+    
     return rtr('wars/battle.html')
 
 
@@ -146,15 +146,31 @@ def fight(request, battle_id, id1, id2, preset):
     battle = get_object_or_404(Battle, id=battle_id)
     ps = preset.upper()
     battle_result = algorithms.computeBattle(int(id1), int(id2), algorithms.ALGORITHM_CLASSES[ps])
-    history = json.loads(battle.history) if battle.history else []
-    history.append([int(id1), int(id2), ps, battle_result['winner'], battle_result['points']])
-    battle.history = json.dumps(history)
+    
     # N.B. player1 always starts! 1-indexed, so 1 or 2
-    battle.turn_owner = 2 if len(history) % 2 == 1 else 1
-    if len(history) >= len(json.loads(battle.player1_sounds)) or \
-       len(history) >= len(json.loads(battle.player2_sounds)):
+    battle.turn_owner = 2 if battle.rounds.count() % 2 == 1 else 1
+    if battle.rounds.count() >= len(json.loads(battle.player1_sounds)) or \
+       battle.rounds.count() >= len(json.loads(battle.player2_sounds)):
         battle.finished = True
+    
+    # battle round
+    battle_round = BattleRound()
+    battle_round.attacker = 1 if battle.turn_owner == battle.player1 else 2
+    battle_round.player1_sound = int(id1)
+    battle_round.player2_sound = int(id2)
+    battle_round.winner = battle_result['winner']
+    # TODO: add previous points
+    if battle.player1 == battle_round.winner:
+        battle_round.player1_points = battle_result['points']
+        battle_round.player2_points = 0
+    else:
+        battle_round.player2_points = battle_result['points']
+        battle_round.player1_points = 0
+    
+    battle.rounds.add(battle_round)
     battle.save()
+    battle_round.save();
+
     return HttpResponse(battle.to_json())
 
 
