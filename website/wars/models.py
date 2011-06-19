@@ -48,3 +48,4 @@ class BattleRound(models.Model):
 def send_update(**kwargs):
     battle = kwargs['instance']
     battle.send_update_battle_status()
+    
