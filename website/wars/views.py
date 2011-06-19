@@ -9,16 +9,22 @@ from forms import *
 from django.views.decorators.csrf import csrf_exempt
 from models import *
 from django.contrib import messages
-import json
+import json, uuid
 from algorithms import algorithms
 from django.core import serializers
+from utils.comet import send_message
+from django.views.decorators.http import require_GET, require_POST
 
 SESSION_NICKNAME = 'session_nickname'
+SESSION_UUID = 'session_uuid'
 
 from algorithms import algorithms
 algorithms.init()
 
 class auth():
+
+    def __init__(self, check_nickname=True):
+        self.check_nickname = check_nickname
 
     def __call__(self, f):
         """
@@ -27,41 +33,53 @@ class auth():
         it a single argument, which is the function object.
         """
         def authed_func(request, *args, **kargs):
-            nickname = request.session.get(SESSION_NICKNAME, False)
 
-            if not nickname:
+            nickname = request.session.get(SESSION_NICKNAME, False)
+            pl_uuid = request.session.get(SESSION_UUID, str(uuid.uuid4()))
+
+            request.session[SESSION_UUID] = pl_uuid
+
+            if self.check_nickname and not nickname:
                 return HttpResponseRedirect(rurl('wars:frontpage'))
 
             request.user = nickname
+            request.uuid = pl_uuid
             return f(request, *args, **kargs)
 
         return authed_func
 
 
+@auth(check_nickname=False)
 def frontpage(request):
     form = PickNameForm()
     if request.method == 'POST':
         form = PickNameForm(request.POST)
         if form.is_valid():
             nickname = form.cleaned_data['nickname']
-            try:
-                battle = Battle.objects.get(player2__isnull=True)
-                nickname = nickname+'2' if battle.player1 == nickname else nickname
-                battle.player2 = nickname
-                battle.save()
-            except Battle.DoesNotExist:
-                battle = Battle(player1=nickname)
-                battle.save()
             request.session[SESSION_NICKNAME] = nickname
+            battle = Battle()
+            battle.player1_uuid = request.uuid
+            battle.player1 = nickname
+            battle.save()
             return HttpResponseRedirect(rurl('wars:wait-on-player', battle.id))
     return rtr('wars/frontpage.html')
 
 
-@auth()
+@auth(check_nickname=False)
 def wait_on_player(request, battle_id):
     battle = get_object_or_404(Battle, id=battle_id)
-    if battle.status_players():
-        return HttpResponseRedirect(rurl('wars:pick-sounds', battle.id))
+    player_is_creator = battle.player1_uuid == request.uuid
+    form = PickNameForm()
+    if request.method == 'POST':
+        form = PickNameForm(request.POST)
+        if form.is_valid():
+            # N.B. TODO: prevent people from stealing the game by checking if player2 is already set.
+            nickname = form.cleaned_data['nickname']
+            request.session[SESSION_NICKNAME] = nickname
+            battle.player2_uuid = request.uuid
+            battle.player2 = nickname
+            battle.save()
+            return HttpResponseRedirect(rurl('wars:pick-sounds', battle.id))
     return rtr('wars/wait_on_player.html')
 
 
@@ -86,10 +104,10 @@ def pick_sounds(request, battle_id):
 @auth()
 def battle(request, battle_id):
     battle = get_object_or_404(Battle, id=battle_id)
-    battle_json = battle.do_json()
+    battle_json = battle.to_json()
     my_nickname = request.session[SESSION_NICKNAME];
     presets = algorithms.ALGORITHM_CLASSES.keys()
-    
+
     return rtr('wars/battle.html')
 
 
@@ -151,3 +169,13 @@ def battle_result(request, battle_id):
     scores = calculate_final_scores(history)
     return rtr('wars/battle_result.html')
 
+
+
+@require_POST
+def update_battle(request, battle_id):
+    form = UpdateBattleForm(request.POST)
+    if form.is_valid():
+        send_message(battle_id, form.cleaned_data['update'])
+        return HttpResponse('updating through comet..')
+    else:
+        return HttpResponse('update form was not valid..')

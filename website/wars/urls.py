@@ -39,4 +39,9 @@ urlpatterns = patterns('',
         battle_status,
         name='status'),
 
+    # update funcs
+    url(r'^battle/(?P<battle_id>\d+)/update/$',
+        update_battle,
+        name='update-battle'),
+
 )

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block header %}
+{% endblock header %}
+
+{% block comet_handler %}
+
+function page_comet_handler(update) {
+    console.debug(update);
+    if('command' in update &&
+       update['command'] == 'updateBattleStatus' &&
+       update['battle'][0]['fields']['player1_uuid'] &&
+       update.battle[0].fields.player2_uuid) {
+        window.location = '{% url wars:pick-sounds battle.id %}';
+    } else {
+        $('#comet_incoming').html('Received message, but the battle cannot start yet.');
+    }
+}
+
+{% endblock %}
+
+
+{% block content %}
+
+    {% if player_is_creator %}
+        <h1>Invite other player</h1>
+
+        <p>You can now share the following link with the person you want to
+           play with. The game will begin as soon as she follows the link.
+
+        <p><a href="{% url wars:wait-on-player battle.id %}">
+            {% url wars:wait-on-player battle.id %}</a>
+
+    {% else %}
+        <h1>Pick a name and start playing</h1>
+
+        <form action="." method="POST">{% csrf_token %}
+            {{ form.as_p }} <br>
+            <input type="submit" value="Play!">
+        </form>
+
+    {% endif %}
+
+{% include "wars/backdrops.html" %}
+{% endblock content %}

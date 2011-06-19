@@ -63,7 +63,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
 )
 
-ROOT_URLCONF = 'fswars.urls'
+ROOT_URLCONF = 'urls'
 
 TEMPLATE_DIRS = (
     os.path.join(PROJECT_ROOT, 'templates'),
@@ -80,6 +80,16 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     'wars',
     'superuser', # this prevents a superuser to be created each time
+)
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    "django.contrib.auth.context_processors.auth",
+    "django.core.context_processors.debug",
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media",
+    "django.core.context_processors.static",
+    "django.contrib.messages.context_processors.messages",
+    "wars.context_processors.extra_settings",
 )
 
 # A sample logging configuration. The only tangible logging
@@ -104,5 +114,3 @@ LOGGING = {
         },
     }
 }
-
-API_KEY = "9bef54d1565d438da6a7898052be83ec"

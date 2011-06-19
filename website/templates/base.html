@@ -19,6 +19,30 @@
             <script type="text/javascript" src="{{ STATIC_URL }}js/settings.js"></script>
             <script type="text/javascript" src="{{ STATIC_URL }}js/freesoundLib.js"></script>
             <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.jplayer.min.js"></script>
+
+            <script type="text/javascript" src="{{ STATIC_URL }}js/json2.js"></script>
+            <script type="text/javascript" src="{{ STATIC_URL }}js/cometd.js"></script>
+            <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.cometd.js"></script>
+
+            <script type="text/javascript">
+                var config = {
+                    {% if battle %}battleId: '{{ battle.id }}'{% endif %}
+                };
+                /* N.B. TODO: If the path of the comet deployment
+                   changes this has to be changed as well. */
+                var cometURL = '{{ COMET_URL }}';
+            </script>
+
+            <script type="text/javascript">
+            {% block comet_handler %}
+                function page_comet_handler(update) {
+                    $('#comet_incoming').html(update);
+                }
+            {% endblock %}
+            </script>
+
+            <script type="text/javascript" src="{{ STATIC_URL }}js/comet.js"></script>
+
         {% endblock %}
     </head>
 
@@ -37,6 +61,9 @@
             {% endif %}
 
             <div id="header">
+                <div id="comet_status"></div>
+                <div id="comet_incoming"></div>
+
                 {% block header %}
                 <!--  img height="80px" src="{{ STATIC_URL }}images/freesound_logo2.png" -->
                 <div class="header_title">

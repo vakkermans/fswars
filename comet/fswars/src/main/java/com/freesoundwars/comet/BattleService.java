@@ -61,7 +61,7 @@ public class BattleService extends AbstractService
             System.out.println(" [x] Received from RabbitMQ'" + rabbit_message + "'");
 
             Map<String, Object> output = new HashMap<String, Object>();
-            output.put("battle", rabbit_message);
+            output.put("command", rabbit_message);
             remote.deliver(getServerSession(), "/updates", output, null);
         }
 

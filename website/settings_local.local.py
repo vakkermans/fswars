@@ -15,3 +15,7 @@ DATABASES = {
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+
+API_KEY = '9cdc313dcbb24d9883503bb4d2341fa1'
+
+COMET_URL = 'http://localhost:8080/fswars/cometd'
