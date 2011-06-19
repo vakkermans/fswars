@@ -69,8 +69,11 @@ def frontpage(request):
 def wait_on_player(request, battle_id):
     battle = get_object_or_404(Battle, id=battle_id)
     player_is_creator = battle.player1_uuid == request.uuid
-    form = PickNameForm()
-    if request.method == 'POST':
+    player_is_invited = battle.player2_uuid == request.uuid
+
+    if request.method == 'POST' and \
+       not player_is_invited and \
+       not battle.player2_uuid:
         form = PickNameForm(request.POST)
         if form.is_valid():
             # N.B. TODO: prevent people from stealing the game by checking if player2 is already set.
@@ -80,6 +83,8 @@ def wait_on_player(request, battle_id):
             battle.player2 = nickname
             battle.save()
             return HttpResponseRedirect(rurl('wars:pick-sounds', battle.id))
+
+    form = PickNameForm()
     return rtr('wars/wait_on_player.html')
 
 
@@ -87,6 +92,9 @@ def wait_on_player(request, battle_id):
 @csrf_exempt
 def pick_sounds(request, battle_id):
     battle = get_object_or_404(Battle, id=battle_id)
+    # prevent simultaneous invite responses
+    if not request.uuid == battle.player1_uuid and not request.uuid == battle.player2_uuid:
+        return HttpResponseRedirect(rurl('wars:wait-on-player', battle.id))
     form = PickSoundsForm()
     return rtr('wars/pick_sounds.html')
 
@@ -120,7 +128,7 @@ def battle(request, battle_id):
     battle_json = battle.to_json()
     my_nickname = request.session[SESSION_NICKNAME];
     presets = algorithms.ALGORITHM_CLASSES.keys()
-    
+
     return rtr('wars/battle.html')
 
 
@@ -146,13 +154,13 @@ def fight(request, battle_id, id1, id2, preset):
     battle = get_object_or_404(Battle, id=battle_id)
     ps = preset.upper()
     battle_result = algorithms.computeBattle(int(id1), int(id2), algorithms.ALGORITHM_CLASSES[ps])
-    
+
     # N.B. player1 always starts! 1-indexed, so 1 or 2
     battle.turn_owner = 2 if battle.rounds.count() % 2 == 1 else 1
     if battle.rounds.count() >= len(json.loads(battle.player1_sounds)) or \
        battle.rounds.count() >= len(json.loads(battle.player2_sounds)):
         battle.finished = True
-    
+
     # battle round
     battle_round = BattleRound()
     battle_round.attacker = 1 if battle.turn_owner == battle.player1 else 2
@@ -166,7 +174,7 @@ def fight(request, battle_id, id1, id2, preset):
     else:
         battle_round.player2_points = battle_result['points']
         battle_round.player1_points = 0
-    
+
     battle.rounds.add(battle_round)
     battle.save()
     battle_round.save();

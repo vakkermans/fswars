@@ -12,7 +12,11 @@ function page_comet_handler(update) {
        update.command == 'updateBattleStatus' &&
        update.battle[0].fields.player1_uuid &&
        update.battle[0].fields.player2_uuid) {
-        window.location = '{% url wars:pick-sounds battle.id %}';
+        // game is full
+        if({% if request.uuid == battle.player1_uuid or request.uuid == battle.player2_uuid %}true{% else %}false{% endif %}) {
+            // user is a player of this game
+            window.location = '{% url wars:pick-sounds battle.id %}';
+        }
     }
 };
 
@@ -21,61 +25,81 @@ function page_comet_handler(update) {
 
 {% block content %}
 
-    {% if player_is_creator %}
+    <center>
+    {% if battle.player1 and battle.player2 %}
+        <img src="{{ STATIC_URL }}images/freesound_wars2.png">
+        <img src="{{ STATIC_URL }}images/battleground.png">
 
-        <center>
+        <h3>This game has already started!</h3>
+
+        <p>Perhaps somebody accepted the invitation before you did.
+
+        <p>You can still play by creating a <a href="{% url wars:frontpage %}">new game</a>.
+    {% else %}
+        {% if player_is_creator %}
+
             <div class="waiting">
                 Invite someone to play!
             </div>
 
-        <p>You will now have to invite someone to play against.
+            <p>You will now have to invite someone to play against.
 
-        <h3>Invite by email or chat</h3>
+            <h3>Facebook</h3>
 
-        <p>{% absurl wars:wait-on-player battle.id %} -
+            <p><div id="fb-root"></div>
 
-            <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
-                    width="110"
-                    height="14"
-                    id="clippy" >
-                <param name="movie" value="{{ STATIC_URL }}swf/clippy.swf"/>
-                <param name="allowScriptAccess" value="always" />
-                <param name="quality" value="high" />
-                <param name="scale" value="noscale" />
-                <param NAME="FlashVars" value="text={% absurl wars:wait-on-player battle.id %}">
-                <param name="bgcolor" value="#ededed">
-                <embed src="{{ STATIC_URL }}swf/clippy.swf"
-                       width="110"
-                       height="14"
-                       name="clippy"
-                       quality="high"
-                       allowScriptAccess="always"
-                       type="application/x-shockwave-flash"
-                       pluginspage="http://www.macromedia.com/go/getflashplayer"
-                       FlashVars="text={% absurl wars:wait-on-player battle.id %}"
-                       bgcolor="#ededed" />
-            </object>
+            <script src="http://connect.facebook.net/en_US/all.js#xfbml=1"></script>
+            <fb:send href="{% absurl wars:wait-on-player battle.id %}" font="arial"></fb:send>
 
-        <h3>Invite through Facebook</h3>
+            <h3>Twitter</h3>
 
-    {% else %}
+            <p><a href="http://twitter.com/share" class="twitter-share-button" data-text="Who's up for a game of Freesound Wars?" data-count="none">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
 
-        <h1>You were invited to play Freesound Wars</h1>
+            <h3>Email or Chat</h3>
 
-        <p>Pick a name and start playing.
+            <p>Copy-Paste this URL to someone.
 
-        <div class="waiting">
-            <form id="second_player_name_form" action="." method="POST">{% csrf_token %}
-                {{ form.as_p }} <br>
-                <input type="submit" value="Play!">
-            </form>
-        </div>
+                <p id="copy_paste_button"><object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
+                        width="110"
+                        height="14"
+                        id="clippy" >
+                    <param name="movie" value="{{ STATIC_URL }}swf/clippy.swf"/>
+                    <param name="allowScriptAccess" value="always" />
+                    <param name="quality" value="high" />
+                    <param name="scale" value="noscale" />
+                    <param NAME="FlashVars" value="text={% absurl wars:wait-on-player battle.id %}">
+                    <param name="bgcolor" value="#ededed">
+                    <embed src="{{ STATIC_URL }}swf/clippy.swf"
+                           width="110"
+                           height="14"
+                           name="clippy"
+                           quality="high"
+                           allowScriptAccess="always"
+                           type="application/x-shockwave-flash"
+                           pluginspage="http://www.macromedia.com/go/getflashplayer"
+                           FlashVars="text={% absurl wars:wait-on-player battle.id %}"
+                           bgcolor="#ededed" />
+                </object>
 
+                <p id="invite_link"><em>{% absurl wars:wait-on-player battle.id %}</em>
+        {% else %}
+
+            <h1>You were invited to play Freesound Wars</h1>
+
+            <p>Pick a name and start playing.
+
+            <div class="waiting">
+                <form id="second_player_name_form" action="." method="POST">{% csrf_token %}
+                    {{ form.as_p }}
+                    <input type="submit" value="Play!">
+                </form>
+            </div>
+
+        {% endif %}
     {% endif %}
 
     </center>
 
-    <p>TODO: check for the case where the game already has 2 players.
 
 {% include "wars/backdrops.html" %}
 

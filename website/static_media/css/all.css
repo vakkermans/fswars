@@ -345,3 +345,11 @@ body {
 #comet_send_submit {
     visibility: hidden;
 }
+
+#copy_paste_button {
+    margin-left: 90px;
+}
+
+#invite_link {
+    color: #4C4C4C;
+}

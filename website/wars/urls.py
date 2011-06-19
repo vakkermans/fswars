@@ -7,7 +7,7 @@ urlpatterns = patterns('',
         frontpage,
         name='frontpage'),
 
-    url(r'^battle/(?P<battle_id>\d+)/wait-on-player/$',
+    url(r'^battle/(?P<battle_id>\d+)/invite/$',
         wait_on_player,
         name='wait-on-player'),
 
