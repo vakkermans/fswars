@@ -1,32 +1,26 @@
-(function($)
-{
+(function($) {
     var cometd = $.cometd;
 
-    $(document).ready(function()
-    {
+    $(document).ready(function() {
         // set up comet
         if(config.battleId != null) {
-            function _connectionEstablished()
-            {
+            function _connectionEstablished() {
                 $('#comet_status').html('Connection Established');
                 // request battle info, to not lose any data
                 $.get('/battle/'+config.battleId+'/request-battle-status/');
             }
 
-            function _connectionBroken()
-            {
+            function _connectionBroken() {
                 $('#comet_status').html('Connection Broken');
             }
 
-            function _connectionClosed()
-            {
+            function _connectionClosed() {
                 $('#comet_status').html('Connection Closed');
             }
 
             // Function that manages the connection status with the Bayeux server
             var _connected = false;
-            function _metaConnect(message)
-            {
+            function _metaConnect(message) {
                 if (cometd.isDisconnected())
                 {
                     _connected = false;
@@ -47,7 +41,6 @@
             }
 
             function _page_comet_handler_helper(m) {
-                console.debug(m);
                 var command = jQuery.parseJSON(m.data.command);
                 console.debug(command);
                 if (command.command == 'updateChat') {
@@ -59,8 +52,7 @@
 
             // Function invoked when first contacting the server and
             // when the server has lost the state of this client
-            function _metaHandshake(handshake)
-            {
+            function _metaHandshake(handshake) {
                 if (handshake.successful === true) {
                     cometd.batch(function() {
                         cometd.subscribe('/updates', _page_comet_handler_helper);
@@ -71,8 +63,7 @@
             }
 
             // Disconnect when the page unloads
-            $(window).unload(function()
-            {
+            $(window).unload(function() {
                 cometd.disconnect(true);
             });
 
