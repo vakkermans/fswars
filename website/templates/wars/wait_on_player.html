@@ -22,13 +22,17 @@ function page_comet_handler(update) {
 {% block content %}
 
     {% if player_is_creator %}
-        <h1>Invite other player</h1>
 
-        <p>You can now share the following link with the person you want to
-           play with. The game will begin as soon as she follows the link.
+        <center>
+            <div class="waiting">
+                Invite someone to play!
+            </div>
 
-        <p><a href="{% absurl wars:wait-on-player battle.id %}">
-            {% absurl wars:wait-on-player battle.id %}</a>
+        <p>You will now have to invite someone to play against.
+
+        <h3>Invite by email or chat</h3>
+
+        <p>{% absurl wars:wait-on-player battle.id %} -
 
             <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
                     width="110"
@@ -52,15 +56,27 @@ function page_comet_handler(update) {
                        bgcolor="#ededed" />
             </object>
 
-    {% else %}
-        <h1>Pick a name and start playing</h1>
+        <h3>Invite through Facebook</h3>
 
-        <form id="second_player_name_form" action="." method="POST">{% csrf_token %}
-            {{ form.as_p }} <br>
-            <input type="submit" value="Play!">
-        </form>
+    {% else %}
+
+        <h1>You were invited to play Freesound Wars</h1>
+
+        <p>Pick a name and start playing.
+
+        <div class="waiting">
+            <form id="second_player_name_form" action="." method="POST">{% csrf_token %}
+                {{ form.as_p }} <br>
+                <input type="submit" value="Play!">
+            </form>
+        </div>
 
     {% endif %}
 
+    </center>
+
+    <p>TODO: check for the case where the game already has 2 players.
+
 {% include "wars/backdrops.html" %}
+
 {% endblock content %}
