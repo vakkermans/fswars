@@ -26,6 +26,13 @@ class Battle(models.Model):
     def to_json(self):
         return serializers.serialize('json', [self])
 
+    def send_update_battle_status(self):
+        send_message(self.id,
+'''
+{"command": "updateBattleStatus",
+"battle": %s }
+''' % self.to_json())
+
 
 class BattleRound(models.Model):
     attacker            = models.IntegerField()
@@ -40,8 +47,4 @@ class BattleRound(models.Model):
 @receiver(post_save, sender=Battle)
 def send_update(**kwargs):
     battle = kwargs['instance']
-    send_message(battle.id,
-'''
-{"command": "updateBattleStatus",
-"battle": %s }
-''' % battle.to_json())
+    battle.send_update_battle_status()

@@ -1,10 +1,21 @@
 {% extends "base.html" %}
 
-{% block head %}
-    {{ block.super }}
-    <meta http-equiv="refresh" content="2">
-{% endblock head %}
+{% block comet_handler %}
 
+function page_comet_handler(update) {
+    console.debug(update);
+    if('command' in update &&
+       update['command'] == 'updateBattleStatus' &&
+       update.battle[0].fields.player1_sounds &&
+       update.battle[0].fields.player2_sounds ) {
+        console.debug('one of the players updated their sounds');
+        $('#comet_incoming').html('The other player has finished picking his sounds.');
+    } else {
+        console.debug('test fail');
+    }
+};
+
+{% endblock %}
 
 {% block content %}
 <br>
@@ -24,7 +35,5 @@
     </div>
 </center>
 
-<img id="boy1" src="{{ STATIC_URL }}images/boy4.png">
-<img id="boy2" src="{{ STATIC_URL }}images/kid_with_gun.png">
-
+{% include "wars/backdrop.html" %}
 {% endblock content %}

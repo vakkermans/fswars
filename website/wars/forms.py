@@ -7,4 +7,4 @@ class PickSoundsForm(forms.Form):
     sound_ids        = forms.CharField(max_length=1024)
 
 class UpdateBattleForm(forms.Form):
-    update           = forms.CharField(max_length=2048)
+    message          = forms.CharField(max_length=2048)

@@ -4,10 +4,13 @@
 
     $(document).ready(function()
     {
+        // set up comet
         if(config.battleId != null) {
             function _connectionEstablished()
             {
                 $('#comet_status').html('<div>CometD Connection Established</div>');
+                // request battle info, to not lose any data
+                $.get('/battle/'+config.battleId+'/request-battle-status/');
             }
 
             function _connectionBroken()

@@ -142,7 +142,7 @@ def fight(request, battle_id, id1, id2, preset):
        len(history) >= len(json.loads(battle.player2_sounds)):
         battle.finished = True
     battle.save()
-    return HttpResponse(battle.do_json())
+    return HttpResponse(battle.to_json())
 
 
 def calculate_final_scores(history):
@@ -159,7 +159,7 @@ def calculate_final_scores(history):
 @auth()
 def battle_status(request, battle_id):
     battle = get_object_or_404(Battle, id=battle_id)
-    return HttpResponse(battle.do_json())
+    return HttpResponse(battle.to_json())
 
 
 @auth()
@@ -172,10 +172,16 @@ def battle_result(request, battle_id):
 
 
 @require_POST
-def update_battle(request, battle_id):
+def browser2browser(request, battle_id):
     form = UpdateBattleForm(request.POST)
     if form.is_valid():
-        send_message(battle_id, form.cleaned_data['update'])
+        send_message(battle_id, form.cleaned_data['message'])
         return HttpResponse('updating through comet..')
     else:
         return HttpResponse('update form was not valid..')
+
+def request_battle_status(request, battle_id):
+    battle = get_object_or_404(Battle, id=battle_id)
+    battle.send_update_battle_status()
+    return HttpResponse('updating through comet..')
+

@@ -39,9 +39,14 @@ urlpatterns = patterns('',
         battle_status,
         name='status'),
 
-    # update funcs
-    url(r'^battle/(?P<battle_id>\d+)/update/$',
-        update_battle,
-        name='update-battle'),
+    # request current battle state over comet
+    url(r'^battle/(?P<battle_id>\d+)/request-battle-status/$',
+        request_battle_status,
+        name='request-battle-status'),
+
+    # browser 2 browser
+    url(r'^battle/(?P<battle_id>\d+)/browser2browser/$',
+        browser2browser,
+        name='browser2browser'),
 
 )

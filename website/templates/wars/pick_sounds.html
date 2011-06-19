@@ -5,24 +5,24 @@
 <style type="text/css" media="all">
     #title
     {
-		font-family:Helvetica,arial;
+        font-family:Helvetica,arial;
     }
 
     #picked_sounds
     {
-		font-family:Helvetica,arial;
+        font-family:Helvetica,arial;
         width: 525px;
         overflow: hidden;
         float:right;
         padding: 0px;
-        
+
 
     }
-    
+
     #picked_sounds_menu
     {
-		color: white;
-		font-family:Helvetica,arial;
+        color: white;
+        font-family:Helvetica,arial;
         width: 525px;
         overflow: hidden;
         border: 0px solid black;
@@ -31,11 +31,11 @@
         left:575px;
         top:35px;
         background-color:rgb(76,76,76);
-		font-size: 10pt; 
-		border-radius: 25px;
-		padding:20px;
+        font-size: 10pt;
+        border-radius: 25px;
+        padding:20px;
     }
-    
+
 
     #picked_sounds .add
     {
@@ -46,11 +46,11 @@
     {
         display: inline;
     }
-    
-    
+
+
     #search-results
     {
- 		font-family:Helvetica,arial;
+         font-family:Helvetica,arial;
         width: 525px;
         overflow: hidden;
         border: 0px solid black;
@@ -67,144 +67,145 @@
     {
         display: none;
     }
-    
+
     #search-div
     {
-    	left: 8px;
-		top: 70px;
-		width:535px;
-		position:fixed;
-		background-color:#EDEDED;
-		/*border-radius: 15px;*/
-		padding:2px;
-	}    
-	
+        left: 8px;
+        top: 70px;
+        width:535px;
+        position:fixed;
+        background-color:#EDEDED;
+        /*border-radius: 15px;*/
+        padding:2px;
+    }
+
 
     #fake-div
     {
-    	left: 0px;
-		top: 0px;
-		height:7px;
-		width:565px;
-		position:fixed;
-		background-color:#EDEDED;
+        left: 0px;
+        top: 0px;
+        height:7px;
+        width:565px;
+        position:fixed;
+        background-color:#EDEDED;
 
-	}    
+    }
 
- 	.alignRight
- 	{
- 		font-family:Helvetica,arial;
- 		text-align: right;
- 	}
-      
-  	.search_resultE { 
-  		font-family:Helvetica,arial; 
-  		font-size: 10pt; 
-  		background-color:rgb(220,220,220);
-  		border-radius: 15px;
-  		padding:4px;
-	}
- 
-	.search_resultE:hover{
-		font-family:Helvetica,arial;
-		background-color:rgb(110,225,110);
-		font-size: 10pt;
-		border-radius: 15px;
-		padding:4px; 
-	}	
+     .alignRight
+     {
+         font-family:Helvetica,arial;
+         text-align: right;
+     }
 
-	.search_resultO { 
-  		font-family:Helvetica,arial; 
-  		font-size: 10pt; 
-  		background-color:rgb(220,220,220);
-  		border-radius: 15px;
-  		padding:4px;
-	}
- 
-	.search_resultO:hover{
-		font-family:Helvetica,arial;
-		background-color:rgb(110,225,110);
-		font-size: 10pt; 
-		border-radius: 15px;
-		padding:4px;
-	}
-	
-	.picked_result { 
-  		font-family:Helvetica,arial; 
-  		font-size: 10pt; 
-  		border-radius: 15px;
-  		padding:4px;
-	}
-	
-	.picked_result:hover { 
-  		font-family:Helvetica,arial; 
-  		font-size: 10pt; 
-  		background-color:rgb(225,100,100);
-  		border-radius: 15px;
-  		padding:4px;
-	}
-	
-	.space {		
-		height: 20pt; 
-		font-size: 10pt; 
-	}
-	
-	.instructions {
-		font-size: 13pt; 
-		height: 18pt; 
-	}
-	
-	.playButton {		
-		height: 25pt; 
-	}
+      .search_resultE {
+          font-family:Helvetica,arial;
+          font-size: 10pt;
+          background-color:rgb(220,220,220);
+          border-radius: 15px;
+          padding:4px;
+    }
+
+    .search_resultE:hover{
+        font-family:Helvetica,arial;
+        background-color:rgb(110,225,110);
+        font-size: 10pt;
+        border-radius: 15px;
+        padding:4px;
+    }
+
+    .search_resultO {
+          font-family:Helvetica,arial;
+          font-size: 10pt;
+          background-color:rgb(220,220,220);
+          border-radius: 15px;
+          padding:4px;
+    }
+
+    .search_resultO:hover{
+        font-family:Helvetica,arial;
+        background-color:rgb(110,225,110);
+        font-size: 10pt;
+        border-radius: 15px;
+        padding:4px;
+    }
+
+    .picked_result {
+          font-family:Helvetica,arial;
+          font-size: 10pt;
+          border-radius: 15px;
+          padding:4px;
+    }
+
+    .picked_result:hover {
+          font-family:Helvetica,arial;
+          font-size: 10pt;
+          background-color:rgb(225,100,100);
+          border-radius: 15px;
+          padding:4px;
+    }
+
+    .space {
+        height: 20pt;
+        font-size: 10pt;
+    }
+
+    .instructions {
+        font-size: 13pt;
+        height: 18pt;
+    }
+
+    .playButton {
+        height: 25pt;
+    }
 
 </style>
+
 <script type="text/javascript">
     var sounds = [];
-	var num_sounds = 0;
-	var max_sounds = 5;
-	var currently_displayed_search_result = 0;
-	var snd;
-	// var username = {{ username }};
-	var freesound;
-	
-	$(document).ready(function(){
-	
-	$("#jquery_jplayer_1").jPlayer({
+    var num_sounds = 0;
+    var max_sounds = 5;
+    var currently_displayed_search_result = 0;
+    var snd;
+    // var username = {{ username }};
+    var freesound;
+
+    $(document).ready(function(){
+
+    $("#jquery_jplayer_1").jPlayer({
             ready: function() {
             },
             swfPath: "{{ STATIC_URL }}swf",
             supplied: "mp3, ogg"
     });
-	
-	$("#id_sound_ids").hide();
-	$("#id_sound_ids").prev().hide();
-	$("#send_form").hide();
-	$("#remove_sounds_label").hide();
-	
-	apiKey = settings.apiKey;	
-	console.debug("key: " + apiKey);
-	
-	if(apiKey == "")
-	{
-		alert("no KEY no honey!"); 
-	}			
-	else 
-	{				
-		/*======= freesound object ========*/
-		//creating freesound object	
-		freesound = new Freesound(apiKey, true);
-	}
-	});
-	
-	function playPreview(url_mp3, url_ogg) {
-		 snd = new Audio(url_mp3);
-		 snd.play()
-		 
-		 
-		 /*
-		 stopPreview();
-		 console.log(url_mp3)
+
+    $("#id_sound_ids").hide();
+    $("#id_sound_ids").prev().hide();
+    $("#send_form").hide();
+    $("#remove_sounds_label").hide();
+
+    apiKey = settings.apiKey;
+    console.debug("key: " + apiKey);
+
+    if(apiKey == "")
+    {
+        alert("no KEY no honey!");
+    }
+    else
+    {
+        /*======= freesound object ========*/
+        //creating freesound object
+        freesound = new Freesound(apiKey, true);
+    }
+    });
+
+    function playPreview(url_mp3, url_ogg) {
+         snd = new Audio(url_mp3);
+         snd.play()
+
+
+         /*
+         stopPreview();
+         console.log(url_mp3)
          $("#jquery_jplayer_1").jPlayer("setMedia", {
                 mp3: url_mp3,
                 oga: url_ogg
@@ -215,95 +216,95 @@
         snd.pause()
         //$("#jquery_jplayer_1").jPlayer("stop");
     }
-	
-	function search_sounds() {
-		if ($("#search-q").length > 0) {
-			console.log("query: " + $("#search-q").val());
-			var q = $("#search-q").val();
-			var p = 1;
-			var f = "duration:[0.1 TO 10.0]";
-			var s = "downloads_desc";
-			freesound.getSoundsFromQuery(q,p,f,s,displaySearchResults, errorSearch);
-			
-		}
-	}
-	function displaySearchResults(soundCollection) {
-		currently_displayed_search_result = 0;
-		
-		$("#search-results").text("")
-		$("#search-results").append("<br><br><br><br><br>")
-		//$("#search-results").append("<div class=space>Click over sounds to add to your team.</div>")
-		//$("#search-results").append("<br>* number of results: " + soundCollection.properties['num_results']);
-		//$("#search-results").append("<br>* number of pages: " + soundCollection.properties['num_pages']);
-		//$("#search-results").append("<br>* sounds:");
-		for (obj in soundCollection.properties['sounds']) {
-			//sound_id = soundCollection.properties['sounds'][obj]['id'];
-			// $("#search-results").append("<br>--- " + obj + ": " + sound_id + " - " + soundCollection.properties['sounds'][obj]['original_filename']);
-			freesound.getSound(soundCollection.properties['sounds'][obj]['id'], displaySoundInfo, errorSound );	
-		}
-		 
-		sc = soundCollection;
-		// $("#respSearch").append('<br><br><button onclick="sc.previous(displaySearchResults);">previous</button><button onclick="sc.next(displaySearchResults);">next</button>')
-	}
-	function displaySoundInfo(sound) {
-		// console.log("displaySoundInfo");
-		console.log(sound.properties['id']);
-		
-		currently_displayed_search_result = currently_displayed_search_result + 1;
-		if ((currently_displayed_search_result % 2) == 1){
-			classEO='search_resultE';
-		}else{
-			classEO='search_resultO';
-		} 
-		
-		var tags = sound.properties['tags'].join('</span>&nbsp <span class="tags">')
-		
-		$("#search-results").append('<div id="test">')
-		$("#search-results").append('<div id="' + sound.properties["id"] + '" class="' + classEO + '" onclick="addSound(this,' + sound.properties["id"] + ')"><table><tr><td><img src="'+ sound.properties['waveform_m'] + '" alt = "' + sound.properties['waveform_m'] + '"/></td><td class="description" valign=top><strong>filename:</strong> ' + sound.properties['original_filename'] + ' <br><span class="tags">' + tags + ' </span></td></tr></table></div>')
-		$("#search-results").append('<div class="playButton"><button id="pbutton' + sound.properties['id'] + '">Play</button></div>');	
-		$("#search-results").append('</div>')
-		$("#pbutton" + sound.properties['id']).click( function () { playPreview(sound.properties['preview-hq-mp3'],sound.properties['preview-hq-ogg']); return false} )
-		
-		
-		//$("#search-results").append('<br><button onclick="snd.play()">play</button><button onclick="snd.pause()">pause</button>')
-		//$("#search-results").append('<div id="jquery_jplayer_1"></div><div id="jp_interface_1"><a href="#" class="jp-play">Play</a><a href="#" class="jp-pause">Pause</a></div>')	
-	
-	}
-	function errorSearch() {
-	}
-	function errorSound() {
-	}
+
+    function search_sounds() {
+        if ($("#search-q").length > 0) {
+            console.log("query: " + $("#search-q").val());
+            var q = $("#search-q").val();
+            var p = 1;
+            var f = "duration:[0.1 TO 10.0]";
+            var s = "downloads_desc";
+            freesound.getSoundsFromQuery(q,p,f,s,displaySearchResults, errorSearch);
+
+        }
+    }
+    function displaySearchResults(soundCollection) {
+        currently_displayed_search_result = 0;
+
+        $("#search-results").text("")
+        $("#search-results").append("<br><br><br><br><br>")
+        //$("#search-results").append("<div class=space>Click over sounds to add to your team.</div>")
+        //$("#search-results").append("<br>* number of results: " + soundCollection.properties['num_results']);
+        //$("#search-results").append("<br>* number of pages: " + soundCollection.properties['num_pages']);
+        //$("#search-results").append("<br>* sounds:");
+        for (obj in soundCollection.properties['sounds']) {
+            //sound_id = soundCollection.properties['sounds'][obj]['id'];
+            // $("#search-results").append("<br>--- " + obj + ": " + sound_id + " - " + soundCollection.properties['sounds'][obj]['original_filename']);
+            freesound.getSound(soundCollection.properties['sounds'][obj]['id'], displaySoundInfo, errorSound );
+        }
+
+        sc = soundCollection;
+        // $("#respSearch").append('<br><br><button onclick="sc.previous(displaySearchResults);">previous</button><button onclick="sc.next(displaySearchResults);">next</button>')
+    }
+    function displaySoundInfo(sound) {
+        // console.log("displaySoundInfo");
+        console.log(sound.properties['id']);
+
+        currently_displayed_search_result = currently_displayed_search_result + 1;
+        if ((currently_displayed_search_result % 2) == 1){
+            classEO='search_resultE';
+        }else{
+            classEO='search_resultO';
+        }
+
+        var tags = sound.properties['tags'].join('</span>&nbsp <span class="tags">')
+
+        $("#search-results").append('<div id="test">')
+        $("#search-results").append('<div id="' + sound.properties["id"] + '" class="' + classEO + '" onclick="addSound(this,' + sound.properties["id"] + ')"><table><tr><td><img src="'+ sound.properties['waveform_m'] + '" alt = "' + sound.properties['waveform_m'] + '"/></td><td class="description" valign=top><strong>filename:</strong> ' + sound.properties['original_filename'] + ' <br><span class="tags">' + tags + ' </span></td></tr></table></div>')
+        $("#search-results").append('<div class="playButton"><button id="pbutton' + sound.properties['id'] + '">Play</button></div>');
+        $("#search-results").append('</div>')
+        $("#pbutton" + sound.properties['id']).click( function () { playPreview(sound.properties['preview-hq-mp3'],sound.properties['preview-hq-ogg']); return false} )
+
+
+        //$("#search-results").append('<br><button onclick="snd.play()">play</button><button onclick="snd.pause()">pause</button>')
+        //$("#search-results").append('<div id="jquery_jplayer_1"></div><div id="jp_interface_1"><a href="#" class="jp-play">Play</a><a href="#" class="jp-pause">Pause</a></div>')
+
+    }
+    function errorSearch() {
+    }
+    function errorSound() {
+    }
 
     function addSound(element, soundId)
     {
-    	
-        
-    	$("#remove_sounds_label").show();
-        
-        if (num_sounds < max_sounds) 
+
+
+        $("#remove_sounds_label").show();
+
+        if (num_sounds < max_sounds)
         {
             console.log(num_sounds);
-	        if ($.inArray(soundId, sounds) == -1 && num_sounds <= max_sounds)
-	        {
-		        num_sounds = num_sounds + 1; 
-		        
-		        if (num_sounds == max_sounds){
-         		   $("#send_form").show();
-        		}
-		         
-	            console.log("addSound");
-	            sounds.push(soundId);
-	            $("#id_sound_ids").attr("value", sounds);
-				
-	            $(element).closest("#search-results > div").clone()            								
-	            								.attr({
-	            								id: soundId+"_choose",
-	            								"class": "picked_result"							
-	            								}).appendTo("#picked_sounds");
-	            
-	            $("#"+soundId+"_choose").removeAttr('onclick').click( function () { removeSound($("#"+soundId+"_choose"), soundId); return false} )
-	                     
-	        }
+            if ($.inArray(soundId, sounds) == -1 && num_sounds <= max_sounds)
+            {
+                num_sounds = num_sounds + 1;
+
+                if (num_sounds == max_sounds){
+                    $("#send_form").show();
+                }
+
+                console.log("addSound");
+                sounds.push(soundId);
+                $("#id_sound_ids").attr("value", sounds);
+
+                $(element).closest("#search-results > div").clone()
+                                                .attr({
+                                                id: soundId+"_choose",
+                                                "class": "picked_result"
+                                                }).appendTo("#picked_sounds");
+
+                $("#"+soundId+"_choose").removeAttr('onclick').click( function () { removeSound($("#"+soundId+"_choose"), soundId); return false} )
+
+            }
         }
         else {
             alert("Reached your max sounds, don't be greedy warrior!!!");
@@ -312,32 +313,50 @@
 
     function removeSound(element, soundId)
     {
-    	console.log("removing sound: " + soundId)
+        console.log("removing sound: " + soundId)
         var index = $.inArray(soundId, sounds);
         // $(element).prev().attr("id)
         if (index != -1)
         {
 
             sounds.splice(index, 1);
-			$("#id_sound_ids").attr("value", sounds);
+            $("#id_sound_ids").attr("value", sounds);
             $(element).closest("#picked_sounds > div").remove();
             num_sounds = num_sounds - 1;
-            
+
             if (num_sounds <= 4){
-            	$("#send_form").hide();
+                $("#send_form").hide();
             }
-            
+
             if (num_sounds <= 0){
-            	num_sounds = 0;            
-            	$("#remove_sounds_label").hide();
+                num_sounds = 0;
+                $("#remove_sounds_label").hide();
             }
-			
-			
-            
+
+
+
         }
     }
 </script>
 {% endblock head %}
+
+
+{% block comet_handler %}
+
+function page_comet_handler(update) {
+    console.debug(update);
+    if('command' in update &&
+       update['command'] == 'updateBattleStatus' &&
+       (update.battle[0].fields.player1_sounds ||
+        update.battle[0].fields.player2_sounds )) {
+        console.debug('one of the players updated their sounds');
+        $('#comet_incoming').html('The other player has finished picking his sounds.');
+    } else {
+        console.debug('test fail');
+    }
+};
+
+{% endblock %}
 
 {% block title %}Pick your sounds...{% endblock title %}
 
@@ -351,37 +370,37 @@
 
 <div id="search-div">
     <p>
-    	<input type="text" name="q" id="search-q" size="45" /> 
-    	<!-- <input type="submit" name="submit" value="search sounds" onclick="search_sounds" id="search-button"/> -->
-    	<button onclick="search_sounds()">Search!</button>
+        <input type="text" name="q" id="search-q" size="45" />
+        <!-- <input type="submit" name="submit" value="search sounds" onclick="search_sounds" id="search-button"/> -->
+        <button onclick="search_sounds()">Search!</button>
     </p>
 </div>
 
 <div id="search-results" class="sound_list_minimal">
-    
+
 </div>
 
 <div id="picked_sounds_menu">
 <div id="picked_sounds" class="sound_list_minimal">
     <h2 class="section_title">War files</h2>
     <div>
-    	<div class="instructions">
+        <div class="instructions">
             You need to choose 5 sounds for your battle.
         </div>
         <div id="remove_sounds_label" class="space">
             Click over sounds to remove from your team.
         </div>
-    </div>    
+    </div>
 </div>
 <div>
-	<form id="send_form" action="." method="POST">{% csrf_token %}
+    <form id="send_form" action="." method="POST">{% csrf_token %}
         {{ form.as_p }}
         <div class="alignRight">
         <input class="alignRight" type="submit" value="I'm ready to play!" halign="right">
         </div>
- 	</form>
+     </form>
 </div>
 </div>
 
- 
+
 {% endblock content %}
