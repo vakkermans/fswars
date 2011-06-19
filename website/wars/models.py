@@ -3,7 +3,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import User
 from utils.comet import send_message
-from django.core import serializers
+#from django.core import serializers
+import json
 
 
 class Battle(models.Model):
@@ -23,8 +24,23 @@ class Battle(models.Model):
     def status_sounds(self):
         return self.player1_sounds and self.player2_sounds
 
+#    def to_json(self):
+#        return serializers.serialize('json', [self])
+
+    def json_safe(self):
+        data = {}
+        for field in ['player1', 'player1_uuid', 'player2', 'player2_uuid',
+                      'num_rounds', 'turn_owner', 'finished']:
+            data[field] = getattr(self, field)
+        data['player1_sounds'] = json.loads(self.player1_sounds) if self.player1_sounds else []
+        data['player2_sounds'] = json.loads(self.player2_sounds) if self.player2_sounds else []
+        data['rounds'] = [round.json_safe() for round in self.rounds.order_by('-id')]
+#        data['rounds'] = [round.json_safe() for round in \
+#                          BattleRound.objects.filter(battle=self).order_by('-id')]
+        return data
+
     def to_json(self):
-        return serializers.serialize('json', [self])
+        return json.dumps(self.json_safe())
 
     def send_update_battle_status(self):
         send_message(self.id, '{"command": "updateBattleStatus", "battle": %s }' % self.to_json(), True)
@@ -40,8 +56,14 @@ class BattleRound(models.Model):
     player2_points      = models.IntegerField(default=0)
     battle              = models.ForeignKey(Battle, related_name='rounds')
 
+    def json_safe(self):
+        data = {}
+        for field in ['attacker', 'player1_sound', 'player2_sound', 'winner',
+                      'player1_points', 'player2_points']:
+            data[field] = getattr(self, field)
+
+
 @receiver(post_save, sender=Battle)
 def send_update(**kwargs):
     battle = kwargs['instance']
     battle.send_update_battle_status()
-    

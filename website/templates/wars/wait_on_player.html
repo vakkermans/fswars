@@ -7,11 +7,10 @@
 {% block comet_handler %}
 
 function page_comet_handler(update) {
-    console.debug(update);
     if('command' in update &&
        update.command == 'updateBattleStatus' &&
-       update.battle[0].fields.player1_uuid &&
-       update.battle[0].fields.player2_uuid) {
+       update.battle.player1_uuid &&
+       update.battle.player2_uuid) {
         // game is full
         if({% if request.uuid == battle.player1_uuid or request.uuid == battle.player2_uuid %}true{% else %}false{% endif %}) {
             // user is a player of this game
@@ -26,7 +25,7 @@ function page_comet_handler(update) {
 {% block content %}
 
     <center>
-    {% if battle.player1 and battle.player2 %}
+    {% if battle.player1_uuid and battle.player2_uuid and request.uuid != battle.player1_uuid and request.uuid != battle.player2_uuid %}
         <img src="{{ STATIC_URL }}images/freesound_wars2.png">
         <img src="{{ STATIC_URL }}images/battleground.png">
 

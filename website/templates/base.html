@@ -24,6 +24,30 @@
             <script type="text/javascript" src="{{ STATIC_URL }}js/cometd.js"></script>
             <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.cometd.js"></script>
 
+            <!-- Freesound HTML player -->
+            <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}html-player/player.css" />
+            <script src="{{ STATIC_URL }}html-player/soundmanager2.js"></script>
+            <script type="text/javascript" src="{{ STATIC_URL }}html-player/player.js"></script>
+            <script type="text/javascript">
+                soundManager.url = '{{ STATIC_URL }}html-player/swf/';
+                soundManager.flashVersion = 8; // optional: shiny features (default = 8)
+                soundManager.useFlashBlock = false; // optionally, enable when you're ready to dive in
+                soundManager.debugMode = false;
+            </script>
+            <style type='text/css'>
+                .time-indicator {
+                    font-family: 'Inconsolata', arial, serif;
+                    padding-top:10px;
+                    padding-right: 10px;
+                }
+                .measure-readout {
+                    font-family: 'Inconsolata', arial, serif;
+                    padding-top:10px;
+                    padding-right: 10px;
+                }
+            </style>
+
+            <!-- Configuration for comet -->
             <script type="text/javascript">
                 var config = {
                     {% if battle %}battleId: '{{ battle.id }}'{% endif %}
@@ -94,7 +118,7 @@
                 {% block header %}
                 <!--  img height="80px" src="{{ STATIC_URL }}images/freesound_logo2.png" -->
                 <div class="header_title">
-                Battle #{{ battle.id }}: {{ battle.player1 }} VS {{ battle.player2 }} !!!
+                Battle #{{ battle.id }}: <span class="player1_name">{{ battle.player1 }}</span> <em>v.s.</em> <span class="player2_name">{{ battle.player2 }}</span>
                 </div>
 
                 {% endblock header %}

@@ -7,25 +7,46 @@
 
 var sounds = [];
 var num_sounds = 0;
-var max_sounds = 5;
+var max_sounds = {{battle.num_rounds}};
 var currently_displayed_search_result = 0;
 var snd;
-// var username = {{ username }};
 var freesound;
+
+function showAddButton(elem) {
+    elem.find('.sound_add').show();
+    elem.find('.sound_remove').hide();
+};
+function showRemoveButton(elem) {
+    elem.find('.sound_remove').show();
+    elem.find('.sound_add').hide();
+};
+function addSoundHandlers(elem) {
+    elem.find('.sound_add').click(function() {
+        sound = $(this).parent();
+        $('#picked_sounds').append(sound);
+        showRemoveButton(sound);
+    });
+    elem.find('.sound_remove').click(function() {
+        sound = $(this).parent();
+        $('#search-results').append(sound);
+        showAddButton(sound);
+    });
+    showAddButton(elem);
+};
 
 $(document).ready(
     function() {
 
-        // send the form ajax-style and cancel the normal sending by returning false
+        // send the sound_ids form ajax-style and cancel the normal sending by returning false
         $('#send_form').submit(function() {
             $.post('{% url wars:pick-sounds-helper battle.id %}', $('#send_form').serialize());
             return false;
         });
 
-        $("#jquery_jplayer_1").jPlayer({
+        $("#jplayer").jPlayer({
             ready: function() {},
             swfPath: "{{ STATIC_URL }}swf",
-            supplied: "mp3, ogg"
+            supplied: "mp3,ogg"
         });
 
         $("#id_sound_ids").hide();
@@ -40,27 +61,21 @@ $(document).ready(
         } else {
             freesound = new Freesound(apiKey, true);
         }
+
     }
 );
 
 function playPreview(url_mp3, url_ogg) {
-     snd = new Audio(url_mp3);
-     snd.play()
-
-
-     /*
-     stopPreview();
-     console.log(url_mp3)
-     $("#jquery_jplayer_1").jPlayer("setMedia", {
+     $("#jplayer").jPlayer("clearMedia");
+     $("#jplayer").jPlayer("setMedia", {
             mp3: url_mp3,
             oga: url_ogg
-     }).jPlayer("play");
-     */
+     });
+     $("#jplayer").jPlayer("play");
 }
 
 function stopPreview() {
-    snd.pause()
-    //$("#jquery_jplayer_1").jPlayer("stop");
+    $("#jplayer").jPlayer("stop");
 }
 
 function search_sounds() {
@@ -71,7 +86,6 @@ function search_sounds() {
         var f = "duration:[0.1 TO 10.0]";
         var s = "downloads_desc";
         freesound.getSoundsFromQuery(q,p,f,s,displaySearchResults, errorSearch);
-
     }
 }
 
@@ -79,25 +93,15 @@ function displaySearchResults(soundCollection) {
     currently_displayed_search_result = 0;
 
     $("#search-results").text("")
-    $("#search-results").append("<br><br><br><br><br>")
-    //$("#search-results").append("<div class=space>Click over sounds to add to your team.</div>")
-    //$("#search-results").append("<br>* number of results: " + soundCollection.properties['num_results']);
-    //$("#search-results").append("<br>* number of pages: " + soundCollection.properties['num_pages']);
-    //$("#search-results").append("<br>* sounds:");
-    for (obj in soundCollection.properties['sounds']) {
-        //sound_id = soundCollection.properties['sounds'][obj]['id'];
-        // $("#search-results").append("<br>--- " + obj + ": " + sound_id + " - " + soundCollection.properties['sounds'][obj]['original_filename']);
-        freesound.getSound(soundCollection.properties['sounds'][obj]['id'], displaySoundInfo, errorSound );
-    }
 
-    sc = soundCollection;
-    // $("#respSearch").append('<br><br><button onclick="sc.previous(displaySearchResults);">previous</button><button onclick="sc.next(displaySearchResults);">next</button>')
+    for (obj in soundCollection.properties['sounds']) {
+        freesound.getSound(soundCollection.properties['sounds'][obj]['id'],
+                           function(obj) {displaySoundInfo(obj, true, true)},
+                           errorSound );
+    }
 }
 
-function displaySoundInfo(sound) {
-    // console.log("displaySoundInfo");
-    // console.log(sound.properties['id']);
-
+function displaySoundInfo(sound, addButton, removeButton) {
     currently_displayed_search_result = currently_displayed_search_result + 1;
     if ((currently_displayed_search_result % 2) == 1){
         classEO='search_resultE';
@@ -105,17 +109,41 @@ function displaySoundInfo(sound) {
         classEO='search_resultO';
     }
 
-    var tags = sound.properties['tags'].join('</span>&nbsp <span class="tags">')
+    var tags = sound.properties['tags'].slice(0,15).join('</span> <span class="tags">');
 
-    $("#search-results").append('<div id="test">')
-    $("#search-results").append('<div id="' + sound.properties["id"] + '" class="' + classEO + '" onclick="addSound(this,' + sound.properties["id"] + ')"><table><tr><td><img src="'+ sound.properties['waveform_m'] + '" alt = "' + sound.properties['waveform_m'] + '"/></td><td class="description" valign=top><strong>filename:</strong> ' + sound.properties['original_filename'] + ' <br><span class="tags">' + tags + ' </span></td></tr></table></div>')
-    $("#search-results").append('<div class="playButton"><button id="pbutton' + sound.properties['id'] + '">Play</button></div>');
-    $("#search-results").append('</div>')
-    $("#pbutton" + sound.properties['id']).click( function () { playPreview(sound.properties['preview-hq-mp3'],sound.properties['preview-hq-ogg']); return false} )
+    var soundHTML = '';
+
+    soundHTML += '<div class="sound sound_'+sound.properties['id']+'">';
+    if (removeButton) {
+        soundHTML += 	'<div class="sound_remove"><img src="{{STATIC_URL}}images/tab_left.png" /></div>';
+    }
+
+    soundHTML +=		'<div class="player small">';
+    soundHTML +=	    	'<div class="metadata">'
+    soundHTML += 				 sound.properties['preview-hq-mp3'] + ' ';
+    soundHTML +=				 sound.properties['waveform_m'] + ' ';
+    soundHTML +=				 sound.properties['spectral_m'] + ' ';
+    soundHTML +=				 sound.properties['duration'];
+    soundHTML +=			'</div>';
+    soundHTML +=		'</div>';
 
 
-    //$("#search-results").append('<br><button onclick="snd.play()">play</button><button onclick="snd.pause()">pause</button>')
-    //$("#search-results").append('<div id="jquery_jplayer_1"></div><div id="jp_interface_1"><a href="#" class="jp-play">Play</a><a href="#" class="jp-pause">Pause</a></div>')
+    soundHTML += 	'<div class="sound_description">';
+    soundHTML +=    	'<span class="sound_title">' + sound.properties.original_filename + '</span><br>';
+    soundHTML +=    	'<span class="tags">' + tags + '</span>';
+    soundHTML +=    '</div>';
+    if (addButton) {
+        soundHTML += 	'<div class="sound_add"><img src="{{STATIC_URL}}images/tab_right.png" /></div>';
+    }
+    soundHTML +=    '<br style="clear: both;">';
+    soundHTML += '</div>';
+
+    $("#search-results").append(soundHTML);
+
+    var selector = '.sound_'+sound.properties['id'];
+    addSoundHandlers($(selector));
+    makePlayer(selector+' .player');
+
 }
 
 function errorSearch() {}
@@ -189,12 +217,13 @@ function removeSound(element, soundId) {
 
 function page_comet_handler(update) {
     if('command' in update && update.command == 'updateBattleStatus') {
-        if (update.battle[0].fields.player1_sounds && update.battle[0].fields.player2_sounds) {
+        if (update.battle.player1_sounds.length >= {{ battle.num_rounds }} &&
+            update.battle.player2_sounds.length >= {{ battle.num_rounds }}) {
             window.location = '{% url wars:battle battle.id %}';
-        } else if (update.battle[0].fields.player1_sounds) {
-            fswars.add_notification(update.battle[0].fields.player1 + ' finished picking his team.');
-        } else if (update.battle[0].fields.player2_sounds) {
-            fswars.add_notification(update.battle[0].fields.player2 + ' finished picking his team.');
+        } else if (update.battle.player1_sounds.length >= {{ battle.num_rounds }}) {
+            fswars.add_notification(update.battle.player1 + ' finished picking his team.');
+        } else if (update.battle.player2_sounds.length >= {{ battle.num_rounds }}) {
+            fswars.add_notification(update.battle.player2 + ' finished picking his team.');
         }
     }
 };
@@ -206,35 +235,30 @@ function page_comet_handler(update) {
 {% block content %}
 
 <h2 id="title" class="section_title"></h2>
-<p>
-</p>
+
 <div id="fake-div">
 </div>
 
 <div id="search-div">
     <p>
         <input type="text" name="q" id="search-q" size="45" />
-        <!-- <input type="submit" name="submit" value="search sounds" onclick="search_sounds" id="search-button"/> -->
+<!--         <input type="submit" name="submit" value="search sounds" onclick="search_sounds" id="search-button"/> -->
         <button onclick="search_sounds()">Search!</button>
     </p>
 </div>
 
-<div id="search-results" class="sound_list_minimal">
-
+<div id="search-results-wrapper">
+    <div id="search-results" class="sound_list_minimal">
+        <div class="sound sound_62260"><div class="sound_remove">rem</div><div class="player small"><div class="metadata">http://tabasco.upf.edu/data/previews/62/62260_634166-hq.mp3 http://tabasco.upf.edu/data/displays/62/62260_634166_wave_M.png http://tabasco.upf.edu/data/displays/62/62260_634166_spec_M.jpg 4.8587755102</div></div><div class="sound_description"><span class="sound_title">whoosh.wav</span><br><span class="tags">transition</span> <span class="tags">wing</span> <span class="tags">windmill</span> <span class="tags">windturbine</span> <span class="tags">air</span> <span class="tags">swoosh</span> <span class="tags">whoosh</span> <span class="tags">wings</span> <span class="tags">synth</span> <span class="tags">bird</span></div><div class="sound_add">add</div><br style="clear: both;"></div>
+    </div>
 </div>
 
 <div id="picked_sounds_menu">
-<div id="picked_sounds" class="sound_list_minimal">
     <h2 class="section_title">War files</h2>
-    <div>
-        <div class="instructions">
-            You need to choose 5 sounds for your battle.
-        </div>
-        <div id="remove_sounds_label" class="space">
-            Click over sounds to remove from your team.
-        </div>
-    </div>
+    <p>You need to choose 5 sounds for your battle.</p>
+    <div id="picked_sounds"></div>
 </div>
+
 <div>
     <form id="send_form" action="{% url wars:pick-sounds-helper battle.id %}">
         {{ form.as_p }}
@@ -245,7 +269,6 @@ function page_comet_handler(update) {
 </div>
 </div>
 
-$.post("test.php", $("#testform").serialize());
-
+<div id="jplayer"></div>
 
 {% endblock content %}

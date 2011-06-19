@@ -17,7 +17,7 @@ body {
     padding:10px;
     width:1112px;
     color:white;
-    left: 5px;
+    left: 8px;
 }
 
 .title {
@@ -69,6 +69,7 @@ body {
 .section_title {
       font-family:Helvetica,arial;
       font-size: 22pt;
+      margin-bottom: 5px;
 }
 
 .explanation {
@@ -182,11 +183,13 @@ body {
     float:right;
     position: fixed;
     left:575px;
-    top:35px;
+    top:55px;
     background-color:rgb(76,76,76);
     font-size: 10pt;
     border-radius: 25px;
-    padding:20px;
+    border-top-left-radius: 0px 0px;
+    border-top-right-radius: 0px 0px;
+    padding: 0 20px 20px 20px;
 }
 
 
@@ -200,29 +203,32 @@ body {
     display: inline;
 }
 
-
-#search-results
-{
-     font-family:Helvetica,arial;
+#search-results-wrapper {
+    top: 180px;
     width: 525px;
-    overflow: hidden;
+    height: 100%;
+    position: fixed;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+#search-results {
+    width: 525px;
+    overflow-y: scroll;
     border: 0px solid black;
     float:left;
-    padding: 5px;
-    }
+    padding: 0 0 0 10px;
+}
 
-#search-results .add
-{
+#search-results .add {
     display: inline;
 }
 
-#search-results .remove
-{
+#search-results .remove {
     display: none;
 }
 
-#search-div
-{
+#search-div {
     left: 8px;
     top: 70px;
     width:535px;
@@ -233,8 +239,7 @@ body {
 }
 
 
-#fake-div
-{
+#fake-div {
     left: 0px;
     top: 0px;
     height:7px;
@@ -244,13 +249,7 @@ body {
 
 }
 
- .alignRight
- {
-     font-family:Helvetica,arial;
-     text-align: right;
- }
-
-  .search_resultE {
+.search_resultE {
       font-family:Helvetica,arial;
       font-size: 10pt;
       background-color:rgb(220,220,220);
@@ -259,22 +258,6 @@ body {
 }
 
 .search_resultE:hover{
-    font-family:Helvetica,arial;
-    background-color:rgb(110,225,110);
-    font-size: 10pt;
-    border-radius: 15px;
-    padding:4px;
-}
-
-.search_resultO {
-      font-family:Helvetica,arial;
-      font-size: 10pt;
-      background-color:rgb(220,220,220);
-      border-radius: 15px;
-      padding:4px;
-}
-
-.search_resultO:hover{
     font-family:Helvetica,arial;
     background-color:rgb(110,225,110);
     font-size: 10pt;
@@ -302,10 +285,11 @@ body {
     font-size: 10pt;
 }
 
+/*
 .instructions {
     font-size: 13pt;
     height: 18pt;
-}
+}*/
 
 .playButton {
     height: 25pt;
@@ -352,4 +336,56 @@ body {
 
 #invite_link {
     color: #4C4C4C;
+}
+
+.player1_name {
+    color: red;
+}
+.player2_name {
+    color: blue;
+}
+
+.sound div {
+    float: left;
+}
+
+.sound_controls {
+
+    width: 18px;
+    height: 32px;
+    background-color: green;
+}
+
+.sound_waveform {
+    width: 120px;
+    height: 71px;
+}
+
+.sound_description {
+    width: 300px;
+}
+
+.sound_add {
+/*     width: 18px; */
+    height: 71px;
+}
+
+.sound_remove {
+    /*width: 20px;*/
+    height: 71px;
+}
+
+.sound {
+    margin-bottom: 8px;
+    color: #ededed;
+}
+
+.sound_description {
+    background-color: #000;
+    height: 71px;
+    padding-left: 10px;
+}
+
+.tags {
+    font-size: 0.7em;
 }
