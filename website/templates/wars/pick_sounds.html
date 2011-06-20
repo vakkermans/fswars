@@ -8,31 +8,60 @@
 var sounds = [];
 var num_sounds = 0;
 var max_sounds = {{battle.num_rounds}};
-var currently_displayed_search_result = 0;
 var snd;
 var freesound;
+
+Array.prototype.remove = function(from, to) {
+  var rest = this.slice((to || from) + 1 || this.length);
+  this.length = from < 0 ? this.length + from : from;
+  return this.push.apply(this, rest);
+};
 
 function showAddButton(elem) {
     elem.find('.sound_add').show();
     elem.find('.sound_remove').hide();
 };
+
 function showRemoveButton(elem) {
     elem.find('.sound_remove').show();
     elem.find('.sound_add').hide();
 };
-function addSoundHandlers(elem) {
+
+function addSoundHandlers(elem, soundId) {
     elem.find('.sound_add').click(function() {
-        sound = $(this).parent();
-        $('#picked_sounds').append(sound);
-        showRemoveButton(sound);
+        if (sounds.length < max_sounds &&
+            $.inArray(soundId, sounds) == -1) {
+            sounds.push(soundId);
+            if (num_sounds >= max_sounds) {
+                $("#send_form").show();
+            }
+            sound = $(this).parent();
+            sound.hide(500);
+            setTimeout(function() {
+                $('#picked_sounds').append(sound);
+                showRemoveButton(sound);
+                sound.show(500);
+            }, 500);
+        }
     });
     elem.find('.sound_remove').click(function() {
+        var index = $.inArray(soundId, sounds);
+        if (index != -1) {
+            sounds.remove(index);
+        }
         sound = $(this).parent();
-        $('#search-results').append(sound);
-        showAddButton(sound);
+        sound.hide(500);
+        setTimeout(function() {
+            $('#search-results').append(sound);
+            showAddButton(sound);
+            sound.show(500);
+        }, 500);
     });
     showAddButton(elem);
 };
+
+function errorSearch() {}
+function errorSound() {}
 
 $(document).ready(
     function() {
@@ -43,16 +72,7 @@ $(document).ready(
             return false;
         });
 
-        $("#jplayer").jPlayer({
-            ready: function() {},
-            swfPath: "{{ STATIC_URL }}swf",
-            supplied: "mp3,ogg"
-        });
-
-        $("#id_sound_ids").hide();
-        $("#id_sound_ids").prev().hide();
         $("#send_form").hide();
-        $("#remove_sounds_label").hide();
 
         apiKey = settings.apiKey;
 
@@ -61,22 +81,9 @@ $(document).ready(
         } else {
             freesound = new Freesound(apiKey, true);
         }
-
     }
 );
 
-function playPreview(url_mp3, url_ogg) {
-     $("#jplayer").jPlayer("clearMedia");
-     $("#jplayer").jPlayer("setMedia", {
-            mp3: url_mp3,
-            oga: url_ogg
-     });
-     $("#jplayer").jPlayer("play");
-}
-
-function stopPreview() {
-    $("#jplayer").jPlayer("stop");
-}
 
 function search_sounds() {
     if ($("#search-q").length > 0) {
@@ -90,7 +97,6 @@ function search_sounds() {
 }
 
 function displaySearchResults(soundCollection) {
-    currently_displayed_search_result = 0;
 
     $("#search-results").text("")
 
@@ -102,13 +108,6 @@ function displaySearchResults(soundCollection) {
 }
 
 function displaySoundInfo(sound, addButton, removeButton) {
-    currently_displayed_search_result = currently_displayed_search_result + 1;
-    if ((currently_displayed_search_result % 2) == 1){
-        classEO='search_resultE';
-    }else{
-        classEO='search_resultO';
-    }
-
     var tags = sound.properties['tags'].slice(0,15).join('</span> <span class="tags">');
 
     var soundHTML = '';
@@ -118,16 +117,14 @@ function displaySoundInfo(sound, addButton, removeButton) {
         soundHTML += 	'<div class="sound_remove"><img src="{{STATIC_URL}}images/tab_left.png" /></div>';
     }
 
-    soundHTML +=		'<div class="player small">';
-    soundHTML +=	    	'<div class="metadata">'
-    soundHTML += 				 sound.properties['preview-hq-mp3'] + ' ';
-    soundHTML +=				 sound.properties['waveform_m'] + ' ';
-    soundHTML +=				 sound.properties['spectral_m'] + ' ';
-    soundHTML +=				 sound.properties['duration'];
-    soundHTML +=			'</div>';
+    soundHTML +=	'<div class="player small">';
+    soundHTML +=	   	'<div class="metadata">'
+    soundHTML += 			 sound.properties['preview-hq-mp3'] + ' ';
+    soundHTML +=			 sound.properties['waveform_m'] + ' ';
+    soundHTML +=			 sound.properties['spectral_m'] + ' ';
+    soundHTML +=			 sound.properties['duration'];
     soundHTML +=		'</div>';
-
-
+    soundHTML +=	'</div>';
     soundHTML += 	'<div class="sound_description">';
     soundHTML +=    	'<span class="sound_title">' + sound.properties.original_filename + '</span><br>';
     soundHTML +=    	'<span class="tags">' + tags + '</span>';
@@ -141,72 +138,8 @@ function displaySoundInfo(sound, addButton, removeButton) {
     $("#search-results").append(soundHTML);
 
     var selector = '.sound_'+sound.properties['id'];
-    addSoundHandlers($(selector));
+    addSoundHandlers($(selector), sound.properties['id']);
     makePlayer(selector+' .player');
-
-}
-
-function errorSearch() {}
-function errorSound() {}
-
-function addSound(element, soundId) {
-
-    $("#remove_sounds_label").show();
-
-    if (num_sounds < max_sounds)
-    {
-        console.log(num_sounds);
-        if ($.inArray(soundId, sounds) == -1 && num_sounds <= max_sounds)
-        {
-            num_sounds = num_sounds + 1;
-
-            if (num_sounds == max_sounds){
-                $("#send_form").show();
-            }
-
-            console.log("addSound");
-            sounds.push(soundId);
-            $("#id_sound_ids").attr("value", sounds);
-
-            $(element).closest("#search-results > div").clone()
-                                            .attr({
-                                            id: soundId+"_choose",
-                                            "class": "picked_result"
-                                            }).appendTo("#picked_sounds");
-
-            $("#"+soundId+"_choose")
-                .removeAttr('onclick')
-                .click( function () { removeSound($("#"+soundId+"_choose"),
-                                                  soundId);
-                                      return false } )
-        }
-    }
-    else {
-        //alert("Reached your max sounds, don't be greedy warrior!!!");
-    }
-}
-
-function removeSound(element, soundId) {
-
-    console.log("removing sound: " + soundId)
-
-    var index = $.inArray(soundId, sounds);
-    if (index != -1) {
-
-        sounds.splice(index, 1);
-        $("#id_sound_ids").attr("value", sounds);
-        $(element).closest("#picked_sounds > div").remove();
-        num_sounds = num_sounds - 1;
-
-        if (num_sounds <= 4) {
-            $("#send_form").hide();
-        }
-
-        if (num_sounds <= 0) {
-            num_sounds = 0;
-            $("#remove_sounds_label").hide();
-        }
-    }
 }
 
 </script>

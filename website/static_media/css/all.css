@@ -206,7 +206,7 @@ body {
 #search-results-wrapper {
     top: 180px;
     width: 525px;
-    height: 100%;
+    height: 600px;
     position: fixed;
     overflow-y: scroll;
     overflow-x: hidden;
