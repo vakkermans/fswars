@@ -56,11 +56,7 @@ function switchToggle(element)
 }
 
 function makePlayer(selector) {
-
-    console.log('ayalp');
-
     $(selector).each( function () {
-        console.log($(this));
         if ($(this).hasClass("large"))
         {
             $(this).append('<div class="controls"> \

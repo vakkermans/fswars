@@ -107,11 +107,11 @@ def pick_sounds_helper(request, battle_id):
     battle = get_object_or_404(Battle, id=battle_id)
     form = PickSoundsForm(request.POST)
     if form.is_valid():
-        sound_ids = [int(x) for x in form.cleaned_data.get('sound_ids').split(',')]
+        sound_ids = form.cleaned_data.get('sound_ids')
         if battle.player1_uuid == request.uuid:
-            battle.player1_sounds = json.dumps(sound_ids)
+            battle.player1_sounds = sound_ids
         elif battle.player2_uuid == request.uuid:
-            battle.player2_sounds = json.dumps(sound_ids)
+            battle.player2_sounds = sound_ids
         else:
             # This shouldn't happen but perhaps does when session is invalid
             return HttpResponse('Hmm.. you do not seem to be one of the players.')

@@ -32,7 +32,7 @@ function addSoundHandlers(elem, soundId) {
         if (sounds.length < max_sounds &&
             $.inArray(soundId, sounds) == -1) {
             sounds.push(soundId);
-            if (num_sounds >= max_sounds) {
+            if (sounds.length >= max_sounds) {
                 $("#send_form").show();
             }
             sound = $(this).parent();
@@ -49,6 +49,9 @@ function addSoundHandlers(elem, soundId) {
         if (index != -1) {
             sounds.remove(index);
         }
+        if (sounds.length < max_sounds) {
+            $("#send_form").hide();
+        }
         sound = $(this).parent();
         sound.hide(500);
         setTimeout(function() {
@@ -56,6 +59,7 @@ function addSoundHandlers(elem, soundId) {
             showAddButton(sound);
             sound.show(500);
         }, 500);
+
     });
     showAddButton(elem);
 };
@@ -68,7 +72,7 @@ $(document).ready(
 
         // send the sound_ids form ajax-style and cancel the normal sending by returning false
         $('#send_form').submit(function() {
-            $.post('{% url wars:pick-sounds-helper battle.id %}', $('#send_form').serialize());
+            $.post('{% url wars:pick-sounds-helper battle.id %}', {'sound_ids': JSON.stringify(sounds)});
             return false;
         });
 
@@ -102,44 +106,11 @@ function displaySearchResults(soundCollection) {
 
     for (obj in soundCollection.properties['sounds']) {
         freesound.getSound(soundCollection.properties['sounds'][obj]['id'],
-                           function(obj) {displaySoundInfo(obj, true, true)},
+                           function(obj) {fswars.displaySoundInfo(obj, true, true,
+                                                           addSoundHandlers,
+                                                           "#search-results")},
                            errorSound );
     }
-}
-
-function displaySoundInfo(sound, addButton, removeButton) {
-    var tags = sound.properties['tags'].slice(0,15).join('</span> <span class="tags">');
-
-    var soundHTML = '';
-
-    soundHTML += '<div class="sound sound_'+sound.properties['id']+'">';
-    if (removeButton) {
-        soundHTML += 	'<div class="sound_remove"><img src="{{STATIC_URL}}images/tab_left.png" /></div>';
-    }
-
-    soundHTML +=	'<div class="player small">';
-    soundHTML +=	   	'<div class="metadata">'
-    soundHTML += 			 sound.properties['preview-hq-mp3'] + ' ';
-    soundHTML +=			 sound.properties['waveform_m'] + ' ';
-    soundHTML +=			 sound.properties['spectral_m'] + ' ';
-    soundHTML +=			 sound.properties['duration'];
-    soundHTML +=		'</div>';
-    soundHTML +=	'</div>';
-    soundHTML += 	'<div class="sound_description">';
-    soundHTML +=    	'<span class="sound_title">' + sound.properties.original_filename + '</span><br>';
-    soundHTML +=    	'<span class="tags">' + tags + '</span>';
-    soundHTML +=    '</div>';
-    if (addButton) {
-        soundHTML += 	'<div class="sound_add"><img src="{{STATIC_URL}}images/tab_right.png" /></div>';
-    }
-    soundHTML +=    '<br style="clear: both;">';
-    soundHTML += '</div>';
-
-    $("#search-results").append(soundHTML);
-
-    var selector = '.sound_'+sound.properties['id'];
-    addSoundHandlers($(selector), sound.properties['id']);
-    makePlayer(selector+' .player');
 }
 
 </script>
@@ -169,39 +140,31 @@ function page_comet_handler(update) {
 
 <h2 id="title" class="section_title"></h2>
 
-<div id="fake-div">
-</div>
-
 <div id="search-div">
     <p>
         <input type="text" name="q" id="search-q" size="45" />
-<!--         <input type="submit" name="submit" value="search sounds" onclick="search_sounds" id="search-button"/> -->
         <button onclick="search_sounds()">Search!</button>
     </p>
 </div>
 
 <div id="search-results-wrapper">
-    <div id="search-results" class="sound_list_minimal">
-        <div class="sound sound_62260"><div class="sound_remove">rem</div><div class="player small"><div class="metadata">http://tabasco.upf.edu/data/previews/62/62260_634166-hq.mp3 http://tabasco.upf.edu/data/displays/62/62260_634166_wave_M.png http://tabasco.upf.edu/data/displays/62/62260_634166_spec_M.jpg 4.8587755102</div></div><div class="sound_description"><span class="sound_title">whoosh.wav</span><br><span class="tags">transition</span> <span class="tags">wing</span> <span class="tags">windmill</span> <span class="tags">windturbine</span> <span class="tags">air</span> <span class="tags">swoosh</span> <span class="tags">whoosh</span> <span class="tags">wings</span> <span class="tags">synth</span> <span class="tags">bird</span></div><div class="sound_add">add</div><br style="clear: both;"></div>
-    </div>
+    <div id="search-results" class="sound_list_minimal"></div>
 </div>
 
 <div id="picked_sounds_menu">
     <h2 class="section_title">War files</h2>
     <p>You need to choose 5 sounds for your battle.</p>
     <div id="picked_sounds"></div>
-</div>
-
-<div>
     <form id="send_form" action="{% url wars:pick-sounds-helper battle.id %}">
-        {{ form.as_p }}
+        {% comment %}{{ form.as_p }}{% endcomment %}
         <input id="send_form_submit"
                type="submit"
                value="My team of sounds is ready">
      </form>
 </div>
-</div>
 
-<div id="jplayer"></div>
+<div>
+
+</div>
 
 {% endblock content %}
