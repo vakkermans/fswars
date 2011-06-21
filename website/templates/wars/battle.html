@@ -36,10 +36,9 @@
     <script type="text/javascript">
 
     var presets = {{ presets|safe }};
-    var battleObj = {{battle_json|safe}};
+    var battle = {};
     var myPlayer = "{{ my_nickname }}";
-    var current_fight = 0;
-
+    var selectedSounds = [0,0]
 
     $(document).ready(function(){
         apiKey = settings.apiKey;
@@ -48,19 +47,50 @@
         } else {
             freesound = new Freesound(apiKey, true);
         }
-
-        populate(battleObj);
-        setPoll();
     });
 
-    function populate(battle) {
-        // ---------- populate player1
-        var temp = battle['player1_sounds'];
-        for (i in temp) {
-            freesound.getSound(temp[i], function(data) {displaySoundInfo(data, 1);}, errorSound );
-            // $("#sound_p1").append("<div id='" + temp[i] + "'>" + temp[i] + "</div>");
+    function addSoundHandlers(elem, soundId, player, soundClickFunc) {
+        console.debug(elem);
+        elem.find('.sound_description').click(soundClickFunc);
+    };
+
+    function getSoundClickFunc(player, soundId) {
+        return function() {
+            console.debug('player: ' + player + ', : ' + soundId);
+            selectedSounds[player-1] = soundId;
+            $('.sound_description').removeClass('selected'+player);
+            $(this).addClass('selected'+player);
+        };
+    }
+
+    function getDisplaySoundInfoClosure(player, soundClickFunc) {
+        return function(elem, soundId) {
+            addSoundHandlers(elem, soundId, player, soundClickFunc);
         }
-        // ---------- populate presets
+    }
+
+    function fsCallback(player, displayFuncClosure, playerSoundsSelector) {
+        return function(data) {
+            fswars.displaySoundInfo(data, false, false, displayFuncClosure, playerSoundsSelector);
+        };
+    }
+
+    function populatePlayerSounds(sounds, player) {
+        for (var i=0; i<sounds.length; i++) {
+            f0 = getSoundClickFunc(player, sounds[i]);
+            console.debug(f0);
+            f1 = getDisplaySoundInfoClosure(player, f0);
+            f2 = fsCallback(player, f1, '#player'+player+'_sounds');
+            freesound.getSound(sounds[i], f2);
+        }
+    }
+
+    function populate(battle) {
+
+        // populate player1
+       populatePlayerSounds(battle.player1_sounds, 1);
+       populatePlayerSounds(battle.player2_sounds, 2);
+
         for (i in presets) {
             $("#presets").append('<div id="' + presets[i] + '"><img src="{{ STATIC_URL }}images/' + presets[i].toLowerCase() + '_btn.png" /></div><br><br><br>');
             $("#"+ presets[i]).bind("click", {preset: presets[i]}, function(event) {
@@ -72,35 +102,10 @@
                         $("#fight").show();
                     }
         }
-        // ---------- populate player2
-        temp = battle['player2_sounds'];
-        for (i in temp) {
-            freesound.getSound(temp[i], function(data) {displaySoundInfo(data, 2);}, errorSound );
-            //$("#sound_p2").append("<div id='" + temp[i] + "'>" + temp[i] + "</div>");
-        }
+
+
     }
-    function errorSound() {
-    }
-    function displaySoundInfo(sound, player) {
-        // console.log("displaySoundInfo");
-        console.log(sound.properties['id']);
-        $("#sound_p"+player).append("<div id=" + sound.properties['id'] + "_"+player+"\>");
 
-        $("#"+sound.properties['id']+"_"+player).append('<div class="battle_sound_name"><h3>' + sound.properties['original_filename'] + '</h3></div>');
-        $("#"+sound.properties['id']+"_"+player).append('<div class="battle_sound_img"><img src="'+ sound.properties['waveform_m'] + '" alt = "' + sound.properties['waveform_m'] + '"/></div>');
-
-        $("#"+sound.properties['id']+"_"+player).append('<div class="battle_tags">tags: ' + sound.properties['tags'].join(', ') + '</div>');
-        $("#"+sound.properties['id']+"_"+player).append('<br style="clear: both;"/>');
-
-        $("#"+sound.properties['id']+"_"+player).append("</div>");
-
-        // add handler
-        $("#" + sound.properties['id']+"_"+player).bind("click", {soundId: sound.properties['id']}, function(event) {
-            // TODO: add length check and remove function
-            // $("#current_battle").append(event.data.soundId + " ");
-            addToBattleCandidate(event.data.soundId, player);
-        });
-    }
     function addToBattleCandidate(soundId, player) {
         // 2nd sound
         // if ($("#"+ soundId + "_"+player).parent().hasClass("p1")) {
@@ -252,6 +257,20 @@
     </script>
 {% endblock %}
 
+
+{% block comet_handler %}
+
+function page_comet_handler(update) {
+    if('command' in update && update.command == 'updateBattleStatus') {
+        battle = update.battle;
+        console.debug(battle);
+        populate(battle);
+    }
+};
+
+{% endblock %}
+
+
 {% block content %}
 <p><h2>Warrior: {{my_nickname}}</h2></p>
 <center><h1><div id="result"></div></h1></center>
@@ -262,30 +281,31 @@
 </div>
 <br />
 <div id="maincontainer">
+
     <div id="leftcolumn" class="battlecolumn">
-        <div id="player1_sound"></div>
-        <label for="sound_p1"><h2>P1: {% if my_nickname == battle.player1 %}You!{% else %}{{ battle.player1 }}{% endif %}</h2></label>
-        <div id="sound_p1" class="p1"></div>
+        <h2>P1: {% if my_nickname == battle.player1 %}You!{% else %}{{ battle.player1 }}{% endif %}</h2>
+        <div id="player1_sounds"></div>
     </div>
+
     <div id="contentcolumn" class="battlecolumn">
-        <div id="battle_preset"></div>
-        <label for="content"><center><h2>Battle with..</h2></center></label>
+        <center><h2>Battle with..</h2></center>
         <div id="presets"></div>
     </div>
+
     <div id="rightcolumn" class="battlecolumn">
-        <div id="player2_sound"></div>
-        <label for="sound_p2"><h2>P2: {% if my_nickname == battle.player2 %}You!{% else %}{{ battle.player2 }}{% endif %}</h2></label>
-        <div id="sound_p2" class="p2"></div>
+        <h2>P2: {% if my_nickname == battle.player2 %}You!{% else %}{{ battle.player2 }}{% endif %}</h2>
+        <div id="player2_sounds"></div>
     </div>
+
     <br style="clear: both;" />
 </div>
 
 <div id="boxes">
-<div id="dialog" class="window">
-Simple Modal Window |
-<a href="#"class="close"/>Close it</a>
-<p>Anything can go Here</p>
-</div>
+    <div id="dialog" class="window">
+        Simple Modal Window |
+        <a href="#"class="close"/>Close it</a>
+        <p>Anything can go Here</p>
+    </div>
 <!-- Mask to cover the whole screen -->
   <div id="mask"></div>
 </div>

@@ -47,7 +47,7 @@ this.fswars.displaySoundInfo = function(sound, addButton, removeButton, addHandl
 
     $(appendSelector).append(soundHTML);
 
-    var selector = '.sound_'+sound.properties['id'];
+    var selector = appendSelector + ' .sound_'+sound.properties['id'];
     addHandlersFunction($(selector), sound.properties['id']);
-    makePlayer(selector+' .player');
+    makePlayer(selector + ' .player');
 }

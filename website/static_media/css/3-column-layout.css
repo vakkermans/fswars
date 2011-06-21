@@ -34,11 +34,11 @@ margin-right: 20px;
 }
 
 #leftcolumn{
-width: 410px; /*Width of left column in pixel*/
+width: 450px; /*Width of left column in pixel*/
 }
 
 #rightcolumn{
-width: 410px; /*Width of right column*/
+width: 450px; /*Width of right column*/
 }
 
 #footer{
@@ -80,3 +80,12 @@ margin-top: 0;
     height: 0px;
     visibility: hidden;
 }
+
+.selected1 {
+    border: 2px solid red;
+}
+
+.selected2 {
+    border: 2px solid blue;
+}
+
