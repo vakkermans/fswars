@@ -36,9 +36,10 @@
     <script type="text/javascript">
 
     var presets = {{ presets|safe }};
-    var battle = {};
+    var battle;
     var myPlayer = "{{ my_nickname }}";
     var selectedSounds = [0,0]
+    var selectedPreset;
 
     $(document).ready(function(){
         apiKey = settings.apiKey;
@@ -50,16 +51,15 @@
     });
 
     function addSoundHandlers(elem, soundId, player, soundClickFunc) {
-        console.debug(elem);
         elem.find('.sound_description').click(soundClickFunc);
     };
 
     function getSoundClickFunc(player, soundId) {
         return function() {
-            console.debug('player: ' + player + ', : ' + soundId);
             selectedSounds[player-1] = soundId;
             $('.sound_description').removeClass('selected'+player);
             $(this).addClass('selected'+player);
+            isReadyToFight();
         };
     }
 
@@ -78,7 +78,6 @@
     function populatePlayerSounds(sounds, player) {
         for (var i=0; i<sounds.length; i++) {
             f0 = getSoundClickFunc(player, sounds[i]);
-            console.debug(f0);
             f1 = getDisplaySoundInfoClosure(player, f0);
             f2 = fsCallback(player, f1, '#player'+player+'_sounds');
             freesound.getSound(sounds[i], f2);
@@ -86,109 +85,62 @@
     }
 
     function populate(battle) {
-
-        // populate player1
-       populatePlayerSounds(battle.player1_sounds, 1);
-       populatePlayerSounds(battle.player2_sounds, 2);
+        populatePlayerSounds(battle.player1_sounds, 1);
+        populatePlayerSounds(battle.player2_sounds, 2);
 
         for (i in presets) {
             $("#presets").append('<div id="' + presets[i] + '"><img src="{{ STATIC_URL }}images/' + presets[i].toLowerCase() + '_btn.png" /></div><br><br><br>');
             $("#"+ presets[i]).bind("click", {preset: presets[i]}, function(event) {
-                    $("#battle_preset").empty();
-                    $("#battle_preset").append(event.data.preset);
-                    $("#battle_preset").click(function() { $(this).empty(); });
-                    });
-                    if (isReadyToFight()) {
-                        $("#fight").show();
-                    }
-        }
-
-
-    }
-
-    function addToBattleCandidate(soundId, player) {
-        // 2nd sound
-        // if ($("#"+ soundId + "_"+player).parent().hasClass("p1")) {
-        if (player == 1) {
-            $("#player1_sound").empty();
-            $("#player1_sound").append(soundId);
-            $("#player1_sound").click(function() {
-                                                    $(this).empty();
-                                                    // $("#fight").hide();
-                                                });
-        // } else if ($("#"+ soundId).parent().hasClass("p2")) {
-        }
-        else if (player == 2) {
-            $("#player2_sound").empty();
-            $("#player2_sound").append(soundId);
-            $("#player2_sound").click(function() {
-                                                    $(this).empty();
-                                                    // $("#fight").hide();
-                                                });
-        }
-        current_fight++;
-        // $("#current_battle").append(soundId);
-        if (isReadyToFight()) {
-            $("#fight").show();
-        }
-    }
-    function fight() {
-        if (isReadyToFight())
-        {
-            $("#fight").hide();
-            console.log("all ready for battle");
-            var url = "/battle/"+ battleObj['id'] +"/fight/"+ $("#player1_sound").html() +"/"+ $("#player2_sound").html() +"/"+ $("#battle_preset").html();
-            $.get(url, function (data) {
-                    // TODO: this needs fix, check error in firefox
-                    var battle_result = jQuery.parseJSON(data);
-                    console.log(battle_result['history']);
-                    var last_round = battle_result['history'][battle_result['history'].length-1];
-                    $("#result").append(findWinnerAndPoints(last_round));
-                });
-            // clean controls
-            $("#player1_sound").empty();
-            $("#player2_sound").empty();
-            $("#battle_preset").empty();
-        }
-    }
-    function isReadyToFight() {
-        if ($("#player1_sound").html() != ""
-            && $("#player2_sound").html() != ""
-            && $("#battle_preset").html() != "")
-        {
-            return true;
-        }
-        return false;
-    }
-    function setPoll() {
-        var sURL = "/battle/" + battleObj['id'] +"/status/";
-        $.ajax({
-              type: "GET",
-              url: sURL,
-              dataType: "json",
-              success: function(xhr_data) {
-                  console.log(xhr_data);
-                  if (xhr_data.status == 'pending') {
-                    setTimeout(function() { console.log("pending"); }, 3000); // wait 15 seconds than call ajax request again
-                  } else {
-                    // TODO: I don't get the right data...
-                    setInterval(function(xhr_data) {
-                        battleStatus();
-                        // console.log(xhr_data);
-                    }, 2000); // wait 15 seconds than call ajax request again
-                    }
-                }
+                    selectedPreset = event.data.preset;
+                    $('#presets div').removeClass('selectedPreset');
+                    $('#'+selectedPreset).addClass('selectedPreset');
+                    isReadyToFight();
             });
+        }
+
+        // TODO: filter out sounds already in the rounds.
+        // This would prevent weird behaviour on page refresh.
     }
+
+    function fight() {
+        if (isReadyToFightTest()) {
+            $("#fight").hide(200);
+            console.debug(battle);
+            var url = "/battle/"+ battle['id'] +"/fight/" +
+                      selectedSounds[0] + '/' + selectedSounds[1] +
+                      '/' + selectedPreset + '/';
+            $.get(url, function (data) {
+                    console.log('requesting battle result');
+            });
+            // clean controls
+            $('.selectedPreset').hide(500);
+            $('.selected1').parent().hide(500);
+            $('.selected2').parent().hide(500);
+            selectedSounds[0] = selectedSounds[1] = 0;
+            selectedPreset = null;
+        }
+    }
+
+    function isReadyToFightTest() {
+        return selectedPreset &&
+               selectedSounds[0] != 0 &&
+               selectedSounds[1] != 0
+    }
+
+    function isReadyToFight() {
+        if (isReadyToFightTest()) {
+             $('#fight').show(200);
+        }
+    }
+
+    /*
     function battleStatus() {
         var sURL = "/battle/" + battleObj['id'] +"/status/";
         var parsed;
         var turnPlayerNick
         var player_num = (myPlayer == battleObj['player1']) ? 1 : 2;
-        // console.log(player_num);
         $.get(sURL, function(data) {
                 parsed = jQuery.parseJSON(data);
-                // console.log(parsed['turn_owner']);
                 if (parsed['turn_owner'] == player_num) {
                     removeScreen();
                 } else {
@@ -196,20 +148,19 @@
                 }
                 updateAfterBattle(parsed);
             });
-    }
+    }*/
+
     function updateAfterBattle(battle_result) {
-        // show turn result
-        // $("#result").empty();
         var last_round = battle_result['history'][battle_result['history'].length-1];
         if ($("#result").html() != "") {
             $("#result").html(findWinnerAndPoints(last_round));
         }
-        // console.log(battle_result['history'][battle_result['history'].length-1]);
         // remove div with played sounds
         $("#"+ last_round[0]+"_1").remove();
         $("#"+ last_round[1]+"_2").remove();
         $("#"+ last_round[2]).remove();
     }
+
 
     function findWinnerAndPoints(last_round) {
         var sResult = "And the winner is... ";
@@ -221,6 +172,7 @@
         sResult += " with " + last_round[4] + " points!!!";
         return sResult;
     }
+
     function coverScreen() {
         //Get the A tag
         var id = "cover";
@@ -248,6 +200,7 @@
         $(id).fadeIn(2000);
         $(id).html("Your opponent is preparing for attack...");
     }
+
     function removeScreen() {
         $('#mask').hide();
         $('.window').hide();
@@ -261,7 +214,10 @@
 {% block comet_handler %}
 
 function page_comet_handler(update) {
-    if('command' in update && update.command == 'updateBattleStatus') {
+    if('command' in update &&
+       update.command == 'updateBattleStatus' &&
+       battle == null) {
+           console.debug('initializing battle');
         battle = update.battle;
         console.debug(battle);
         populate(battle);

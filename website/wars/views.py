@@ -157,8 +157,7 @@ def fight(request, battle_id, id1, id2, preset):
 
     # N.B. player1 always starts! 1-indexed, so 1 or 2
     battle.turn_owner = 2 if battle.rounds.count() % 2 == 1 else 1
-    if battle.rounds.count() >= len(json.loads(battle.player1_sounds)) or \
-       battle.rounds.count() >= len(json.loads(battle.player2_sounds)):
+    if battle.rounds.count() >= battle.num_rounds:
         battle.finished = True
 
     # battle round
@@ -175,11 +174,13 @@ def fight(request, battle_id, id1, id2, preset):
         battle_round.player2_points = battle_result['points']
         battle_round.player1_points = 0
 
+    battle_round.battle = battle
+    battle_round.save()
+
     battle.rounds.add(battle_round)
     battle.save()
-    battle_round.save();
 
-    return HttpResponse(battle.to_json())
+    return HttpResponse('update through comet')
 
 
 def calculate_final_scores(history):

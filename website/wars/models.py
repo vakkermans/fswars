@@ -28,7 +28,7 @@ class Battle(models.Model):
 #        return serializers.serialize('json', [self])
 
     def json_safe(self):
-        data = {}
+        data = {'id': self.id}
         for field in ['player1', 'player1_uuid', 'player2', 'player2_uuid',
                       'num_rounds', 'turn_owner', 'finished']:
             data[field] = getattr(self, field)
@@ -61,6 +61,7 @@ class BattleRound(models.Model):
         for field in ['attacker', 'player1_sound', 'player2_sound', 'winner',
                       'player1_points', 'player2_points']:
             data[field] = getattr(self, field)
+        return data
 
 
 @receiver(post_save, sender=Battle)

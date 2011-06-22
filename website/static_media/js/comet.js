@@ -7,7 +7,9 @@
             function _connectionEstablished() {
                 $('#comet_status').html('Connection Established');
                 // request battle info, to not lose any data
-                $.get('/battle/'+config.battleId+'/request-battle-status/');
+                setTimeout(function() {
+                    $.get('/battle/'+config.battleId+'/request-battle-status/');
+                }, 500);
             }
 
             function _connectionBroken() {

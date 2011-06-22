@@ -89,3 +89,6 @@ margin-top: 0;
     border: 2px solid blue;
 }
 
+.selectedPreset {
+    border: 2px solid yellow;
+}
