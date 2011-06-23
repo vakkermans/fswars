@@ -99,7 +99,7 @@ function search_sounds() {
         var p = 1;
         var f = "duration:[0.1 TO 10.0]";
         var s = "downloads_desc";
-        fswars.activate_waiting_screen('Seacrhing...');
+        fswars.activate_waiting_screen('Searching...');
         freesound.getSoundsFromQuery(q,p,f,s,displaySearchResults, errorSearch);
     }
 }
@@ -110,11 +110,13 @@ function displaySearchResults(soundCollection) {
     $("#search-results").text("")
 
     for (obj in soundCollection.properties['sounds']) {
-        freesound.getSound(soundCollection.properties['sounds'][obj]['id'],
+        /*freesound.getSound(soundCollection.properties['sounds'][obj]['id'],
                            function(obj) {fswars.displaySoundInfo(obj, true, true,
                                                            addSoundHandlers,
                                                            "#search-results")},
-                           errorSound );
+                           errorSound );*/
+        var sound = {properties: soundCollection.properties['sounds'][obj]}
+        fswars.displaySoundInfo(sound, true, true, addSoundHandlers, "#search-results");
     }
 }
 

@@ -208,7 +208,6 @@ def battle_result(request, battle_id):
 @csrf_exempt
 @require_POST
 def browser2browser(request, battle_id):
-    print request.POST['message']
     if 'message' in request.POST:
         send_message(battle_id, str(request.POST['message']), True)
         return HttpResponse('updating through comet..')

@@ -140,7 +140,11 @@
                         <img id="loading_animation"
                              src="{{ STATIC_URL }}images/ajax-loader.gif" />
                     </div>
-                    Battle #{{ battle.id }}: <span class="player1_name">{{ battle.player1 }}</span> <em>v.s.</em> <span class="player2_name">{{ battle.player2 }}</span>
+                    <span class="player1_name">{{ battle.player1 }}</span>
+                    <span id="player1_points"></span>
+                    <em>v.s.</em>
+                    <span id="player2_points"></span>
+                    <span class="player2_name">{{ battle.player2 }}</span>
                     <span id="game_status_line"></span>
                 </div>
 

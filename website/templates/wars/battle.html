@@ -91,7 +91,24 @@
         }
     }
 
+    function setPlayerPoints(player, points) {
+        $('#player'+player+'_points').text('('+points+')');
+    }
+
+    function setPlayerPointsFromBattle(battle) {
+        var points = [0, 0];
+        for (roundIndex=0; roundIndex<battle.rounds.length; roundIndex++) {
+            points[0] += battle.rounds[roundIndex].player1_points;
+            points[1] += battle.rounds[roundIndex].player2_points;
+        }
+        setPlayerPoints(1, points[0]);
+        setPlayerPoints(2, points[1]);
+    }
+
     function populate(battle) {
+        setPlayerPoints(1,0);
+        setPlayerPoints(2,0);
+
         populatePlayerSounds(battle.player1_sounds, 1);
         populatePlayerSounds(battle.player2_sounds, 2);
 
@@ -180,9 +197,12 @@ function page_comet_handler(update) {
         if (update.command == 'updateBattleStatus') {
             switchWaitingScreens(update.battle);
             if(update.battle.finished) {
+                /*
                 $('#maincontainer').html('<div id="#continue_link"><center>' +
                     'Continue to <a href="{% url wars:result battle.id %}">' +
                     'results</a></center></div>');
+                    */
+                window.location = '{% url wars:result battle.id %}';
                 return
             }
             if (battle == null) {
@@ -197,6 +217,7 @@ function page_comet_handler(update) {
                 $('#points').text(lastRound.winner == 1 ? lastRound.player1_points : lastRound.player2_points);
                 $('#result').show(500);
             }
+            setPlayerPointsFromBattle(battle);
         } else if (update.command == 'updateSelection' &&
                    update.sender != uuid) {
             $(update.removeSelector).removeClass(update.classToAdd);
