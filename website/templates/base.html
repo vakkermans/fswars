@@ -8,12 +8,14 @@
             <link href='http://fonts.googleapis.com/css?family=Quattrocento' rel='stylesheet' type='text/css'>
             <link REL="SHORTCUT ICON" HREF="{{STATIC_URL}}favicon.ico">
             <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/all.css" />
+            <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/ui-lightness/jquery-ui-1.8.13.custom.css" />
             <!--[if IE 6]><link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/ie6.css" /><![endif]-->
 
             <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
             <meta name="FSWars" content="Freesound is your battleground." />
 
-            <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.js"></script>
+            <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.5.1.min.js"></script>
+            <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.8.13.custom.min.js"></script>
             <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-jsonp.js"></script>
             <script type="text/javascript" src="{{ STATIC_URL }}js/settings.js"></script>
             <script type="text/javascript" src="{{ STATIC_URL }}js/freesoundLib.js"></script>
@@ -69,7 +71,6 @@
             {% endblock %}
             </script>
 
-
             <script type="text/javascript">
 
                 $(document).ready(function() {
@@ -95,6 +96,15 @@
                                     'message': '{{request.user}}: '+message};
                         fswars.browser2browser({{battle.id}}, data);
                     };
+
+                    $('#comet_draggable_icon').hide();
+                    $('#comet').draggable();
+                    $('#comet').mouseover(function() {
+                        $('#comet_draggable_icon').show();
+                    });
+                    $('#comet').mouseout(function() {
+                        $('#comet_draggable_icon').hide();
+                    });
                     {% endif %}
 
                 });
@@ -154,6 +164,7 @@
 
             {% if battle %}
             <div id="comet">
+                <img id="comet_draggable_icon" src="{{ STATIC_URL }}images/draggable.png" />
                 <div id="comet_status"></div>
                 <div id="comet_incoming"></div>
                 <form id="comet_send_form" action="{% url wars:browser2browser battle.id %}">

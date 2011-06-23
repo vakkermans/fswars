@@ -96,7 +96,7 @@
         populatePlayerSounds(battle.player2_sounds, 2);
 
         for (i in presets) {
-            $("#presets").append('<div id="' + presets[i] + '"><img src="{{ STATIC_URL }}images/' + presets[i].toLowerCase() + '_btn.png" /></div><br><br><br>');
+            $("#presets").append('<div id="' + presets[i] + '"><img src="{{ STATIC_URL }}images/' + presets[i].toLowerCase() + '_btn.png" /></div><br>');
             $("#"+ presets[i]).bind("click", {preset: presets[i]}, function(event) {
                     selectedPreset = event.data.preset;
                     $('#presets div').removeClass('selectedPreset');
@@ -118,21 +118,29 @@
     function fight() {
         if (isReadyToFightTest()) {
             $("#fight").hide(200);
-            console.debug(battle);
+            var waitText = 'Calculating battle score..';
+            fswars.activate_waiting_screen(waitText);
+            var data = {'command': 'activateWaitingScreen',
+                        'waitText': waitText,
+                        'sender': uuid};
+            fswars.browser2browser({{battle.id}}, data);
             var url = "/battle/"+ battle['id'] +"/fight/" +
                       selectedSounds[0] + '/' + selectedSounds[1] +
                       '/' + selectedPreset + '/';
             $.get(url, function (data) {
                     console.log('requesting battle result');
             });
-            // clean controls
-            $('.selectedPreset').hide(500);
-            $('.selected1').parent().hide(500);
-            $('.selected2').parent().hide(500);
+            cleanControls();
             selectedSounds[0] = selectedSounds[1] = 0;
             selectedPreset = null;
-            fswars.activate_waiting_screen('Calculating battle score..');
+
         }
+    }
+
+    function cleanControls() {
+        $('.selectedPreset').hide(500);
+        $('.selected1').parent().hide(500);
+        $('.selected2').parent().hide(500);
     }
 
     function isReadyToFightTest() {
@@ -148,6 +156,19 @@
         }
     }
 
+    function switchWaitingScreens(battle) {
+        if (battle.finished) {
+            fswars.deactivate_waiting_screen();
+            return
+        }
+        var playerNumber = battle.player2_uuid == '{{request.uuid}}' ? 2 : 1;
+        if (playerNumber != battle.turn_owner) {
+            var turnOwner = playerNumber == 1 ? battle.player2 : battle.player1;
+            fswars.activate_waiting_screen(turnOwner + "'s turn...");
+        } else {
+            fswars.deactivate_waiting_screen();
+        }
+    }
     </script>
 {% endblock %}
 
@@ -157,31 +178,32 @@
 function page_comet_handler(update) {
     if('command' in update) {
         if (update.command == 'updateBattleStatus') {
+            switchWaitingScreens(update.battle);
+            if(update.battle.finished) {
+                $('#maincontainer').html('<div id="#continue_link"><center>' +
+                    'Continue to <a href="{% url wars:result battle.id %}">' +
+                    'results</a></center></div>');
+                return
+            }
             if (battle == null) {
                 battle = update.battle;
                 console.debug(battle);
                 populate(battle);
             } else {
-                fswars.deactivate_waiting_screen();
                 battle = update.battle;
-                if(battle.finished) {
-                    $('#maincontainer').html('<div id="#continue_link"><center>' +
-                        'Continue to <a href="{% url wars:result battle.id %}">' +
-                        'results</a></center></div>');
-                }
-                lastRound = battle.rounds.last();
+                lastRound = battle.rounds.last()
+                cleanControls();
                 $('#winner').text(lastRound.winner == 1 ? battle.player1 : battle.player2);
                 $('#points').text(lastRound.winner == 1 ? lastRound.player1_points : lastRound.player2_points);
                 $('#result').show(500);
             }
         } else if (update.command == 'updateSelection' &&
                    update.sender != uuid) {
-            console.debug('setting selection')
-            console.debug(update.sender);
-            console.debug(uuid);
-            console.debug($(update.selector));
             $(update.removeSelector).removeClass(update.classToAdd);
             $(update.selector).addClass(update.classToAdd);
+        } else if (update.command == 'activateWaitingScreen' &&
+                   update.sender != uuid) {
+            fswars.activate_waiting_screen(update.waitText);
         }
     }
 };

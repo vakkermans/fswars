@@ -53,6 +53,7 @@ this.fswars.displaySoundInfo = function(sound, addButton, removeButton, addHandl
 }
 
 this.fswars.activate_waiting_screen = function(message) {
+    console.debug('activate_waiting_screen');
     $('#loading_animation').css('visibility', 'visible');
     $('#game_status_line').text(message);
     $('#game_status_line').show(200);
@@ -61,6 +62,7 @@ this.fswars.activate_waiting_screen = function(message) {
 }
 
 this.fswars.deactivate_waiting_screen = function() {
+    console.debug('deactivate_waiting_screen')
     $('#loading_animation').css('visibility', 'hidden');
     $('#game_status_line').hide(200);
     $('#game_status_line').text('');
@@ -69,6 +71,7 @@ this.fswars.deactivate_waiting_screen = function() {
 }
 
 this.fswars.initialize_waiting_screen = function() {
+    console.debug('initialize_waiting_screen');
     $('#loading_animation').css('visibility', 'hidden');
     $('#game_status_line').hide();
     $('#waiting_screen').hide();

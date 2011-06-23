@@ -155,11 +155,6 @@ def fight(request, battle_id, id1, id2, preset):
     ps = preset.upper()
     battle_result = algorithms.computeBattle(int(id1), int(id2), algorithms.ALGORITHM_CLASSES[ps])
 
-    # N.B. player1 always starts! 1-indexed, so 1 or 2
-    battle.turn_owner = 2 if battle.rounds.count() % 2 == 1 else 1
-    if battle.rounds.count() >= battle.num_rounds:
-        battle.finished = True
-
     # battle round
     battle_round = BattleRound()
     battle_round.attacker = 1 if battle.turn_owner == battle.player1 else 2
@@ -178,6 +173,10 @@ def fight(request, battle_id, id1, id2, preset):
     battle_round.save()
 
     battle.rounds.add(battle_round)
+    if battle.rounds.count() >= battle.num_rounds:
+        battle.finished = True
+        # N.B. player1 always starts! 1-indexed, so 1 or 2
+    battle.turn_owner = (battle.rounds.count() % 2) + 1
     battle.save()
 
     return HttpResponse('update through comet')

@@ -305,6 +305,12 @@ body {
     bottom: 30px;
     right: 10px;
     background-color: #ededed;
+    z-index: 1000;
+}
+#comet_draggable_icon {
+    position: absolute;
+    width: 16px;
+    height: 16px;
 }
 #comet_status {
     position: absolute;

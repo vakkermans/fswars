@@ -64,7 +64,9 @@ function addSoundHandlers(elem, soundId) {
     showAddButton(elem);
 };
 
-function errorSearch() {}
+function errorSearch() {
+    fswars.deactivate_waiting_screen();
+}
 function errorSound() {}
 
 $(document).ready(
@@ -73,6 +75,7 @@ $(document).ready(
         // send the sound_ids form ajax-style and cancel the normal sending by returning false
         $('#send_form').submit(function() {
             $.post('{% url wars:pick-sounds-helper battle.id %}', {'sound_ids': JSON.stringify(sounds)});
+            fswars.activate_waiting_screen('Waiting on other player...');
             return false;
         });
 
@@ -96,11 +99,13 @@ function search_sounds() {
         var p = 1;
         var f = "duration:[0.1 TO 10.0]";
         var s = "downloads_desc";
+        fswars.activate_waiting_screen('Seacrhing...');
         freesound.getSoundsFromQuery(q,p,f,s,displaySearchResults, errorSearch);
     }
 }
 
 function displaySearchResults(soundCollection) {
+    fswars.deactivate_waiting_screen();
 
     $("#search-results").text("")
 
