@@ -6,7 +6,7 @@ env.hosts = ['109.169.40.165'] # ['freesoundwars.com']
 
 PROJECT_NAME = 'fswars'
 
-SRC_DIR = 'src/%s/' % PROJECT_NAME
+SRC_DIR = 'src/%s/website/' % PROJECT_NAME
 DATA_DIR = "data/%s/" % PROJECT_NAME
 
 GIT_REP = 'git://github.com/vakkermans/fswars.git'
