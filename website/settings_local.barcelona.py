@@ -13,7 +13,7 @@ DATABASES = {
     }
 }
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 API_KEY = '9cdc313dcbb24d9883503bb4d2341fa1'
