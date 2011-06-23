@@ -77,7 +77,7 @@ def dependencies():
     with cd('/tmp/'):
         run("""source %s && \
                 pip install --upgrade \
-                    django simplejson django-piston flup \
+                    django simplejson django-piston flup pika \
                     git+https://github.com/g-roma/freesound-python.git#egg=freesound""" % VIRTUALENV_ACTIVATE)
 
 #def crontab():
