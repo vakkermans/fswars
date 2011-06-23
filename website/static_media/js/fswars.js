@@ -51,3 +51,30 @@ this.fswars.displaySoundInfo = function(sound, addButton, removeButton, addHandl
     addHandlersFunction($(selector), sound.properties['id']);
     makePlayer(selector + ' .player');
 }
+
+this.fswars.activate_waiting_screen = function(message) {
+    $('#loading_animation').css('visibility', 'visible');
+    $('#game_status_line').text(message);
+    $('#game_status_line').show(200);
+    $('#waiting_screen').show(200);
+    $('#waiting_screen').css('zIndex', 200);
+}
+
+this.fswars.deactivate_waiting_screen = function() {
+    $('#loading_animation').css('visibility', 'hidden');
+    $('#game_status_line').hide(200);
+    $('#game_status_line').text('');
+    $('#waiting_screen').hide(200);
+    $('#waiting_screen').css('zIndex', -200);
+}
+
+this.fswars.initialize_waiting_screen = function() {
+    $('#loading_animation').css('visibility', 'hidden');
+    $('#game_status_line').hide();
+    $('#waiting_screen').hide();
+}
+
+this.fswars.browser2browser = function(battleId, data) {
+    $.post('/battle/'+battleId+'/browser2browser/',
+           {message: JSON.stringify(data)});
+}

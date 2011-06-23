@@ -34,7 +34,7 @@ class Battle(models.Model):
             data[field] = getattr(self, field)
         data['player1_sounds'] = json.loads(self.player1_sounds) if self.player1_sounds else []
         data['player2_sounds'] = json.loads(self.player2_sounds) if self.player2_sounds else []
-        data['rounds'] = [round.json_safe() for round in self.rounds.order_by('-id')]
+        data['rounds'] = [round.json_safe() for round in self.rounds.order_by('id')]
 #        data['rounds'] = [round.json_safe() for round in \
 #                          BattleRound.objects.filter(battle=self).order_by('-id')]
         return data
@@ -54,6 +54,7 @@ class BattleRound(models.Model):
     # Just in case we change the scoring model.
     player1_points      = models.IntegerField(default=0)
     player2_points      = models.IntegerField(default=0)
+    preset              = models.CharField(max_length=128)
     battle              = models.ForeignKey(Battle, related_name='rounds')
 
     def json_safe(self):

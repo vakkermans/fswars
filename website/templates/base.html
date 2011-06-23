@@ -22,6 +22,7 @@
             <script type="text/javascript" src="{{ STATIC_URL }}js/json2.js"></script>
             <script type="text/javascript" src="{{ STATIC_URL }}js/cometd.js"></script>
             <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.cometd.js"></script>
+            <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-getpath.js"></script>
 
             <script type="text/javascript" src="{{ STATIC_URL }}js/fswars.js" type="text/javascript"></script>
 
@@ -50,6 +51,8 @@
 
             <!-- Configuration for comet -->
             <script type="text/javascript">
+                Array.prototype.last = function() {return this[this.length-1];}
+
                 var config = {
                     {% if battle %}battleId: '{{ battle.id }}'{% endif %}
                 };
@@ -66,11 +69,14 @@
             {% endblock %}
             </script>
 
-            {% if battle %}
+
             <script type="text/javascript">
+
                 $(document).ready(function() {
 
+                    fswars.initialize_waiting_screen();
 
+                    {% if battle %}
                     // prevent enter from sending forms
                     $('input, form').keypress(function(e) {
                         if(e.keyCode === 13) {
@@ -87,13 +93,14 @@
                     send_chat = function(message) {
                         var data = {'command': 'updateChat',
                                     'message': '{{request.user}}: '+message};
-                        $.post('{% url wars:browser2browser battle.id %}',
-                                {message: JSON.stringify(data)});
+                        fswars.browser2browser({{battle.id}}, data);
                     };
+                    {% endif %}
 
                 });
+
             </script>
-            {% endif %}
+
 
             <script type="text/javascript" src="{{ STATIC_URL }}js/comet.js"></script>
 
@@ -119,7 +126,12 @@
                 {% block header %}
                 <!--  img height="80px" src="{{ STATIC_URL }}images/freesound_logo2.png" -->
                 <div class="header_title">
-                Battle #{{ battle.id }}: <span class="player1_name">{{ battle.player1 }}</span> <em>v.s.</em> <span class="player2_name">{{ battle.player2 }}</span>
+                    <div id="loading_animation_wrapper">
+                        <img id="loading_animation"
+                             src="{{ STATIC_URL }}images/ajax-loader.gif" />
+                    </div>
+                    Battle #{{ battle.id }}: <span class="player1_name">{{ battle.player1 }}</span> <em>v.s.</em> <span class="player2_name">{{ battle.player2 }}</span>
+                    <span id="game_status_line"></span>
                 </div>
 
                 {% endblock header %}
@@ -150,6 +162,8 @@
             </div>
             {% endif %}
         {% endblock body %}
+
+        <div id="waiting_screen"></div>
     </body>
 
 </html>

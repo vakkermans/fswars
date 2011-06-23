@@ -37,11 +37,12 @@
 
     var presets = {{ presets|safe }};
     var battle;
-    var myPlayer = "{{ my_nickname }}";
+    var uuid = "{{ request.uuid }}";
     var selectedSounds = [0,0]
     var selectedPreset;
 
     $(document).ready(function(){
+        $('#result').hide();
         apiKey = settings.apiKey;
         if(apiKey == "") {
             alert("no KEY!");
@@ -58,6 +59,12 @@
         return function() {
             selectedSounds[player-1] = soundId;
             $('.sound_description').removeClass('selected'+player);
+            var data = {'command': 'updateSelection',
+                        'removeSelector': '.sound_description',
+                        'sender': uuid,
+                        'selector': $(this).getPath(),
+                        'classToAdd': 'selected'+player};
+            fswars.browser2browser({{battle.id}}, data);
             $(this).addClass('selected'+player);
             isReadyToFight();
         };
@@ -118,10 +125,12 @@
             $('.selected2').parent().hide(500);
             selectedSounds[0] = selectedSounds[1] = 0;
             selectedPreset = null;
+            fswars.activate_waiting_screen('Calculating battle score..');
         }
     }
 
     function isReadyToFightTest() {
+        $('#result').hide(300);
         return selectedPreset &&
                selectedSounds[0] != 0 &&
                selectedSounds[1] != 0
@@ -133,80 +142,6 @@
         }
     }
 
-    /*
-    function battleStatus() {
-        var sURL = "/battle/" + battleObj['id'] +"/status/";
-        var parsed;
-        var turnPlayerNick
-        var player_num = (myPlayer == battleObj['player1']) ? 1 : 2;
-        $.get(sURL, function(data) {
-                parsed = jQuery.parseJSON(data);
-                if (parsed['turn_owner'] == player_num) {
-                    removeScreen();
-                } else {
-                    coverScreen();
-                }
-                updateAfterBattle(parsed);
-            });
-    }*/
-
-    function updateAfterBattle(battle_result) {
-        var last_round = battle_result['history'][battle_result['history'].length-1];
-        if ($("#result").html() != "") {
-            $("#result").html(findWinnerAndPoints(last_round));
-        }
-        // remove div with played sounds
-        $("#"+ last_round[0]+"_1").remove();
-        $("#"+ last_round[1]+"_2").remove();
-        $("#"+ last_round[2]).remove();
-    }
-
-
-    function findWinnerAndPoints(last_round) {
-        var sResult = "And the winner is... ";
-        if (last_round[3] == 1) {
-            sResult += battleObj['player1'];
-        } else {
-            sResult += battleObj['player2'];
-        }
-        sResult += " with " + last_round[4] + " points!!!";
-        return sResult;
-    }
-
-    function coverScreen() {
-        //Get the A tag
-        var id = "cover";
-
-        //Get the screen height and width
-        var maskHeight = $(document).height();
-        var maskWidth = $(window).width();
-
-        //Set heigth and width to mask to fill up the whole screen
-        $('#mask').css({'width':maskWidth,'height':maskHeight});
-
-        //transition effect
-        $('#mask').fadeIn(1000);
-        $('#mask').fadeTo("slow",0.8);
-
-        //Get the window height and width
-        var winH = $(window).height();
-        var winW = $(window).width();
-
-        //Set the popup window to center
-        $(id).css('top',  winH/2-$(id).height()/2);
-        $(id).css('left', winW/2-$(id).width()/2);
-
-        //transition effect
-        $(id).fadeIn(2000);
-        $(id).html("Your opponent is preparing for attack...");
-    }
-
-    function removeScreen() {
-        $('#mask').hide();
-        $('.window').hide();
-    }
-
-
     </script>
 {% endblock %}
 
@@ -214,13 +149,34 @@
 {% block comet_handler %}
 
 function page_comet_handler(update) {
-    if('command' in update &&
-       update.command == 'updateBattleStatus' &&
-       battle == null) {
-           console.debug('initializing battle');
-        battle = update.battle;
-        console.debug(battle);
-        populate(battle);
+    if('command' in update) {
+        if (update.command == 'updateBattleStatus') {
+            if (battle == null) {
+                battle = update.battle;
+                console.debug(battle);
+                populate(battle);
+            } else {
+                fswars.deactivate_waiting_screen();
+                battle = update.battle;
+                if(battle.finished) {
+                    $('#maincontainer').html('<div id="#continue_link"><center>' +
+                        'Continue to <a href="{% url wars:result battle.id %}">' +
+                        'results</a></center></div>');
+                }
+                lastRound = battle.rounds.last();
+                $('#winner').text(lastRound.winner == 1 ? battle.player1 : battle.player2);
+                $('#points').text(lastRound.winner == 1 ? lastRound.player1_points : lastRound.player2_points);
+                $('#result').show(500);
+            }
+        } else if (update.command == 'updateSelection' &&
+                   update.sender != uuid) {
+            console.debug('setting selection')
+            console.debug(update.sender);
+            console.debug(uuid);
+            console.debug($(update.selector));
+            $(update.removeSelector).removeClass(update.classToAdd);
+            $(update.selector).addClass(update.classToAdd);
+        }
     }
 };
 
@@ -228,14 +184,26 @@ function page_comet_handler(update) {
 
 
 {% block content %}
-<p><h2>Warrior: {{my_nickname}}</h2></p>
-<center><h1><div id="result"></div></h1></center>
-<div id="status"></div>
-<br />
+
+<br><br><br>
+
+<center>
+    <h1>
+        <div id="result">
+            <span id="winner"></span> won the last round with
+            <span id="points"></span> points.
+        </div>
+    </h1>
+</center>
+
+<br>
+
 <div id="fight" style="display: none;">
     <center><h1><a href="#" onclick="fight()"><img src="{{ STATIC_URL}}images/fight.png" /></a></h1></center>
 </div>
-<br />
+
+<br>
+
 <div id="maincontainer">
 
     <div id="leftcolumn" class="battlecolumn">
@@ -254,16 +222,6 @@ function page_comet_handler(update) {
     </div>
 
     <br style="clear: both;" />
-</div>
-
-<div id="boxes">
-    <div id="dialog" class="window">
-        Simple Modal Window |
-        <a href="#"class="close"/>Close it</a>
-        <p>Anything can go Here</p>
-    </div>
-<!-- Mask to cover the whole screen -->
-  <div id="mask"></div>
 </div>
 
 

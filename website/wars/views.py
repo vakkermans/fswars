@@ -167,7 +167,7 @@ def fight(request, battle_id, id1, id2, preset):
     battle_round.player2_sound = int(id2)
     battle_round.winner = battle_result['winner']
     # TODO: add previous points
-    if battle.player1 == battle_round.winner:
+    if battle_round.winner == 1:
         battle_round.player1_points = battle_result['points']
         battle_round.player2_points = 0
     else:
@@ -183,14 +183,12 @@ def fight(request, battle_id, id1, id2, preset):
     return HttpResponse('update through comet')
 
 
-def calculate_final_scores(history):
+def calculate_final_scores(battle):
     player1 = 0
     player2 = 0
-    for i in range(len(history)):
-        if history[i][3] == 1:
-            player1 += history[i][4]
-        else:
-            player2 += history[i][4]
+    for round in battle.rounds.all():
+        player1 += round.player1_points
+        player2 += round.player2_points
     return player1, player2
 
 
@@ -203,8 +201,8 @@ def battle_status(request, battle_id):
 @auth()
 def battle_result(request, battle_id):
     battle = get_object_or_404(Battle, id=battle_id)
-    history = json.loads(battle.history) if battle.history and battle.history != '' else []
-    scores = calculate_final_scores(history)
+    battle_json = battle.to_json()
+    scores = calculate_final_scores(battle)
     return rtr('wars/battle_result.html')
 
 

@@ -56,9 +56,4 @@ urlpatterns = patterns('',
         browser2browser,
         name='browser2browser'),
 
-#     render sounds
-#    url(r'^battle/render-sound/(?P<sound_id>\d+)/$',
-#        render_sound,
-#        name='browser2browser'),
-
 )
